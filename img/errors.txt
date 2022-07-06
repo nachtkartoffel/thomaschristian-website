@@ -1,0 +1,18 @@
+[2020-8-18 08:36:50] layer "02-03_img.jpng": Unsupported extension: jpng
+[2020-8-18 08:36:50] layer "intro-img.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "intro-txt.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "butter-cta.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "head-ll.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "adresse.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "katzenbild.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "txt-ll.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "02-01_img.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "02-txt.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "02-03_img.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "02-2_img.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "03-01_alma.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "03-02.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "03-03_filme.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "04_bg.jpg copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "explain-end.png copy": Expected end of input but "c" found.
+[2020-8-18 08:36:50] layer "kompass.jpg copy": Expected end of input but "c" found.
