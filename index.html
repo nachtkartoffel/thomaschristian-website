@@ -1,0 +1,176 @@
+<html lang="de">
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<title>Hi, na!</title>
+
+<style type="text/css">
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  overflow: hidden;
+background: #f44e52;
+        color: #1f194a !important; 
+    text-align: center;
+    
+}
+html:hover span, body:hover span {
+
+}
+
+canvas {
+  cursor: crosshair;
+        color: #1f194a;
+}
+
+span {
+  font-family: 'Georgia', cursive;
+  font-size: 40px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  color: #000;
+  margin-top: -40px;
+  margin-left: -200px;
+    color: #1f194a;
+}
+    
+    
+</style>
+<script type="text/javascript">
+<!--
+if (screen.width <= 1024) {
+document.location = "mobile/m-index.html";
+}
+//-->
+</script>
+</head>
+
+    
+<body>
+<canvas id='canvas'></canvas>
+<span id='info'>Klicken und Ziehen!</span>
+    
+    
+<script type="text/javascript">
+
+
+// Application variables
+var position = {x: 0, y: window.innerHeight/2};
+var counter = 0;
+var minFontSize = 10;
+var angleDistortion = 0;
+var letters = "Hi, ich bin Thomas. Diese Website erzählt dir meine wichtigsten Stationen in meiner beruflichen Laufbahn. Let's go:      Geboren am: 31.08.1991 in Andernach      2009-2011 Fachhochschulreife im Bereich Mediengestaltung und Medienmanagement      2011-2013 Ausbildung als Mediengestalter Digital und Print - head:mark      2013-2014 Grafikdesigner und Projektmanager - German Print Group      2015-2016 UX-Designer devion GmBH      2016-2018      Junior Art Director - Davies Meyer      2018-2020 Art Director - 247GRAD      seit Juni 2020 Creative Director - 247GRAD            PS: Du kannst dir dieses Bild auch einfach, mit einem Rechtsklick, speichern. Danke fürs zuhören.";
+
+// Drawing variables
+var canvas;
+var context;
+var mouse = {x: 0, y: 0, down: false}
+
+function init() {
+  canvas = document.getElementById( 'canvas' );
+  context = canvas.getContext( '2d' );
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  
+  canvas.addEventListener('mousemove', mouseMove, false);
+  canvas.addEventListener('mousedown', mouseDown, false);
+  canvas.addEventListener('mouseup',   mouseUp,   false);
+  canvas.addEventListener('mouseout',  mouseUp,  false);  
+  canvas.addEventListener('dblclick', doubleClick, false);
+  
+  window.onresize = function(event) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+}
+
+function mouseMove ( event ){
+  mouse.x = event.pageX;
+  mouse.y = event.pageY;
+  draw();
+}
+
+function draw() {
+ if ( mouse.down ) {
+    var d = distance( position, mouse );
+    var fontSize = minFontSize + d/2;
+    var letter = letters[counter];
+    var stepSize = textWidth( letter, fontSize );
+    
+    if (d > stepSize) {
+      var angle = Math.atan2(mouse.y-position.y, mouse.x-position.x);
+      
+      context.font = fontSize + "px Georgia";
+    
+      context.save();
+      context.translate( position.x, position.y);
+      context.rotate( angle );
+      context.fillText(letter,0,0);
+      context.restore();
+
+      counter++;
+      if (counter > letters.length-1) {
+        counter = 0;
+      }
+    
+    //console.log (position.x + Math.cos( angle ) * stepSize)
+      position.x = position.x + Math.cos(angle) * stepSize;
+      position.y = position.y + Math.sin(angle) * stepSize;
+
+      }
+  }     
+}
+
+function distance( pt, pt2 ){
+  
+  var xs = 0;
+  var ys = 0;
+ 
+  xs = pt2.x - pt.x;
+  xs = xs * xs;
+ 
+  ys = pt2.y - pt.y;
+  ys = ys * ys;
+ 
+  return Math.sqrt( xs + ys );
+}
+
+function mouseDown( event ){
+  setTimeout(1000);  
+  mouse.down = true;
+  position.x = event.pageX;
+  position.y = event.pageY;
+  
+  document.getElementById('info').style.display = 'none';
+}
+
+
+function mouseUp( event ){
+    mouse.down = false;
+    
+}
+
+function doubleClick( event ) {
+  canvas.width = canvas.width; 
+}
+
+function textWidth( string, size ) {
+  context.font = size + "px Georgia";
+  
+  if ( context.fillText ) {
+    return context.measureText( string ).width;
+  } else if ( context.mozDrawText) {
+    return context.mozMeasureText( string );
+  }
+  
+ };
+
+init();    
+</script>
+    
+    <!-- Hi, ich bin Thomas schön, dass du da bist. Ich bin 31.08.1991 in Andernach geboren und aufgewachsen. Ich erzähle dir auf dieser Website meinen Werdegang im Design und wünsche dir viel Spaß dabei! 2011 habe ich mein Fach-Abi im Bereich Mediengestaltung und Medienmanagement abgeschlossen. Anschließend, habe ich direkt mit einer Ausbildung als Mediengestalter Digital und Print weitergemacht. 2013 habe ich diese erfolgreich abgeschlossen. So ganz genau wusste ich damals nicht, in welche Richtung ich weitermarschieren möchte. 2013 habe ich zunächst als Grafikdesigner bei der German Print Group gearbeitet. Ja, das klingt genauso uninteressant, wie es war. 2015 bin ich vollständig in den digitalen Bereich wechselt und arbeitete als UX-Designer bei devion, einer Agentur in Andernach. Und was soll ich sagen? Genau das, war mein Ding! Ich bin fasziniert gewesen ... 2016 wechselte ich daher zu Davies Meyer als Junior Art Director nach Hamburg gezogen, um meinen Horizont noch weiter zu skalieren. 2018 habe ich den Junior gestrichen und bei 247GRAD angefangen. Seit Juni 2020 bin ich in der Position des Creative Directors bei 247GRAD. In der Zwischenzeit habe ich auch meinen Medienfachwirt in der Abendschule gemacht. Das ist sowas ähnliches wie ein Bachelor, zumindest hat mir die IHK das so verkauft. Was als nächstes kommen wird? Wer weiß, wer weiß ...                             PS: Du kannst dir dieses Bild auch einfach, mit einem Rechtsklick, speichern. Danke fürs zuhören.
+--> 
+</body>
+</html>
