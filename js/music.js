@@ -42,7 +42,7 @@
     if (!isPlaying) {
       // console.log('play');
       e.target.src =
-      "svg/pause.svg";
+      "SVG/pause.svg";
       e.target.alt = "Pause";
       isPlaying = true;
       document.getElementById(currentAudio).play();
@@ -50,7 +50,7 @@
     } else {
       // console.log('pause');
       e.target.src =
-      "svg/play.svg";
+      "SVG/play.svg";
       e.target.alt = "Play";
       document.getElementById(currentAudio).pause();
       isPlaying = false;
