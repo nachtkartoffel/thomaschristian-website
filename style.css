@@ -193,7 +193,7 @@ box-shadow: 6px 6px 0px 5px #1C2621;
 }
 
 .ordner-nudes {
-
+z-index:12;
 	background-color: #FCF2E0;
 	border-radius: 8px;
 	border-style: solid;
@@ -428,7 +428,10 @@ li {
 	.hidemobile
 	{display: none;}
 }
-
+button {
+	color: #1C2621;
+	
+}
 
 canvas {
 	  cursor: url("brush.png"), pointer !important;
