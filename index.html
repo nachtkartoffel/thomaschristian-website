@@ -96,8 +96,8 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 	
 <!-- COMPUTER INFO --> 
-<div id="dragMe" style="display: none;" class="ordner-computer ">
-<div id="" class="ordner-head draggable"><div class="symbols" onClick="hideComputer()"></div>
+<div id="dragMe" style="display: none; position: absolute;" class="draggable ordner-computer ">
+<div id="dragMe-Zone" class="ordner-head"><div class="symbols" onClick="hideComputer()"></div>
 <div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
 <h5 class="mover">Über diesen Computer</h5></div></div>
 <div class="computer-content">
@@ -131,8 +131,8 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 <!-- END OF COMPUTER INFO -->
 	
 <!-- START FOLDER -->	
-<div id="dragMe-Doc" class="ordner-nudes size-medium" style="display:none;">
-<div class="ordner-head" style="">
+<div id="dragMe-Doc" class="ordner-nudes size-medium draggable" style="display:none; position: absolute;">
+<div id="dragMe-Doc-Zone" class="ordner-head" style="">
 	<div class="symbols" onClick="hideDocuments()"></div>
 	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
 	<h5 class="mover">MyNudes</h5></div></div>
@@ -152,7 +152,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 		
 <!-- START IMAGE -->	
-<div id="dragMe-IMG" class="ordner-computer" style="width:480px; height:auto; margin-left: 80px; margin-top:80px; overflow: hidden; z-index:200; display:none;">
+<div id="dragMe-IMG" class="draggable ordner-computer" style="width:480px; height:auto; margin-left: 80px; margin-top:80px; overflow: hidden; z-index:200; display:none;">
 <div class="ordner-head"><div class="symbols" onClick="hideSelfie()"></div><div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; "><h5 class="mover">Selfie.jpg</h5></div></div>
 
 
@@ -166,7 +166,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 	
 
-	<div id="dragMe-WARNING" class="ordner-nudes size-small" style="display: none;">
+	<div id="dragMe-WARNING" class="draggable ordner-nudes size-small" style="display: none;">
 <div class="ordner-head" style="">
 	<div class="symbols" onClick="hideWarning()"></div>
 	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
@@ -185,7 +185,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 <!--  spottify -->
 
-        <div id="dragMe-MUSIC" class="music-container" style="display: none;">
+        <div id="dragMe-MUSIC" class="draggable music-container" style="display: none;">
 			<div id="" class="ordner-head draggable"><div class="symbols" onClick="hideMusic()"></div>
 <div style=" width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center;">
 <h5 class="mover" style="margin-left:-26px;">Spotify</h5></div></div>
@@ -236,7 +236,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 	
 <!-- START Lebenslauf -->	
-<div id="lebenslauf" class="ordner-nudes " style="display: none;">
+<div id="lebenslauf" class="draggable ordner-nudes " style="display: none; position: absolute; z-index:10;">
 <div class="ordner-head" style="">
 	<div class="symbols" onClick="hideLebenslauf()"></div>
 	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
@@ -280,7 +280,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 
 
 <!-- START FOLDER -->	
-<div id="designercc" class="ordner-nudes size-medium" style="display:none; margin-left: 200px; margin-top:20px; width:800px; height:600px;">
+<div id="designercc" class="draggable ordner-nudes size-medium" style="display:none; margin-left: 200px; margin-top:20px; width:800px; height:600px;">
 <div class="ordner-head" style="">
 	<div class="symbols" onClick="hideDesigner()"></div>
 	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
@@ -371,6 +371,7 @@ function hideNotification() {
 </script>	
 
 </main><script type="text/javascript" src="js/dragqueen-one.js"></script>
+
 	<script type="text/javascript" src="js/music.js"></script>
 		<script type="text/javascript" src="js/painter.js"></script>
 </body>
