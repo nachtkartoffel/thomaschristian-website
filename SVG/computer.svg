@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_3" data-name="Ebene 3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.76 233.76">
+  <defs>
+    <style>
+      .cls-1, .cls-2, .cls-3 {
+        fill: #fcf4e4;
+      }
+
+      .cls-4, .cls-5 {
+        fill: #353230;
+      }
+
+      .cls-5 {
+        font-family: Roboto-Medium, Roboto;
+        font-size: 28px;
+        font-weight: 500;
+      }
+
+      .cls-2 {
+        stroke-linecap: round;
+      }
+
+      .cls-2, .cls-3 {
+        stroke: #353230;
+        stroke-linejoin: round;
+        stroke-width: 4px;
+      }
+    </style>
+  </defs>
+  <text class="cls-5" transform="translate(20.22 217.62)"><tspan x="0" y="0">Mein Computer</tspan></text>
+  <g>
+    <polygon class="cls-4" points="189.8 95.45 197.82 95.45 197.82 133.48 156.1 174.67 155.48 160.97 176.91 112.3 189.8 95.45"/>
+    <polyline class="cls-3" points="176.91 140.89 176.91 112.3 52.25 112.3 52.25 140.89"/>
+    <g>
+      <polygon class="cls-1" points="33.65 160.32 51.08 142.89 174.08 142.89 156.65 160.32 33.65 160.32"/>
+      <path class="cls-4" d="m169.25,144.89l-13.43,13.43H38.47l13.43-13.43h117.35m9.66-4H50.25l-21.43,21.43h128.66l21.43-21.43h0Z"/>
+    </g>
+    <polyline class="cls-3" points="30.82 162.32 30.82 172.97 155.48 172.97 155.48 162.32"/>
+    <path class="cls-4" d="m80.54,7.76h102.21c4.14,0,7.5,3.36,7.5,7.5v83.41h-117.21V15.26c0-4.14,3.36-7.5,7.5-7.5Z"/>
+    <path class="cls-3" d="m66.85,21.39h102.31c4.11,0,7.45,3.34,7.45,7.45v83.47H59.41V28.83c0-4.11,3.34-7.45,7.45-7.45Z"/>
+    <polygon class="cls-4" points="61.12 21.33 75.78 9.46 97.06 11.17 75.35 21.55 61.12 21.33"/>
+    <line class="cls-2" x1="62.46" y1="128" x2="68.58" y2="128"/>
+    <line class="cls-2" x1="132.86" y1="128" x2="162.82" y2="128"/>
+    <polygon class="cls-4" points="183.33 92.06 176.91 96.74 176.62 112.3 193.27 109.6 186.84 92.06 183.33 92.06"/>
+    <rect class="cls-3" x="72.88" y="33.32" width="90.27" height="66.98"/>
+    <rect class="cls-3" x="104.14" y="45.21" width="42.85" height="29.86"/>
+    <rect class="cls-3" x="88.33" y="58.56" width="42.85" height="29.86"/>
+  </g>
+</svg>

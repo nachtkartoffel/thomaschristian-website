@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_2" data-name="Ebene 2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 186.91 37.26">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fcf2e0;
+        stroke: #2e2c2b;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 2px;
+      }
+
+      .cls-2 {
+        fill: #2e2c2b;
+        font-family: Roboto-LightItalic, Roboto;
+        font-size: 17.11px;
+        font-style: italic;
+        font-weight: 300;
+      }
+    </style>
+  </defs>
+  <g id="Ebene_3" data-name="Ebene 3">
+    <g>
+      <rect class="cls-1" x="1" y="1" width="184.91" height="35.26" rx="4" ry="4"/>
+      <text class="cls-2" transform="translate(13.24 24.44)"><tspan x="0" y="0">Nichts zum Suchen ...</tspan></text>
+    </g>
+  </g>
+</svg>

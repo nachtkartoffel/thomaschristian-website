@@ -1,494 +1,376 @@
 <!doctype html>
 <html>
+
 <head>
 <meta charset="UTF-8">
-<title>My CV Periodic Table</title>
+<title>Unbenanntes Dokument</title>
+<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="music.css">
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-<style> 
-body {
-  background: #202e38;
-  font-family: "Poppins", sans-serif;
-}
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,400;0,500;0,700;1,300;1,500;1,700&display=swap" rel="stylesheet">
 
-h1 {
-  margin: 2em auto 0;
-  font: 700 3em "Poppins", sans-serif;
-  color: #f1f5f6;
-  text-align: center;
-}
 
-h5 {
-  margin: 0 auto 2em;
-  font: 400 1.2em "Poppins", sans-serif;
-  color: #f1f5f6;
-  text-align: center;
-}
+	</head>
 
-a {
-  text-decoration: none;
-}
-.empty {
-		visibility: hidden;
-	}
+<body><div id="loading" class="hideMe"> 
+	<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+<lottie-player id="hideMe" src="https://thomaschristian.info/lade-bg.json"  background="transparent"  speed="1"  style="width: 100%; height: 100%;"    autoplay></lottie-player></div>
+	
+	<div style="position: absolute; width:100%; height:100%;  margin-top:-16px; background-image: url('noise.jpg'); background-size:cover; opacity: 0.05; pointer-events: none; z-index:99; mix-blend-mode: hard-light; "></div>
+<main>
+<nav>
+<div class="sub-nav"> <img src="SVG/logo-start.svg" style="height:40%; width:auto; align-self: center;">
+<ul class="hidemobile">
+	<li class="navi">Start</li>
+	<li class="navi">Datei</li>
+	<li class="navi">Fenster</li>
+	<li class="navi">Enjoy</li>
+</ul></div>
+	
+	<div class="sub-nav" style="text-align: center; align-items: center; justify-content: center;">
+	
+	<ul>
+	<li class="navi">home / usr / thomas </li>	
+	</ul>
+	
+	</div>
+	
+	<div class="sub-nav" style="justify-content: flex-end;">
+	<script type="text/javascript">
+		
+		// Inspired By: tinyurl.com/y7ls5d72
+
+var currDate = new Date();
+var month = currDate.getMonth() + 1;
+var day = currDate.getDate();
+var year = currDate.getFullYear();
+var hour = currDate.getHours();
+var min = currDate.getMinutes();
+var second = currDate.getSeconds();
+if (day < 10) day = '0' + day;
+
+if (month < 10) month = '0' + month;
+
+if (min < 10) min = '0' + min;
+
+if (second < 10) second = '0' + second;
+
+if (hour < 12) var dayNight = ' ';
+else var dayNight = ' ';
+
+
+
+readableDate = day + '.' + month + '.' + year + ' ' + 'um ' + hour + ':' + min + ':' + second + ' ' + dayNight;
+
+// document.write(month + '-' + day + '-' + year + ' ' + 'at ' + hour + ':' + min + ':' + second + ' ' + dayNight);
+
+document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul></li>');
+		
+		</script>
+	
+	</div>
+	
+</nav>
+
+<div id="meldung" class="notification" style="z-index: 500;"><img class="system-icon" src="SVG/system.svg"><p class="small-txt"><b>Wartung des Systems ausbleibend</b><br />Dieses System wurde von einem Designer erstellt und nicht sorgfältig gewartet. Etwaige Fehlermeldungen und Unsauberkeiten sind daher normal.</p><button class="small-txt small-button" onClick="hideNotification()">Okay -.-</button></div>	
+	
+<div class="wrapper-main">
+
+	<div class="icons"><img class="img-icon" src="SVG/computer.svg" onClick="showComputer()"></div>
+		<div class="icons"><img class="img-icon" src="SVG/folder.svg" onClick="showDocuments()"></div>
+			<a href="https://www.youtube.com/watch?v=VFZquMoWtu0" target="_blank"> <div class="icons"><img class="img-icon" src="SVG/showreel.svg"></div></a>
+				<a href="https://mehralsliebe.info" target="_blank"><div class="icons"><img class="img-icon" src="SVG/portfolio.svg"></div></a>
+				<div class="icons"><img class="img-icon" src="SVG/passwort.svg" onClick="showWarning()"></div>
+					<div class="icons"><img class="img-icon" src="SVG/playlist.svg" onClick="showMusic()"></div>
+					<div class="icons"><img class="img-icon" src="SVG/designerscc.svg" onClick="showDesigner()"></div>
+	<div class="icons"><img class="img-icon" src="SVG/lebenslauf.svg" onClick="showLebenslauf()"></div>
+
+		
+</div>	
+	<div class="wrapper-main bottom">		<img class="img-icon" src="SVG/papierkorb.svg"></div>
 	
 	
 	
-@media (max-width: 800px) {
-	.empty {
-		display: none;
-	}
-
 	
-	
-	
-	}
-aside.context {
-  text-align: center;
-  color: #fff;
-  line-height: 1.6;
-}
-aside.context a {
-  text-decoration: none;
-  color: #fff;
-  padding: 3px 0;
-  border-bottom: 1px dashed;
-}
-aside.context .explanation {
-  max-width: 700px;
-  margin: 4em auto 0;
-}
+<!-- COMPUTER INFO --> 
+<div id="dragMe" style="display: none;" class="ordner-computer ">
+<div id="" class="ordner-head draggable"><div class="symbols" onClick="hideComputer()"></div>
+<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
+<h5 class="mover">Über diesen Computer</h5></div></div>
+<div class="computer-content">
+<hr>
+<img style="width: 50%; height:auto; margin: 12px;" src="SVG/pc-illu.svg">
+<h4>Macindows OSXP</h4>
+<p class="subline">Version 31.41941 ...</p>
+	 
+<a href="https://medium.com/@thomaschristianbusenkell" target="_blank"><button>Updates und mehr updates ...</button></a>
 
-footer {
-  text-align: center;
-  margin: 2em auto;
-  width: 100%;
-}
-footer a {
-  text-decoration: none;
-  display: inline-block;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  background: transparent;
-  border: 1px dashed #fff;
-  color: #fff;
-  margin: 5px;
-}
-footer a:hover {
-  background: rgba(255, 255, 255, 0.1);
-}
-footer a .icons {
-  margin-top: 12px;
-  display: inline-block;
-  font-size: 20px;
-}
-
-.periodic-table {
-  display: flex;
-	flex-wrap: wrap;
-  grid-template-columns: repeat(9, 100px);
-  grid-template-rows: repeat(4, 100px);
-  grid-gap: 10px;
-  margin: auto;
- width:80%;  justify-content: center;
-}
-
-.periodic-element {
-	cursor: pointer;
-  padding: 4px;
-	width:100px;
-	height: 100px;
-	min-width: 100px;
-	max-width: 100px;
-	max-height: 100px;
-	min-height: 100px;
-  position: relative;
-  z-index: 1;
-  cursor: default;
-  transition: all 0.3s ease;
-}
-.periodic-element .periodic-element-inner {
-  background: #202e38;
-  padding: 10px 15px;
-  width: calc(100% - 30px);
-  height: calc(100% - 20px);
-  transition: inherit;
-}
-.periodic-element .title {
-  font: 700 30px/1.2 "Poppins", sans-serif;
-  margin: 0.2em 0 0;
-  transition: 0.8s ease 600ms;
-}
-.periodic-element .description {
-  font: 500 12px "Poppins", sans-serif;
-	line-height: 14px;
-  margin-top: 0.2em;
-}
-.periodic-element:after {
-  z-index: 10;
-  content: attr(data-description);
-  background: #f9f8f7;
-  color: #333;
-  width: 180px;
-  position: absolute;
-  top: 80%;
-  opacity: 0;
-  transition: opacity 0.3s ease 0.3s, top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
-  height: auto;
-  font-size: 12px;
-  line-height: 1.4;
-  padding: 10px;
-  margin: 0 0 0 -50px;
-  border-radius: 6px;
-  text-align: center;
-}
-.periodic-element:hover {
-  transform: scale(1.12);
-  z-index: 10;
-}
-.periodic-element:hover .periodic-element-inner {
-  background: transparent;
-}
-.periodic-element:hover .title,
-.periodic-element:hover .description {
-  -webkit-text-fill-color: #222;
-}
-.periodic-element:hover:after {
-  top: 105%;
-  opacity: 1;
-}
-
-a.periodic-element {
-  cursor: pointer;
-}
-
-.social-media {
-  background: linear-gradient(to bottom right, #f3f9a6 0%, #cbc634 100%);
-}
-.social-media .title,
-.social-media .description {
-  background: -webkit-linear-gradient(#f3f9a6, #cbc634);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.fun-stuff {
-  background: linear-gradient(to bottom right, #ff616d 0%, #ffc171 100%);
-}
-.fun-stuff .title,
-.fun-stuff .description {
-  background: -webkit-linear-gradient(#ff616d, #ffc171);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.just-trying {
-  background: linear-gradient(to bottom right, #37cfdc 0%, #5a88e5 100%);
-}
-.just-trying .title,
-.just-trying .description {
-  background: -webkit-linear-gradient(#37cfdc, #5a88e5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.intense-work {
-  background: linear-gradient(to bottom right, #58ac30 0%, #a7df62 100%);
-}
-.intense-work .title,
-.intense-work .description {
-  background: -webkit-linear-gradient(#58ac30, #a7df62);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.legend-table {
-  padding: 15px;
-  text-align: center;
-  font-size: 15px;
-  margin: 2em auto 0;
-}
-.legend-table__marker {
-  width: 25px;
-  height: 25px;
-  margin: 5px 5px 10px;
-  display: inline-block;
-  vertical-align: middle;
-  box-shadow: 0.5px 1px rgba(0, 0, 0, 0.15);
-}
-.legend-table__text {
-  display: inline-block;
-  vertical-align: middle;
-  margin: 0 25px 5px 5px;
-  background: -webkit-linear-gradient(#ccc, #eee);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.legend-table__direction {
-  display: inline-block;
-  margin: 10px 15px 10px 10px;
-  background: -webkit-linear-gradient(#ccc, #eee);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.empty-spacer-1 {
-  grid-column: 3/span 4;
-  grid-row: 1;
-}
-.empty-spacer-2 {
-  grid-column: 1;
-  grid-row: 4;
-}
-	
-</style>	
-	
-</head>
-
-<body>
-	
-	
-<h1>My CV Periodic Table</h1>
-<h5>How I waste my time developing new skills.</h5>
-<div class="periodic-table">
-
-	<a href="https://www.facebook.com/thmsbsk/" target="_blank"> <div class="periodic-element social-media" data-description="Only so I don't miss out on my friends' milestones 🤷" >
-    <div class="periodic-element-inner">
-      <div class="title">Fb</div>
-      <div class="description">Facebook</div>
-    </div>
-  </div></a>
-  <div class="periodic-element fun-stuff" data-description="I have zero cooking skills, so I watch cooking videos and never try cooking for real 🍳">
-    <div class="periodic-element-inner">
-      <div class="title">Ck</div>
-      <div class="description">Cooking</div>
-    </div>
-  </div>
- <a class="periodic-element social-media" data-description="I'm only on here to reject invitations 😂" href="https://www.linkedin.com/in/thomas-christian-06b734163/"  target="_blank">
-    <div class="periodic-element-inner">
-      <div class="title">Li</div>
-      <div class="description">LinkedIn</div>
-    </div>
-  </a>
-<div class="periodic-element social-media empty" data-description=" " >
-    <div class="periodic-element-inner">
-      <div class="title"> </div>
-      <div class="description"> </div>
-    </div>
-  </div>
-<div class="periodic-element social-media empty" data-description=" " >
-    <div class="periodic-element-inner">
-      <div class="title"> </div>
-      <div class="description"> </div>
-    </div>
-  </div>
-<div class="periodic-element social-media empty" data-description=" " >
-    <div class="periodic-element-inner">
-      <div class="title"> </div>
-      <div class="description"> </div>
-    </div>
-  </div>
-<div class="periodic-element social-media empty" data-description=" " >
-    <div class="periodic-element-inner">
-      <div class="title"> </div>
-      <div class="description"> </div>
-    </div>
-  </div>
-	
-	
-  <a class="periodic-element social-media" data-description="Looking at amazing Dribbble 🏀 shots and internally die from the amount of talent/skill out there" href="https://dribbble.com/nachtkartoffel1"  target="_blank">
-    <div class="periodic-element-inner">
-      <div class="title">Db</div>
-      <div class="description">Dribbble</div>
-    </div>
-  </a> 
-  <div class="periodic-element intense-work" data-description="First experience on digital development: From 2013 to 2014 I was a UX Designer at devion. 🔥">
-    <div class="periodic-element-inner">
-      <div class="title">De</div>
-      <div class="description">Devion</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="Making custom emojis for Slack 💪🏻">
-    <div class="periodic-element-inner">
-      <div class="title">Sl</div>
-      <div class="description">Slack</div>
-    </div>
-  </div>
-  <div class="periodic-element fun-stuff" data-description="'Wikipedia Wormhole' is a thing. And it is dangerous 🐛">
-    <div class="periodic-element-inner">
-      <div class="title">Wk</div>
-      <div class="description">Wikipedia</div>
-    </div>
-  </div>
-  <a href="https://open.spotify.com/playlist/3lrCZct35C5dz3Mho1bnVc?si=9a2817ff513648bd"  target="_blank"><div class="periodic-element fun-stuff" data-description="Choosing the right playlist. (If my Spotify is working... it's always not working)">
-    <div class="periodic-element-inner">
-      <div class="title">Sp</div>
-      <div class="description">Spotify</div>
-    </div>
-  </div></a>
-	  
-	  
-	  <a class="periodic-element social-media" data-description="If you say something witty, it's going on my Twitter 🐦" href="https://twitter.com/nachtkartoffel" target="_blank">
-    <div class="periodic-element-inner">
-      <div class="title">Tw</div>
-      <div class="description">Twitter</div>
-    </div></a>
-  <div class="periodic-element social-media" data-description="Professional RPG-Watcher right here ✌️">
-    <div class="periodic-element-inner">
-      <div class="title">Tc</div>
-      <div class="description">Twitch</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="Creating GitHub issues, a.k.a. tossing problems which I can solve to the frontend team">
-    <div class="periodic-element-inner">
-      <div class="title">Gt</div>
-      <div class="description">GitHub</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="Trying to fix UX is my main taks and the main reason I toss issues to the team.">
-    <div class="periodic-element-inner">
-      <div class="title">Ux</div>
-      <div class="description">User Experience</div>
-    </div>
-  </div>
-  <div class="periodic-element just-trying" data-description="A skill I'm trying to learn 🎨... and failing to learn 😛">
-    <div class="periodic-element-inner">
-      <div class="title">Il</div>
-      <div class="description">Illustration</div>
-    </div>
-  </div><a class="periodic-element just-trying" data-description="Resident Designer. Keeping the diminishing flame of web design in me alive 🕯️" href="https://tellystats.com" target="_blank">
-    <div class="periodic-element-inner">
-      <div class="title">Te</div>
-      <div class="description">TellyStats</div>
-    </div></a>
-	<div class="periodic-element intense-work" data-description="Currently I'm part of the cosmic gang at SYZYGY and creating digital products as a Creative Director ☄️">
-    <div class="periodic-element-inner">
-      <div class="title">Sy</div>
-      <div class="description">SYZYGY</div>
-    </div>
-  </div>
-  <div class="periodic-element just-trying" data-description="I just need to stop adding items and actually start doing things. Am I the only one who is still using Wunderlist? 😂">
-    <div class="periodic-element-inner">
-      <div class="title">Wu</div>
-      <div class="description">Wunderlist</div>
-    </div>
-  </div>
-  <div class="periodic-element fun-stuff" data-description="Or any animal gifs, basically. 🐈🐕🦊🦔🦉🐍🐬🦄">
-    <div class="periodic-element-inner">
-      <div class="title">Dg</div>
-      <div class="description">Dog Gifs</div>
-    </div>
-	
-  </div>
-	
-	<a class="periodic-element fun-stuff" data-description="Getting distracted by Toggl comics 🙃" href="https://blog.toggl.com" target="_blank">
-    <div class="periodic-element-inner">
-      <div class="title">Tg</div>
-      <div class="description">Toggl Blog</div>
-    </div></a>
-  <div class="periodic-element just-trying" data-description="I google every damn thing. Including movie spoilers. While watching the movie. Yes.">
-    <div class="periodic-element-inner">
-      <div class="title">Gg</div>
-      <div class="description">Google</div>
-    </div>
-  </div><a class="periodic-element just-trying" data-description="I like spreadsheets so I create them for the smallest reasons 🧐" >
-    <div class="periodic-element-inner">
-      <div class="title">Ex</div>
-      <div class="description">Excel</div>
-    </div></a>
-  <div class="periodic-element intense-work" data-description="I worked from 2015 to 2018 at Davies Meyer as an Art Director">
-    <div class="periodic-element-inner">
-      <div class="title">Dm</div>
-      <div class="description">Davies Meyer</div>
-    </div>
-  </div>
-  <div class="periodic-element just-trying" data-description="It's very much not my job, but sometimes I stick my hand into the Coding Projects jar 🍪 anyway">
-    <div class="periodic-element-inner">
-      <div class="title">Cd</div>
-      <div class="description">Coding</div>
-    </div>
-  </div>
-  <div class="periodic-element social-media" data-description="I spend so much time creating issues on this plattform, I decided to style it as a social media platform.">
-    <div class="periodic-element-inner">
-      <div class="title">So</div>
-      <div class="description">Stackoverflow</div>
-    </div>
-  </div>
-  <div class="periodic-element just-trying" data-description="That's my one thing to think creatively and strategically.">
-    <div class="periodic-element-inner">
-      <div class="title">Ch</div>
-      <div class="description">Chess</div>
-    </div>
-  </div><a class="periodic-element social-media" data-description="Fuck this app. It's a terrible love-hate relationship." href="https://www.instagram.com/nachtkartoffel/" target="_blank">
-    <div class="periodic-element-inner">
-      <div class="title">In</div>
-      <div class="description">Instagram</div>
-    </div></a><a class="periodic-element fun-stuff" data-description="Obsessing over musicals and stalking broadway stars is 👏🏻 not 👏🏻 a 👏🏻 crime!" >
-    <div class="periodic-element-inner">
-      <div class="title">Mu</div>
-      <div class="description">Musicals</div>
-    </div></a>
-  <div class="periodic-element fun-stuff" data-description="I learn memes, I make memes, I breathe memes.">
-    <div class="periodic-element-inner">
-      <div class="title">Me</div>
-      <div class="description">Memes</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="Battling double columns in Notion">
-    <div class="periodic-element-inner">
-      <div class="title">No</div>
-      <div class="description">Notion</div>
-    </div>
-  </div>
-  <div class="periodic-element social-media" data-description="Oh my god. Someone please save me from this Reddit hell hole 😭">
-    <div class="periodic-element-inner">
-      <div class="title">Re</div>
-      <div class="description">Reddit</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="Research &amp; Documentation nobody asks for 🤓📝">
-    <div class="periodic-element-inner">
-      <div class="title">Rd</div>
-      <div class="description">Research</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="From 2018 I worked five years as a Creative Director at 247GRAD.">
-    <div class="periodic-element-inner">
-      <div class="title">Gr</div>
-      <div class="description">247GRAD</div>
-    </div>
-  </div>
-  <div class="periodic-element intense-work" data-description="I love to develop creative concepts on communication.">
-    <div class="periodic-element-inner">
-      <div class="title">Cc</div>
-      <div class="description">Creative Campaigns</div>
-    </div>
-  </div>
- <div class="periodic-element just-trying" data-description="Writing is a nice way to let creative flow. I think you can just get better, to read other stories, so I do.">
-    <div class="periodic-element-inner">
-      <div class="title">Bo</div>
-      <div class="description">Books</div>
-    </div>
-  </div>
+<div class="table">
+	<div class="row-left">Prozessor</div>
+	<div class="row-right">Reicht aus</div>
 </div>
-<div class="legend-table">
-  <div class="legend-table__wrapper"><span class="legend-table__marker social-media"></span><span class="legend-table__text">Social Media</span><span class="legend-table__marker intense-work"></span><span class="legend-table__text">Serious Work</span><span class="legend-table__marker just-trying"></span><span class="legend-table__text">Personal Development</span><span class="legend-table__marker fun-stuff"></span><span class="legend-table__text">Fun Stuff</span><br/>
-
-  </div>
+	
+<div class="table">
+	<div class="row-left">Speicher</div>
+	<div class="row-right">Ganz sicher genug</div>
 </div>
-<aside class="context">
-  <div class="explanation">I try to be productive a lot, and I <s>fail</s> learn a lot :)<br/>If you like to collaborate, feel free <a href="mailto:hello@mehralsliebe.info" target="_blank">hello@mehralsliebe.info</a>.</div>
-</aside>
 
+<div class="table">
+	<div class="row-left">Startup Disk</div>
+	<div class="row-right">31 zettabytes of sh*t</div>
+</div>
+	<a href="https://mehralsliebe.info" target="_blank"><button>More usefull stuff ...</button></a>
+<br />
+<p class="subline">TM and &#169; Mehr Als Liebe Corporation 1991-2023. <br />All Lefts Reserverd.</p>
+</div> 
+</div> 
+	
+<!-- END OF COMPUTER INFO -->
+	
+<!-- START FOLDER -->	
+<div id="dragMe-Doc" class="ordner-nudes size-medium" style="display:none;">
+<div class="ordner-head" style="">
+	<div class="symbols" onClick="hideDocuments()"></div>
+	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
+	<h5 class="mover">MyNudes</h5></div></div>
+
+<div class="ordner-head"><img class="ordner-head-img" src="SVG/arrow.svg"><img class="ordner-head-img rotate" src="SVG/arrow.svg"><img class="ordner-head-img" src="SVG/darstellung.svg"> <img class="ordner-head-img" style="justify-content: flex-end;" src="SVG/searchbar.svg"></div>
+<div>
+	
+<hr style="margin-top:12px;">
+<div class="ordner-inhalt">
+	<a href="https://medium.com/@thomaschristianbusenkell/ein-pl%C3%A4doyer-f%C3%BCr-gute-design-absichten-bd89c4a02ad8" target="_blank"><div class="icons"><img class="img-icon" src="SVG/darkpattern.svg"></div></a>
+	<a href="https://www.linkedin.com/pulse/brands-faces-warum-marken-ein-gesicht-zum-verlieben-busenkell/" target="_blank"> <div class="icons"><img class="img-icon" src="SVG/branding.svg"></div></a>
+	<a href="https://medium.com/@thomaschristianbusenkell/wie-geht-eigentlich-kreativit%C3%A4t-5aaf10108d3c" target="_blank"> <div class="icons"><img class="img-icon" src="SVG/kreativitaet.svg"></div></a>
+	<div class="icons"><img class="img-icon" src="SVG/hi.svg" onClick="showSelfie()"></div></div></div>
+
+</div> 
+<!-- END OF FOLDER -->	
+	
+		
+<!-- START IMAGE -->	
+<div id="dragMe-IMG" class="ordner-computer" style="width:480px; height:auto; margin-left: 80px; margin-top:80px; overflow: hidden; z-index:200; display:none;">
+<div class="ordner-head"><div class="symbols" onClick="hideSelfie()"></div><div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; "><h5 class="mover">Selfie.jpg</h5></div></div>
+
+
+<div><hr style="margin-bottom:0px;">
+	<img class="selfie" src="img/hi-image.jpg" style="padding: 0px; margin-bottom:-10px;">
+	</div>
+
+</div> 
+<!-- END OF IMAGE -->	
+	
+	
+	
+
+	<div id="dragMe-WARNING" class="ordner-nudes size-small" style="display: none;">
+<div class="ordner-head" style="">
+	<div class="symbols" onClick="hideWarning()"></div>
+	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
+	<h5 class="mover">Fehlermeldung</h5></div></div>
+
+<div>
+	
+<hr>
+	<div class="center-flex">	<img src="SVG/warning.svg" style="width:60px; height:auto;"><p class="warning">Achtung! Das Speichern von Passwörtern auf dem Desktop ist datenschutzrechtlich nicht cool. Bitte kontaktieren Sie den Adminstrator.</p></div>
+	<div class="ordner-inhalt center-flex">	<button onClick="hideWarning()">Whatever</button><button onClick="mail()">Okay</button></div>
+</div>
+
+</div> 
+	
+	
+	
+<!--  spottify -->
+
+        <div id="dragMe-MUSIC" class="music-container" style="display: none;">
+			<div id="" class="ordner-head draggable"><div class="symbols" onClick="hideMusic()"></div>
+<div style=" width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center;">
+<h5 class="mover" style="margin-left:-26px;">Spotify</h5></div></div>
+          <hr>  <section class="album-cover">
+                
+                <button class="arrow left" id="prev" style="display:none;">
+          
+                </button>
+               
+                
+                <button class="arrow right" id="next" style="display: none;">
+                   
+                </button>
+            </section>
+            <section class="music-player">
+                <h1 class="music-player__title"></h1>
+                <h2 class="music-player__author"></h2>
+                <div class="music-time">
+                    <p class="music-time__current"></p>
+                    <p class="music-time__last"></p>
+                </div>
+                <div class="music-bar" id="progress">
+                    <div id="length"></div>
+                </div>
+                <div class="music-order">
+                    <div class="music-order__loop is-loop" id="loop">
+                        <img src="SVG/repeat.svg" alt="Loop music">
+                    </div>
+                    <div class="music-order__shuffle" id="shuffle">
+                        <img src="SVG/shuffle.svg" alt="Shuffle music">
+                    </div>
+                </div>
+                <div class="music-control" style="margin-bottom: 25px;">
+                    <div class="music-control__backward" id="backward">
+                        <img src="SVG/forward-back.svg" alt="Backward" style="transform: rotate(180deg);">
+                    </div>
+                    <div class="music-control__play" id="play">
+                        <img src="SVG/play.svg" alt="Play" class="play">
+                    </div>
+                    <div class="music-control__forward" id="forward">
+                        <img src="SVG/forward-back.svg" alt="Forward">
+                    </div>
+                </div>
+            </section>
+        </div>
+
+<!--  end spottify -->
+	
+	
+<!-- START Lebenslauf -->	
+<div id="lebenslauf" class="ordner-nudes " style="display: none;">
+<div class="ordner-head" style="">
+	<div class="symbols" onClick="hideLebenslauf()"></div>
+	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
+	<h5 class="mover">lebenslauf.doc</h5></div></div>
+
+<div class="ordner-head"><img class="ordner-head-img" src="SVG/txt-head.svg" ></div>
+<div>
+	
+<hr style="margin-top:12px; margin-bottom: 0px;">
+
+<div class="ordner-inhalt" style="align-items: center; justify-content: center; width:700px;">
+	<div class="lineal" style=""></div>
+	<div class="dokument" style="">
+	<h2>Lebenslauf</h2>
+<p>
+<ul class="lebenslauf">
+<li><b>2009-2011</b><br />Fachhochschulreife an der BBS Bad Neuenahr-Ahrweiler </li>
+<li><b>2011-2013</b><br />Ausbildung als Mediengestalter Digital & Print bei head:mark Marketing und Kommunikation</li>
+<li><b>2013-2015</b><br />Mediengestalter / Projektmanager bei German Print Group</li>
+<li><b>2014-2016</b><br />UX Designer bei devion</li>
+<li><b>Feb 2016 - Jan 2018</b><br />Junior Art Director bei Davies Meyer</li>
+<li><b>Feb 2018 - Jun 2020</b><br />Art Director bei 247GRAD</li>
+<li><b>Jun 2020 - Dez 2022</b><br />Creative Director bei 247GRAD</li>
+<li><b>seit Jan 2023</b><br />Associate Creative Director bei SYZYGY</li>
+</ul>		
+		<br />
+<h2>Zertifikate [&] Weiterbildung</h2>
+<ul class="lebenslauf">
+<li><b>2016</b><br />CSS Winner - indola.com</li>
+<li><b>2016</b><br />Medienfachwirt an der Julius-Wegeler-Schule</li>
+<li><b>ADC Seminar</b><br />Text: Campaign</li>	
+<li><b>ADC Seminar</b><br />Kreativtechniken [&] Ideenfindung</li>		
+<li><b>ADC Seminar</b><br />Von der Strategie zur Kreation</li>		
+		</ul></p></div>
+	
+	</div></div>
+
+</div> 
+<!-- END OF Lebenslauf -->	
+	
+
+
+<!-- START FOLDER -->	
+<div id="designercc" class="ordner-nudes size-medium" style="display:none; margin-left: 200px; margin-top:20px; width:800px; height:600px;">
+<div class="ordner-head" style="">
+	<div class="symbols" onClick="hideDesigner()"></div>
+	<div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; ">
+	<h5 class="mover">Designer CC</h5></div></div>
+<hr>
+<div class="ordner-head" style="align-content: center;"><img class="ordner-head-img" onClick="hideDesigner()" style="margin-top:-4px; margin-left:-3px;" src="SVG/close-plain.svg"> unbenannt-1-2-final_v2.dsgnr</div>
+<div>
+	
+
+	
+	<hr style="margin-top:6px;">
+<div class="ordner-inhalt"><img src="SVG/toolset.svg" alt="Toolset Abbildung" style="position: absolute; height:60%; width:auto; margin:24px;">
+      <canvas id="canvas" height="509" width="800"></canvas>
+	
+	</div></div>
+
+</div> 
+<!-- END OF FOLDER -->	
+	
+	
 
 <script type="text/javascript">
-$(".periodic-table").html($(".periodic-table .periodic-element").sort(function(){
-    return Math.random()-0.5;
-}));
-</script>
+function mail(){
+    window.open("mailto:hello@mehralsliebe.info");
+}	
 	
+	
+function showComputer() {
+   document.getElementById('dragMe').style.display = "flex";
+}	
+function hideComputer() {
+   document.getElementById('dragMe').style.display = "none";
+}
+	
+function showDocuments() {
+   document.getElementById('dragMe-Doc').style.display = "flex";
+}	
+function hideDocuments() {
+   document.getElementById('dragMe-Doc').style.display = "none";
+}	
+	
+function showSelfie() {
+   document.getElementById('dragMe-IMG').style.display = "flex";
+}	
+function hideSelfie() {
+   document.getElementById('dragMe-IMG').style.display = "none";
+}	
+	
+function showMusic() {
+   document.getElementById('dragMe-MUSIC').style.display = "flex";
+}
+	
+function hideMusic() {
+   document.getElementById('dragMe-MUSIC').style.display = "none";
+}	
+
+function showWarning() {
+   document.getElementById('dragMe-WARNING').style.display = "flex";
+}
+	
+function hideWarning() {
+   document.getElementById('dragMe-WARNING').style.display = "none";
+}
+	
+function showLebenslauf() {
+   document.getElementById('lebenslauf').style.display = "flex";
+}
+	
+function hideLebenslauf() {
+   document.getElementById('lebenslauf').style.display = "none";
+}
+
+	
+function showDesigner() {
+   document.getElementById('designercc').style.display = "flex";
+}
+	
+function hideDesigner() {
+   document.getElementById('designercc').style.display = "none";
+}
+	
+	
+function hideNotification() {
+   document.getElementById('meldung').style.display = "none";
+}	
+	
+	
+</script>	
+
+</main><script type="text/javascript" src="js/dragqueen-one.js"></script>
+	<script type="text/javascript" src="js/music.js"></script>
+		<script type="text/javascript" src="js/painter.js"></script>
 </body>
 </html>

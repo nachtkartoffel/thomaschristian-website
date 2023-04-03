@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_3" data-name="Ebene 3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.76 233.76">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fcf4e4;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #353230;
+      }
+
+      .cls-3 {
+        font-family: Roboto-Medium, Roboto;
+        font-size: 28px;
+        font-weight: 500;
+      }
+    </style>
+  </defs>
+  <text class="cls-3" transform="translate(3.54 217.62)"><tspan x="0" y="0">dark_patterns.doc</tspan></text>
+  <g>
+    <g>
+      <polygon class="cls-1" points="55.28 173.81 55.28 18.23 147.16 18.23 178.49 46.49 178.49 173.81 55.28 173.81"/>
+      <path class="cls-2" d="m146.39,20.23l30.09,27.14v124.44H57.28V20.23h89.11m1.54-4H53.28v159.58h127.21V45.6l-32.56-29.36h0Z"/>
+    </g>
+    <g>
+      <polygon class="cls-1" points="149.93 43.6 149.93 20.73 175.28 43.6 149.93 43.6"/>
+      <path class="cls-2" d="m151.93,25.23l18.15,16.37h-18.15v-16.37m-4-8.99v29.36h32.56l-32.56-29.36h0Z"/>
+    </g>
+  </g>
+  <rect class="cls-2" x="82.13" y="57.79" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="67.94" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="78.09" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="88.24" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="98.39" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="108.54" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="118.68" width="69.56" height="5.29"/>
+  <rect class="cls-2" x="82.13" y="128.83" width="22.03" height="5.29"/>
+  <g>
+    <rect class="cls-1" x="38.77" y="40.89" width="53.13" height="53.13"/>
+    <path class="cls-2" d="m89.9,42.89v49.13h-49.13v-49.13h49.13m4-4h-57.13v57.13h57.13v-57.13h0Z"/>
+  </g>
+  <polygon class="cls-2" points="91.84 51.27 74.89 51.27 74.89 56.95 78.74 56.95 72.8 66.7 72.8 51.27 64.72 51.27 57.37 66.1 57.37 56.95 61.4 56.95 61.4 51.27 44.45 51.27 44.45 56.95 48.05 56.95 48.05 84.99 55.8 84.99 63.49 71.91 63.49 84.99 72.8 84.99 87.92 56.95 91.84 56.95 91.84 51.27"/>
+</svg>

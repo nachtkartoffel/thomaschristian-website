@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Ebene_3" data-name="Ebene 3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 233.76 233.76">
+  <defs>
+    <style>
+      .cls-1 {
+        font-size: 30.83px;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        fill: #fcf2e0;
+      }
+
+      .cls-1, .cls-3 {
+        font-family: Roboto-Bold, Roboto;
+        font-weight: 700;
+      }
+
+      .cls-4 {
+        fill: #2e2c2b;
+      }
+
+      .cls-3 {
+        font-size: 71.41px;
+      }
+
+      .cls-5 {
+        letter-spacing: .04em;
+      }
+
+      .cls-6 {
+        fill: #2e2c2a;
+        font-family: Roboto-Medium, Roboto;
+        font-size: 28px;
+        font-weight: 500;
+      }
+    </style>
+  </defs>
+  <text class="cls-6" transform="translate(42.99 217.62)"><tspan x="0" y="0">DesignerCC</tspan></text>
+  <g>
+    <rect class="cls-2" x="45.83" y="20.21" width="142.11" height="142.11"/>
+    <path class="cls-4" d="m185.94,22.21v138.11H47.83V22.21h138.11m4-4H43.83v146.11h146.11V18.21h0Z"/>
+  </g>
+  <rect class="cls-4" x="62.38" y="36.76" width="109" height="109"/>
+  <g>
+    <text class="cls-3" transform="translate(73.14 115.73) scale(.88 1)"><tspan x="0" y="0">D</tspan></text>
+    <text class="cls-1" transform="translate(114.63 86.19)"><tspan class="cls-5" x="0" y="0">S</tspan><tspan x="20.19" y="0">G</tspan></text>
+    <text class="cls-1" transform="translate(114.5 115.7)"><tspan x="0" y="0">NR</tspan></text>
+  </g>
+</svg>
