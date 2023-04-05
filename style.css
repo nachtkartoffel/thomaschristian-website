@@ -180,9 +180,9 @@ cursor: url("hand.png"), pointer !important;
 	flex-direction: column;
 	position: absolute;
 
-	height:500px;
-	max-height: 100%;
-	max-width:100%;
+
+	width:320px;
+	height:520px;
   z-index: 9;
     top: 50%;  /* position the top  edge of the element at the middle of the parent */
     left: 50%; /* position the left edge of the element at the middle of the parent */
