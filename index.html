@@ -18,7 +18,7 @@
 	<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
 <lottie-player id="hideMe" src="https://thomaschristian.info/lade-bg.json"  background="transparent"  speed="1"  style="width: 100%; height: 100%;"    autoplay></lottie-player></div>
 	
-	<div style="position: absolute; width:100%; height:100%;  margin-top:-16px; background-image: url('noise.jpg'); background-size:cover; opacity: 0.05; pointer-events: none; z-index:99; mix-blend-mode: hard-light; "></div>
+	<div style="position: absolute; width:100%; height:100%;  margin-top:-16px; background-image: url('noise.jpg'); background-size:cover; opacity: 0.05; pointer-events: none; z-index:999; mix-blend-mode: hard-light; "></div>
 <main>
 <nav>
 <div class="sub-nav"> <img src="SVG/logo-start.svg" style="height:40%; width:auto; align-self: center;">
@@ -82,8 +82,9 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 		<div class="icons"><img class="img-icon" src="SVG/folder.svg" onClick="showDocuments()"></div>
 			<a href="https://www.youtube.com/watch?v=VFZquMoWtu0" target="_blank"> <div class="icons"><img class="img-icon" src="SVG/showreel.svg"></div></a>
 				<a href="https://mehralsliebe.info" target="_blank"><div class="icons"><img class="img-icon" src="SVG/portfolio.svg"></div></a>
+	<div class="icons"><img class="img-icon" src="SVG/passwort.svg" onClick="showWarning()"></div>
 				<a href="https://thomaschristian.info/firouzja" target="_blank"><div class="icons"><img class="img-icon" src="SVG/schrift.svg"></div></a>
-				<div class="icons"><img class="img-icon" src="SVG/passwort.svg" onClick="showWarning()"></div>
+				
 					<div class="icons"><img class="img-icon" src="SVG/playlist.svg" onClick="showMusic()"></div>
 					<div class="icons"><img class="img-icon" src="SVG/designerscc.svg" onClick="showDesigner()"></div>
 	<div class="icons"><img class="img-icon" src="SVG/lebenslauf.svg" onClick="showLebenslauf()"></div>
@@ -152,7 +153,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 		
 <!-- START IMAGE -->	
-<div id="dragMe-IMG" class="draggable ordner-computer" style="width:480px; height:auto; margin-left: 80px; margin-top:80px; overflow: hidden; z-index:200; display:none;">
+<div id="dragMe-IMG" class="draggable ordner-computer" style="width:480px; height:auto; overflow: hidden; z-index:200; display:none;">
 <div class="ordner-head"><div class="symbols" onClick="hideSelfie()"></div><div style="width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center; "><h5 class="mover">Selfie.jpg</h5></div></div>
 
 
@@ -185,7 +186,7 @@ document.write('<ul class="hidemobile"><li class="navi">' + readableDate + '</ul
 	
 <!--  spottify -->
 
-        <div id="dragMe-MUSIC" class="draggable music-container" style="display: none;">
+        <div id="dragMe-MUSIC" class="draggable music-container ordner-nudes" style="display: none;">
 			<div id="" class="ordner-head draggable"><div class="symbols" onClick="hideMusic()"></div>
 <div style=" width: 100%;text-align: center; justify-content: center; display: flex; align-items: center; align-content: center;">
 <h5 class="mover" style="margin-left:-26px;">Spotify</h5></div></div>
