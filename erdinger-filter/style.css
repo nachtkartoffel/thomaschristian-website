@@ -1,0 +1,14 @@
+* { margin: 0; padding: 0; }
+html { background: #fff; }
+body { margin: 10px 0 0 0; }
+
+.h6 {
+color: #000;
+font-family: Roboto; 
+font-size: 1rem;
+font-weight: 300;
+letter-spacing: 3px;
+text-align: center;
+text-decoration: none;
+text-transform: none;
+}
