@@ -2,156 +2,46 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>campfire</title>
+  <title>Simple campfire</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
 <link rel="stylesheet" href="./style.css">
 
 </head>
 <body>
 <!-- partial:index.partial.html -->
-<div class="stage">
-  <div class="campfire">
-    <div class="sparks">
-      <div class="spark"></div>
-      <div class="spark"></div>
-      <div class="spark"></div>
-      <div class="spark"></div>
-      <div class="spark"></div>
-      <div class="spark"></div>
-      <div class="spark"></div>
-      <div class="spark"></div>
-    </div>
-    <div class="logs">
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-      <div class="log">
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-        <div class="streak"></div>
-      </div>
-    </div>
-    <div class="sticks">
-      <div class="stick"></div>
-      <div class="stick"></div>
-      <div class="stick"></div>
-      <div class="stick"></div>
-    </div>
-    <div class="fire">
-      <div class="fire__red">
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-      </div>
-      <div class="fire__orange">
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-      </div>
-      <div class="fire__yellow">
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-      </div>
-      <div class="fire__white">
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-        <div class="flame"></div>
-      </div>
-    </div>
+<body>
+<div class="cf-container">
+  <div class="cf-flame-container"  id="fireNodes1">
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
   </div>
+  <div class="cf-flame-container" id="fireNodes2">
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+  </div>
+  <div class="cf-flame-container" id="base-fire">
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+    <div class = "cf-flame"></div>
+  </div>
+  <div class= "cf-log-container">
+    <div class="cf-log"></div>
+    <div class="cf-log"></div>
+  <div>
 </div>
+    </body>
 <!-- partial -->
-  
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.0/anime.min.js'></script><script  src="./script.js"></script>
+
 </body>
 </html>
