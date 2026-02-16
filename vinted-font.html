@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text zu Bild</title>
+    <link rel="preload" as="image" href="https://thomaschristian.info/letters/logo-vinted-letters.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease-out;
+        }
+
+        #preloader.fade-out {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #preloader-logo {
+            max-width: 500px;
+            width: 90%;
+            margin-bottom: 40px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        body {
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Courier New', monospace;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            flex: 1;
+            padding: 40px;
+            padding-bottom: 120px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        #letterContainer {
+            --scale-factor: 1;
+            font-size: calc(clamp(80px, 16vw, 320px) * var(--scale-factor));
+            line-height: 1.5;
+            min-height: 1.5em;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .letter-img {
+            height: 1em;
+            width: auto;
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+        .line-break {
+            width: 100%;
+            height: 0;
+        }
+
+        #textInput {
+            background: transparent;
+            border: none;
+            color: #000;
+            font-size: clamp(32px, 8vw, 64px);
+            font-family: 'Courier New', monospace;
+            padding: 0;
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            width: 100%;
+            caret-color: transparent;
+            resize: none;
+            overflow: hidden;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        #textInput::placeholder {
+            color: transparent;
+            text-transform: none;
+        }
+        
+        .cursor {
+            width: 3px;
+            background-color: #000;
+            animation: blink 1s step-end infinite;
+            height: 1em;
+            display: inline-block;
+            align-self: center;
+            margin-left: 12px;
+        }
+
+        @keyframes blink {
+            0%, 49% {
+                opacity: 1;
+            }
+            50%, 100% {
+                opacity: 0;
+            }
+        }
+
+        #downloadBtn {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 200px;
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-top: 3px solid #000;
+            border-right: 3px solid #000;
+            padding: 20px;
+            font-size: clamp(14px, 3vw, 20px);
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+        }
+
+        #downloadBtn:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        #scaleControl {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 200px;
+            background-color: #000;
+            border-top: 3px solid #000;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #scaleSlider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #scaleSlider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+
+        #scaleSlider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            cursor: pointer;
+            border: 2px solid #000;
+        }
+
+        #scaleLabel {
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        #downloadBtn:active {
+            transform: scale(0.98);
+        }
+
+        canvas {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="preloader">
+        <img id="preloader-logo" src="https://thomaschristian.info/letters/logo-vinted-letters.png" alt="Logo">
+        <div class="spinner"></div>
+    </div>
+    
+    <div class="container">
+        <div class="input-wrapper">
+            <div id="letterContainer">
+                <span class="cursor" id="cursor"></span>
+            </div>
+            <textarea 
+                id="textInput" 
+                autofocus
+                style="position: absolute; opacity: 0; pointer-events: none; top: 0; left: 0;"
+            ></textarea>
+        </div>
+        <button id="downloadBtn">Als PNG herunterladen</button>
+        <div id="scaleControl">
+            <span id="scaleLabel">Größe: 100%</span>
+            <input type="range" id="scaleSlider" min="25" max="200" value="100" step="5">
+        </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <script>
+        const textInput = document.getElementById('textInput');
+        const letterContainer = document.getElementById('letterContainer');
+        const cursor = document.getElementById('cursor');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const scaleSlider = document.getElementById('scaleSlider');
+        const scaleLabel = document.getElementById('scaleLabel');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const BASE_URL = 'https://thomaschristian.info/letters/';
+        
+        // Scale factor for display and PNG
+        let currentScale = 1;
+
+        // Define available variants for each letter
+        const letterVariants = {
+            'A': ['a.jpg', 'a2.jpg', 'a3.jpg', 'a4.jpg', 'a5.jpg'],
+            'B': ['b.jpg', 'b2.jpg', 'b3.jpg'],
+            'C': ['c.jpg', 'c2.jpg', 'c3.jpg'],
+            'D': ['d.jpg', 'd2.jpg', 'd3.jpg'],
+            'E': ['e.jpg', 'e2.jpg', 'e3.jpg'],
+            'F': ['f.jpg', 'f2.jpg', 'f3.jpg'],
+            'G': ['g.jpg', 'g2.jpg'],
+            'H': ['h.jpg', 'h2.jpg', 'h3.jpg'],
+            'I': ['i.jpg'],
+            'J': ['j.jpg', 'j2.jpg', 'j3.jpg'],
+            'K': ['k.jpg'],
+            'L': ['l.jpg'],
+            'M': ['m.jpg', 'm2.jpg'],
+            'N': ['n.jpg', 'n2.jpg', 'n3.jpg'],
+            'O': ['o.jpg', 'o2.jpg', 'o3.jpg'],
+            'P': ['p.jpg', 'p2.jpg'],
+            'Q': ['q.jpg'],
+            'R': ['r.jpg'],
+            'S': ['s.jpg', 's2.jpg', 's3.jpg'],
+            'T': ['t.jpg', 't2.jpg'],
+            'U': ['u.jpg'],
+            'V': ['v.jpg'],
+            'W': ['w.jpg'],
+            'X': ['x.jpg'],
+            'Y': ['y.jpg'],
+            'Z': ['z.jpg']
+        };
+
+        // Store the chosen image for each character position
+        let chosenImages = [];
+
+        // Preload all images
+        const imagePreloadCache = {};
+        function preloadImages() {
+            for (const letter in letterVariants) {
+                const variants = letterVariants[letter];
+                variants.forEach(filename => {
+                    const img = new Image();
+                    img.src = BASE_URL + filename;
+                    imagePreloadCache[filename] = img;
+                });
+            }
+        }
+
+        // Start preloading immediately
+        preloadImages();
+
+        // Scale slider event
+        scaleSlider.addEventListener('input', function(e) {
+            const scalePercent = parseInt(e.target.value);
+            currentScale = scalePercent / 100;
+            letterContainer.style.setProperty('--scale-factor', currentScale);
+            scaleLabel.textContent = `Größe: ${scalePercent}%`;
+        });
+
+        function getRandomLetterImage(letter) {
+            const variants = letterVariants[letter] || [`${letter.toLowerCase()}.jpg`];
+            const randomIndex = Math.floor(Math.random() * variants.length);
+            return BASE_URL + variants[randomIndex];
+        }
+
+        function renderLetters() {
+            const text = textInput.value.toUpperCase();
+            letterContainer.innerHTML = '';
+            
+            let charIndex = 0;
+            for (let i = 0; i < text.length; i++) {
+                const char = text[i];
+                
+                if (char === '\n') {
+                    const br = document.createElement('div');
+                    br.className = 'line-break';
+                    letterContainer.appendChild(br);
+                } else if (char === ' ') {
+                    const space = document.createElement('span');
+                    space.innerHTML = '&nbsp;';
+                    space.style.width = '0.3em';
+                    space.style.display = 'inline-block';
+                    letterContainer.appendChild(space);
+                } else if (/[A-Z]/.test(char)) {
+                    const img = document.createElement('img');
+                    // Use stored image or generate new one
+                    if (!chosenImages[i]) {
+                        chosenImages[i] = getRandomLetterImage(char);
+                    }
+                    img.src = chosenImages[i];
+                    img.className = 'letter-img';
+                    img.alt = char;
+                    letterContainer.appendChild(img);
+                }
+            }
+            
+            // Clean up chosenImages array if text got shorter
+            if (text.length < chosenImages.length) {
+                chosenImages = chosenImages.slice(0, text.length);
+            }
+            
+            letterContainer.appendChild(cursor);
+        }
+
+        textInput.addEventListener('input', function(e) {
+            this.value = this.value.toUpperCase();
+            renderLetters();
+        });
+
+        textInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                downloadBtn.click();
+            }
+        });
+
+        // Keep focus on textarea
+        letterContainer.addEventListener('click', () => {
+            textInput.focus();
+        });
+
+        // Initial render
+        renderLetters();
+
+        downloadBtn.addEventListener('click', async function() {
+            const text = textInput.value || 'TEXT';
+            if (!text.trim()) return;
+            
+            // Clone the container
+            const containerClone = letterContainer.cloneNode(true);
+            
+            // Remove cursor from clone
+            const cursorInClone = containerClone.querySelector('.cursor');
+            if (cursorInClone) cursorInClone.remove();
+            
+            // Create temporary wrapper with same width as original
+            const tempWrapper = document.createElement('div');
+            tempWrapper.style.position = 'absolute';
+            tempWrapper.style.left = '-9999px';
+            tempWrapper.style.top = '0';
+            tempWrapper.style.background = '#fff';
+            tempWrapper.style.padding = '40px';
+            tempWrapper.style.width = letterContainer.offsetWidth + 80 + 'px';
+            tempWrapper.style.boxSizing = 'border-box';
+            
+            // Apply same styling to clone
+            containerClone.style.width = letterContainer.offsetWidth + 'px';
+            containerClone.style.display = 'flex';
+            containerClone.style.flexWrap = 'wrap';
+            containerClone.style.alignItems = 'center';
+            containerClone.style.fontSize = window.getComputedStyle(letterContainer).fontSize;
+            containerClone.style.lineHeight = window.getComputedStyle(letterContainer).lineHeight;
+            
+            tempWrapper.appendChild(containerClone);
+            document.body.appendChild(tempWrapper);
+            
+            // Wait a bit for layout to settle
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Wait for all images to load
+            const images = containerClone.querySelectorAll('img');
+            await Promise.all(Array.from(images).map(img => {
+                if (img.complete) return Promise.resolve();
+                return new Promise((resolve) => {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                    setTimeout(resolve, 1000); // fallback timeout
+                });
+            }));
+            
+            // Get actual dimensions after wrapping
+            const width = tempWrapper.offsetWidth;
+            const height = containerClone.offsetHeight + 80;
+            
+            // Set canvas size with scale factor for quality
+            const scale = 2; // 2x for better quality
+            canvas.width = width * scale;
+            canvas.height = height * scale;
+            ctx.scale(scale, scale);
+            
+            // Fill background
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw each image at its exact rendered position
+            const imgsInClone = containerClone.querySelectorAll('img');
+            const containerRect = containerClone.getBoundingClientRect();
+            
+            for (let img of imgsInClone) {
+                const rect = img.getBoundingClientRect();
+                
+                const x = rect.left - containerRect.left + 40;
+                const y = rect.top - containerRect.top + 40;
+                const w = rect.width;
+                const h = rect.height;
+                
+                // Load image
+                const drawImg = new Image();
+                drawImg.crossOrigin = 'anonymous';
+                try {
+                    await new Promise((resolve, reject) => {
+                        drawImg.onload = resolve;
+                        drawImg.onerror = reject;
+                        drawImg.src = img.src;
+                    });
+                    
+                    ctx.drawImage(drawImg, x, y, w, h);
+                } catch (e) {
+                    console.error('Failed to load image:', img.src);
+                }
+            }
+            
+            // Clean up
+            document.body.removeChild(tempWrapper);
+            
+            // Download
+            const link = document.createElement('a');
+            link.download = `text-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        });
+
+        // Hide preloader after 3 seconds
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                const preloader = document.getElementById('preloader');
+                preloader.classList.add('fade-out');
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                }, 500); // Match transition duration
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
