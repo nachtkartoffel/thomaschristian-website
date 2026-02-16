@@ -263,32 +263,41 @@
 
         // Define available variants for each letter
         const letterVariants = {
-            'A': ['a.jpg', 'a2.jpg', 'a3.jpg', 'a4.jpg', 'a5.jpg'],
-            'B': ['b.jpg', 'b2.jpg', 'b3.jpg'],
-            'C': ['c.jpg', 'c2.jpg', 'c3.jpg'],
-            'D': ['d.jpg', 'd2.jpg', 'd3.jpg'],
-            'E': ['e.jpg', 'e2.jpg', 'e3.jpg'],
+            'A': ['a.jpg', 'a2.jpg', 'a3.jpg', 'a4.jpg', 'a5.jpg', 'a6.jpg', 'a7.jpg'],
+            'B': ['b.jpg', 'b2.jpg', 'b3.jpg', 'b4.jpg', 'b5.jpg'],
+            'C': ['c.jpg', 'c2.jpg', 'c3.jpg', 'c4.jpg', 'c5.jpg'],
+            'D': ['d.jpg', 'd2.jpg', 'd3.jpg', 'd4.jpg', 'd5.jpg'],
+            'E': ['e.jpg', 'e2.jpg', 'e3.jpg', 'e4.jpg'],
             'F': ['f.jpg', 'f2.jpg', 'f3.jpg'],
-            'G': ['g.jpg', 'g2.jpg'],
+            'G': ['g.jpg', 'g2.jpg', 'g3.jpg', 'g4.jpg'],
             'H': ['h.jpg', 'h2.jpg', 'h3.jpg'],
-            'I': ['i.jpg'],
+            'I': ['i.jpg', 'i2.jpg', 'i3.jpg'],
             'J': ['j.jpg', 'j2.jpg', 'j3.jpg'],
-            'K': ['k.jpg'],
-            'L': ['l.jpg'],
-            'M': ['m.jpg', 'm2.jpg'],
+            'K': ['k.jpg', 'k2.jpg', 'k3.jpg', 'k4.jpg'],
+            'L': ['l.jpg', 'l2.jpg', 'l3.jpg', 'l4.jpg'],
+            'M': ['m.jpg', 'm2.jpg', 'm3.jpg', 'm4.jpg', 'm5.jpg'],
             'N': ['n.jpg', 'n2.jpg', 'n3.jpg'],
             'O': ['o.jpg', 'o2.jpg', 'o3.jpg'],
-            'P': ['p.jpg', 'p2.jpg'],
+            'P': ['p.jpg', 'p2.jpg', 'p3.jpg'],
             'Q': ['q.jpg'],
-            'R': ['r.jpg'],
-            'S': ['s.jpg', 's2.jpg', 's3.jpg'],
+            'R': ['r.jpg', 'r2.jpg', 'r3.jpg'],
+            'S': ['s.jpg', 's2.jpg', 's3.jpg', 's4.jpg'],
             'T': ['t.jpg', 't2.jpg'],
-            'U': ['u.jpg'],
+            'U': ['u.jpg', 'u2.jpg', 'u3.jpg'],
             'V': ['v.jpg'],
             'W': ['w.jpg'],
             'X': ['x.jpg'],
             'Y': ['y.jpg'],
-            'Z': ['z.jpg']
+            'Z': ['z.jpg'],
+            '0': ['0.jpg'],
+            '1': ['1.jpg'],
+            '2': ['2.jpg'],
+            '3': ['3.jpg'],
+            '4': ['4.jpg'],
+            '5': ['5.jpg'],
+            '6': ['6.jpg'],
+            '8': ['8.jpg'],
+            '9': ['9.jpg']
         };
 
         // Store the chosen image for each character position
@@ -342,7 +351,7 @@
                     space.style.width = '0.3em';
                     space.style.display = 'inline-block';
                     letterContainer.appendChild(space);
-                } else if (/[A-Z]/.test(char)) {
+                } else if (/[A-Z0-9]/.test(char)) {
                     const img = document.createElement('img');
                     // Use stored image or generate new one
                     if (!chosenImages[i]) {
