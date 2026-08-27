@@ -1,0 +1,1401 @@
+/* ==========================================================================
+   noll media — Website (Header/Navigation)
+   ========================================================================== */
+
+:root{
+  --black:#000;
+  --white:#fff;
+  --font-display:'ES Klarheit Kurrent TRIAL SmBd', 'ES Klarheit Kurrent TRIAL', Arial, sans-serif;
+  --font-display-bold:'ES Klarheit Kurrent TRIAL', Arial, sans-serif;
+  --font-body:'Helvetica Neue', Arial, Helvetica, sans-serif;
+  --grid-width:78.9583vw; /* 3032px content width @ 3840px reference, 12 cols x 216px + 11 gutters x 40px */
+  --grid-margin:calc((100vw - var(--grid-width)) / 2); /* space outside the content grid, each side */
+  --wrap:var(--grid-width);
+  --gutter:clamp(20px, 5vw, 64px);
+  --active-col-offset:20vw; /* 3 columns+gutters in (3 x 256px @3840 = 768px = 768/3840) = start of column 4.
+                                Used by .case-active-title's `left` and duplicated as ACTIVE_COL_OFFSET_VW in
+                                js/main.js for the active-slide anchor — keep both in sync if the grid changes. */
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{
+  scroll-behavior:smooth;
+  overflow-x:clip; /* the Cases carousel keeps off-screen buffer copies (endless-loop design) positioned outside the viewport via transform; they're visually clipped by .cases-track's own overflow:hidden but still expand the document's scrollable width — this rule kills horizontal scroll/scrollbar site-wide regardless of that.
+     `clip`, not `hidden`: `overflow:hidden` still leaves the box
+     scrollable via script/wheel/keyboard even with no visible scrollbar
+     (confirmed live — a horizontal wheel gesture still panned the whole
+     page and blanked out its left edge with `hidden` set); `clip` removes
+     the scroll position entirely, which is what "don't allow horizontal
+     scrolling" actually needs.
+     IMPORTANT: this must live on <html> only, not <body>. Giving <body>
+     a non-visible overflow makes the UA promote body into its own
+     scrolling box instead of the real viewport/document being the root
+     scroller (a legacy quirk of how overflow propagates from body to the
+     viewport) — that broke position:sticky for .process-circle-wrap
+     (it stopped tracking scroll at all, sitting permanently off-screen)
+     the first time this was tried on body. html keeps the real root
+     scroller intact while still clipping horizontal overflow. */
+}
+body{
+  margin:0;
+  min-height:100vh;
+  overflow-x:clip; /* belt-and-suspenders alongside html's overflow-x:clip above — `hidden` here specifically was what broke sticky (see the comment on html), but `clip` doesn't turn the element into a scroll container in the first place, so it shouldn't trigger the same root-scroller promotion. Both are needed in practice: html alone still left window.scrollX movable via wheel input in testing. */
+  background:var(--black);
+  color:var(--white);
+  font-family:var(--font-body);
+  font-weight:300;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+img,svg{ display:block; max-width:100%; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; }
+
+.wrap{ max-width:var(--wrap); margin:0 auto; padding:0; }
+
+.skip-link{
+  position:absolute; left:-999px; top:0; background:var(--white); color:var(--black);
+  padding:12px 20px; z-index:200; border-radius:0 0 8px 0;
+}
+.skip-link:focus{ left:0; }
+
+/* ---------- Header ---------- */
+.site-header{
+  position:sticky; top:0; z-index:100;
+  /* was a linear-gradient scrim (black 85% at top fading to transparent) —
+     removed per explicit direction, this was reading as an unwanted
+     "vignette" always present at the very top of the page (Hero, Cases,
+     with the menu open, everywhere), same complaint as the debug-grid fix
+     above. background left unset: body is already solid black, so no
+     gradient/scrim is needed for contrast against the nav.
+     backdrop-filter:blur removed earlier per explicit direction. */
+}
+.header-inner{
+  display:grid; grid-template-columns:1fr auto 1fr; align-items:center; column-gap:24px;
+  padding-top:28px; padding-bottom:28px;
+  /* clips .main-nav's compact-scroll slide-out at this element's own right
+     edge — which is also the content grid's right edge, since
+     .header-inner carries the .wrap class (max-width:var(--grid-width),
+     same width/centering as .debug-grid). See the "Compact header on
+     scroll" rules below for why this needs to be a hard clip rather than
+     an opacity fade. */
+  overflow:hidden;
+}
+.header-inner .logo{ justify-self:start; }
+.header-inner .main-nav{ justify-self:center; }
+.header-inner .nav-toggle{ justify-self:end; }
+.logo{
+  display:inline-flex; align-items:center; color:var(--white);
+}
+.logo-mark{ height:40px; width:auto; max-width:none; flex:none; }
+/* Wordmark height kept proportional to the mark, matching their relative
+   size in Logo_new.svg (mark 42.5 tall, text 21.5 tall in that file's own
+   units): 40px * 21.5/42.5 = 20.24px. Don't set both to 40px independently
+   — that stretches the text to match the icon's height instead of the
+   text's own, smaller, design size. */
+.logo-text-clip{
+  height:20.24px; width:auto; margin-left:14px; flex:none;
+  display:flex; align-items:center;
+  overflow:hidden;
+}
+.logo-wordmark{
+  display:block; height:20.24px; width:auto; max-width:none; flex:none;
+  opacity:0;
+  transform:translateY(140%);
+  transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .6s cubic-bezier(.4,0,.2,1);
+}
+.logo:hover .logo-wordmark,
+.logo:focus-visible .logo-wordmark{
+  opacity:1;
+  transform:translateY(0);
+}
+@media (prefers-reduced-motion:reduce){
+  .logo-wordmark{ transition:none; }
+}
+.main-nav{ display:flex; align-items:center; gap:clamp(20px,3vw,48px); }
+.nav-item{ position:relative; display:inline-flex; align-items:center; }
+.nav-dot{
+  position:absolute; left:-8px; top:50%;
+  width:6px; height:6px; border-radius:50%; background:currentColor;
+  opacity:0;
+  transform:translateY(calc(-50% + 12px));
+  transition:transform .35s cubic-bezier(.4,0,.2,1), opacity .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.main-nav a{
+  font-family:var(--font-display-bold); font-weight:700; font-size:18px; line-height:1;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+/* hovering/focusing any single item shows its dot (pure Y motion, unaffected by any link shift) */
+.nav-item:hover .nav-dot,
+.nav-item:focus-within .nav-dot{
+  opacity:1;
+  transform:translateY(-50%);
+}
+/* the dot sits just left of the hovered item: earlier items move further left,
+   the hovered item and everything after it move right — spreading apart from the dot */
+.nav-item:has(~ .nav-item:hover) a,
+.nav-item:has(~ .nav-item:focus-within) a{
+  transform:translateX(-10px);
+}
+.nav-item:hover a,
+.nav-item:hover ~ .nav-item a,
+.nav-item:focus-within a,
+.nav-item:focus-within ~ .nav-item a{
+  transform:translateX(10px);
+}
+@media (prefers-reduced-motion:reduce){
+  .main-nav a, .nav-dot{ transition:none; }
+}
+/* Menu icon design from Figma node 337:2318 ("menu" component,
+   Property 1=default/hover/active), same file as the header animation
+   above — scaled down (×0.406) from its 120px-square reference to match
+   this button's existing ~26px bar size instead of the Figma frame's own
+   much larger scale.
+   default: bars left-aligned, middle bar shorter (26/22/26px) — a small
+   asymmetric notch on the right, not a plain even hamburger.
+   hover/focus: bars right-align into a descending "staircase" (per the
+   attached reference) — right edge of every bar lands on the same x
+   (26px): bar 2 shifts right 4px + shrinks to 22px (4+22=26), bar 3
+   shifts right 9px + shrinks to 17px (9+17=26).
+   BUG FIXED: this previously used the *unscaled* Figma left-offset deltas
+   (11px/22px) as margin-left while the widths WERE scaled (×0.406) — two
+   different scales on the two properties meant the right edges marched
+   further right with each bar instead of converging, so the hover shape
+   didn't taper inward like the reference at all. margin-left now uses
+   the same 0.406 scale as the widths, so right edges actually line up.
+   active (menu open — hooked off the aria-expanded state js/main.js
+   already sets, no extra class needed): classic hamburger→X, middle bar
+   fades out, top/bottom bars translate to center and rotate ±45deg. */
+.nav-toggle{
+  display:none; flex-direction:column; align-items:flex-start; gap:6px; padding:8px;
+  background:none; border:0; cursor:pointer;
+}
+.nav-toggle span{
+  height:2px; background:var(--white); display:block;
+  transition:width .3s cubic-bezier(.4,0,.2,1), margin-left .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1), opacity .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-toggle span:nth-child(1){ width:26px; }
+.nav-toggle span:nth-child(2){ width:22px; }
+.nav-toggle span:nth-child(3){ width:26px; }
+.nav-toggle:hover span:nth-child(2),
+.nav-toggle:focus-visible span:nth-child(2){ margin-left:4px; }
+.nav-toggle:hover span:nth-child(3),
+.nav-toggle:focus-visible span:nth-child(3){ margin-left:9px; width:17px; }
+.nav-toggle[aria-expanded="true"] span:nth-child(1){ width:26px; margin-left:0; transform:translateY(8px) rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+.nav-toggle[aria-expanded="true"] span:nth-child(3){ width:26px; margin-left:0; transform:translateY(-8px) rotate(-45deg); }
+@media (prefers-reduced-motion:reduce){
+  .nav-toggle span{ transition:none; }
+}
+.mobile-nav{
+  display:none; flex-direction:column; gap:0; background:#0a0a0a;
+  border-top:1px solid rgba(255,255,255,.1);
+}
+.mobile-nav a{
+  padding:16px var(--gutter); border-bottom:1px solid rgba(255,255,255,.08);
+  font-family:var(--font-display-bold); font-weight:700; font-size:18px;
+}
+body.nav-open .mobile-nav{ display:flex; }
+
+/* ---------- Compact header on scroll (desktop) ----------
+   Figma prototype node 248:496 / component 334:2271 (variants "active=no"
+   / "active=yes"): the nav links slide out to the right (clipped by their
+   own wrapper's overflow) while a burger icon slides in from the right at
+   the same time — a horizontal swap, not a fade. The prototype triggers
+   it on click; per explicit follow-up direction this instead triggers
+   once the page has been scrolled down one full viewport (js/main.js
+   toggles body.nav-compact past window.innerHeight). Clicking the burger
+   still opens the existing .mobile-nav overlay (same element/handler
+   already used at the ≤860px breakpoint below) — the prototype's own
+   open-menu panel design wasn't part of the node shared here, so this
+   reuses what's already built rather than guessing at a new one.
+   Scoped to min-width:861px so the existing ≤860px mobile behavior
+   (nav-toggle always visible, main-nav always hidden) is untouched. */
+@media (min-width:861px){
+  .nav-toggle{
+    display:flex; /* was just "none" above — must actually render (not display:none) to be transitionable */
+    pointer-events:none;
+    /* was opacity:0 + translateX(24px) — same issue as .main-nav below: a
+       24px offset barely clears the button's own 42px width, so it was
+       opacity doing the actual hiding, not the clip, and would've shown a
+       sliver of icon peeking past the grid edge if opacity were removed.
+       nav-toggle already rests flush against .header-inner's right edge
+       (justify-self:end in the grid — verified live: its right edge
+       exactly equals .header-inner's), so any offset past its own width
+       (42px) is enough to fully exit the overflow:hidden clip; 60px
+       leaves a safe margin. Per explicit direction, no opacity here
+       either — pure clip, matching .main-nav's approach. */
+    transform:translateX(60px);
+    transition:transform .8s cubic-bezier(.4,0,.2,1); /* was .4s — slowed down per explicit direction */
+  }
+  .main-nav{
+    transition:transform .8s cubic-bezier(.4,0,.2,1); /* was .4s — slowed down per explicit direction; also now has much further (100vw) to travel than the old 48px, so the slower duration keeps the motion from reading as an even more abrupt snap */
+  }
+  body.nav-compact .main-nav{
+    /* was opacity:0 + a modest translateX(48px) — that 48px never actually
+       reached .header-inner's own right edge (measured live: ~277px+ gap
+       at typical desktop widths, growing further on wider screens since
+       .main-nav's width is font-size-fixed while .header-inner scales with
+       the viewport), so it was opacity alone doing all the hiding, not a
+       real clip. Per explicit direction this should be a hard mask at the
+       grid's edge instead: pointer-events:none (still can't be interacted
+       with while sliding out) and a translateX large enough (100vw, safely
+       bigger than that gap can ever get, since .header-inner itself is
+       capped at 78.9583vw) to guarantee it fully exits .header-inner's
+       overflow:hidden boundary — see that rule above. No opacity at all:
+       .header-inner's clip is what hides it, cutting off hard exactly at
+       the grid edge as it slides past, not fading. */
+    pointer-events:none;
+    transform:translateX(100vw);
+  }
+  body.nav-compact .nav-toggle{
+    pointer-events:auto;
+    transform:translateX(0);
+  }
+  /* Manual un-collapse (nav-toggle clicked while nav-compact is on): the
+     nav row slides back to its normal position on top of nav-compact's
+     hidden state, and the toggle stays put — its burger→X morph is just
+     the existing [aria-expanded="true"] rule below, reused as-is. */
+  body.nav-compact.nav-compact-expanded .main-nav{
+    pointer-events:auto;
+    transform:translateX(0);
+  }
+  /* Solid backdrop while manually expanded: .site-header itself has no
+     background (removed earlier per explicit direction, since the body
+     is solid black everywhere else) — but here the sticky header is
+     deliberately being re-opened over content that's already scrolled
+     underneath it, so the reappeared nav text needs an opaque backing to
+     stay legible against whatever that content is. */
+  body.nav-compact-expanded .site-header{
+    background:var(--black);
+  }
+  @media (prefers-reduced-motion:reduce){
+    .nav-toggle, .main-nav{ transition:none; }
+  }
+}
+
+@media (max-width:860px){
+  .main-nav{ display:none; }
+  .nav-toggle{ display:flex; }
+}
+
+/* ---------- Hero: top line + headline ----------
+   Figma node 497:1572 (3840px reference), converted to vw:
+   bullet 22px -> 0.5729vw, gap 42px -> 1.0938vw, top-line 38px -> 0.9896vw
+   headline 292px -> 7.6042vw, tracking 2.92px -> 0.076vw */
+.hero{ padding-top:clamp(24px, 4vw, 90px); padding-bottom:clamp(32px, 4.5vw, 90px); }
+.eyebrow{
+  display:flex; align-items:center; gap:1.0938vw;
+  font-family:var(--font-display); font-weight:400; font-size:0.9896vw;
+  color:var(--white); margin:0 0 1.8vw;
+  white-space:nowrap;
+}
+.eyebrow-dot{ width:6px; height:6px; border-radius:50%; background:var(--white); flex:none; }
+.hero-title{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:700; text-transform:uppercase;
+  font-size:7.6042vw; line-height:1.1; letter-spacing:0.076vw;
+}
+.hero-row{ display:block; white-space:nowrap; }
+.hero-outline{ color:transparent; -webkit-text-stroke:0.026vw var(--white); }
+.hero-fill{ color:var(--white); }
+
+/* ---------- Slider controls ----------
+   Figma node 197:934 (btn-slider, 109.22px @ 3840px ref -> 2.8443vw),
+   arranged per node 497:1580 (32px gap -> 0.8333vw). Base = white circle
+   + dark arrow (images/slider-hoverfalse.svg, always shown). The hover
+   state (images/slider-hovertrue.svg) only adds a thin ring on top of the
+   same base — so instead of swapping images, the ring is a separate layer
+   that fades/scales in on hover, "smart animating" between the two Figma
+   states with a real CSS transition. */
+.slider-section{ padding-top:clamp(24px, 3vw, 64px); padding-bottom:clamp(24px, 3.5vw, 72px); }
+.slider-controls{ display:flex; align-items:center; gap:0.8333vw; }
+.slider-btn{
+  position:relative; flex:none;
+  width:2.8443vw; height:2.8443vw; min-width:36px; min-height:36px;
+  border-radius:50%; border:0; padding:0; background:none;
+}
+.slider-btn--prev{ transform:rotate(180deg); }
+.slider-btn-base,
+.slider-btn-ring{
+  position:absolute; inset:0; width:100%; height:100%; display:block;
+}
+.slider-btn-ring{
+  opacity:0; transform:scale(.85);
+  transition:opacity .35s cubic-bezier(.4,0,.2,1), transform .35s cubic-bezier(.4,0,.2,1);
+}
+.slider-btn:hover .slider-btn-ring,
+.slider-btn:focus-visible .slider-btn-ring{
+  opacity:1; transform:scale(1);
+}
+@media (prefers-reduced-motion:reduce){
+  .slider-btn-ring{ transition:none; }
+}
+
+/* ---------- Cases carousel ----------
+   Figma node 497:1580 (3840px reference), converted to vw, then scaled
+   down another x0.85: small slot 21.759 x 19.922vw, large slot
+   25.013 x 24.349vw. title/tags 62px -> 1.6146vw, column gap 72px -> 1.875vw,
+   row gap ~40px -> 1.0417vw.
+   Endless loop, rebuilt on a transform-only architecture: js/main.js lays
+   out the 4 cases several times in a row inside .cases-track-inner (DOM
+   order never changes) and moves that whole strip with a single
+   translateX on the inner element — no scrollLeft, no JS-driven frame
+   loop. .cases-track just clips (overflow:hidden); its coordinate origin
+   (local x=0) sits at padding-left:var(--grid-margin), i.e. column 1's
+   start.
+   The active item's left edge is anchored, in JS, to local x =
+   var(--active-col-offset) — column 4's start, not column 1 — via
+   activeColOffsetPx() in js/main.js. .case-active-title is positioned at
+   the *same* offset below, so it always lines up with the active slide.
+   Note: `left` on an absolutely positioned element is measured from its
+   containing block's padding EDGE, which ignores .cases-header's own
+   padding-left entirely — that's why the title's `left` has to add
+   var(--grid-margin) back in explicitly, even though .cases-track gets
+   that same distance "for free" as normal-flow padding.
+   Item width/height and the strip's translateX all share the same
+   transition (.5s cubic-bezier(.4,0,.2,1)), so they move in lockstep and
+   the active slide's edge never lags behind the title or overshoots it. */
+.cases-header{
+  position:relative;
+  display:flex; align-items:center;
+  min-height:2.8443vw;
+  margin-bottom:clamp(16px, 2vw, 40px);
+  padding-left:var(--grid-margin);
+}
+.case-active-title{
+  position:absolute; left:calc(var(--grid-margin) + var(--active-col-offset)); top:50%;
+  transform:translateY(-50%);
+  margin:0; font-family:var(--font-display); font-weight:400; font-size:1.6146vw; color:var(--white);
+  white-space:nowrap;
+}
+.cases-track{
+  overflow:hidden;
+  contain:layout paint;
+  padding-left:var(--grid-margin);
+  padding-bottom:clamp(16px, 2vw, 40px);
+}
+.cases-track-inner{
+  display:flex; align-items:center; gap:1.0417vw;
+  will-change:transform;
+  transition:transform .5s cubic-bezier(.4,0,.2,1);
+}
+
+.case-item{
+  flex:0 0 auto;
+  width:21.759vw; min-width:190px;
+  display:flex; flex-direction:column; gap:1.875vw;
+  will-change:width;
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+.case-media{
+  width:100%; height:19.922vw; min-height:170px;
+  border-radius:0.625vw; overflow:hidden; background:#552828;
+  will-change:height;
+  transition:height .5s cubic-bezier(.4,0,.2,1);
+}
+.case-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+.case-tags{
+  /* One step down from the title's 1.6146vw by the golden ratio (÷1.618),
+     and switched off the SmBd family (which only has a single, always-
+     semibold face regardless of font-weight) onto the family that actually
+     has a Regular/400 face, for a visibly less bold look. */
+  margin:0; font-family:var(--font-display-bold); font-weight:400; font-size:0.9979vw; line-height:1.2; color:var(--white);
+  opacity:0; transition:opacity .3s ease;
+}
+.case-item.is-large{ width:25.013vw; min-width:230px; }
+.case-item.is-large .case-media{ height:25.32vw; min-height:198px; } /* minimal bump from 24.349vw/190px */
+.case-item.is-large .case-tags{ opacity:1; }
+
+@media (prefers-reduced-motion:reduce){
+  .case-item, .case-media, .cases-track-inner{ transition:none; }
+}
+
+/* ---------- Prozess ----------
+   Figma node 512:1531 (3840px reference) for the base sizes; the curve
+   geometry below was re-derived from the user's own Figma PROTOTYPE
+   (node 525:1565 and its sibling delay-cycled states 528:1684 / 525:1643 —
+   same file). That prototype auto-advances between 3 fixed snapshots on a
+   timer; the user asked for the same visual positioning but driven by
+   normal scroll instead, which is what js/main.js does continuously.
+   Reverse-engineered from the prototype's raw node geometry (all 3 states
+   share one identically-placed ellipse, confirming the circle itself never
+   moves — only which items are "in view" changes):
+     ellipse (the circle): x=-3593 y=-1282 width=4725 height=4725, on the
+     3840px-wide reference frame → radius=2362.5px=61.523vw, its LEFT edge
+     at -93.568vw (so its center sits at -32.044vw — off-screen left, NOT
+     centered on the window edge like an earlier iteration assumed).
+     Each item has a small "dash" connector rectangle (#d9d9d9, 296×38px)
+     whose LEFT edge sits exactly on the circle's curve (verified against
+     all 3 snapshots to within ~1px on 4 of 6 sampled points) and whose
+     RIGHT edge is exactly where that item's number+text content starts —
+     i.e. the dash IS the gap, literal width 296px=7.708vw. Confirms the
+     original per-item formula (x = circleEdgeX + gap, where circleEdgeX
+     solves the circle equation for that item's dy from viewport center)
+     was structurally right — only the constants (radius/left-offset/gap)
+     were guessed too small/wrong before this reference existed.
+   That prototype-accurate radius (61.523vw) turned out too large to read
+   as *motion* during real scrolling, though: the Figma mockup shows its
+   swing by placing 3 items far apart on one tall canvas (up to ~1700px of
+   vertical distance from the circle's center), which a single real
+   viewport never spans — at a normal viewport height the same formula
+   with that radius only swings items by a few vw, so they barely visibly
+   "run" past the circle at all. Per explicit follow-up direction ("die
+   Punkte rechts neben dem Kreis laufen lassen"), the radius (and its
+   matching left-offset, recentring the circle at x=0 — its rightmost
+   point — instead of the prototype's off-screen-left center) were tuned
+   down from the prototype-exact value specifically to make that swing
+   clearly visible within one real scroll pass, while keeping every other
+   prototype-derived detail (the dash connector, its width-as-gap, the
+   number+text flex row) unchanged.
+   RADIUS_VW / CIRCLE_LEFT_VW / GAP_VW in js/main.js must stay equal to
+   --process-radius / --process-circle-left / --process-gap here.
+   The circle is sticky-pinned vertically centered in the viewport
+   (position:sticky on .process-circle-wrap) while .process-list scrolls
+   past it in normal in-flow document scroll — no scroll-jacking.
+   IMPORTANT: nothing between .process-circle-wrap and the page's real
+   scroll root may have `overflow` set to anything other than `visible` —
+   that's what makes position:sticky work here — so the circle's own
+   left-bleed is clipped on .process-circle-wrap itself (the sticky element,
+   clipping itself is fine), not on .process, which stays overflow:visible.
+   Number font is spec'd "Medium" in Figma, which isn't among the four
+   weights we have (Light/Regular/SemiBold/Bold) — substituted SemiBold
+   (var(--font-display)) as the closest available weight; swap in a real
+   Medium woff2 in fonts/ if the client provides one. */
+.process{
+  --process-radius:32vw;      /* circle radius — must match RADIUS_VW in js/main.js. Tuned down from the prototype-exact 61.523vw for visible swing during real scroll — see the comment above. */
+  --process-circle-left:-32vw; /* circle's left edge offset — must match CIRCLE_LEFT_VW in js/main.js. Equal to -1*radius, so the circle's center sits at x=0 (the window's left edge) and its rightmost bulge reaches exactly --process-radius into the viewport. */
+  --process-gap:7.708vw;          /* circle-to-content gap — must match GAP_VW in js/main.js */
+  --process-num-gap:1.5625vw;     /* gap between the number and the text block, 60px on the 3840px reference */
+  display:grid; /* circle-wrap and content stacked in the same cell (grid-area 1/1) instead of one pushing the other down — .process's own height is set by the taller one (content), and the shorter one (100vh circle wrap) scrolls/sticks within that shared space */
+}
+.process-circle-wrap{
+  grid-area:1/1;
+  position:sticky; top:0; height:100vh; width:100%;
+  overflow:hidden;
+  display:flex; align-items:center;
+  pointer-events:none; z-index:0;
+}
+.process-circle{
+  /* was a plain div with border-radius:50% + border — swapped for an SVG
+     <circle> so the outline can be "drawn" with stroke-dasharray/
+     stroke-dashoffset, animated live in js/main.js as the user scrolls
+     through the section (see the JS comment near RADIUS_VW). Same
+     width/height/margin-left positioning trick as before (only the
+     rightmost bulge of the circle is ever actually visible — see the
+     --process-circle-left comment on .process above), just on an <svg>
+     instead of a <div> now. overflow:visible isn't needed since the
+     circle sits exactly on the SVG's own edges (r=49.95 in a 0 0 100 100
+     viewBox, i.e. barely inset for the stroke). */
+  display:block;
+  width:calc(var(--process-radius) * 2); height:calc(var(--process-radius) * 2);
+  margin-left:var(--process-circle-left);
+  flex:none;
+  overflow:visible;
+}
+.process-circle-path{
+  fill:none;
+  stroke:var(--white);
+  stroke-width:0.05; /* ~1px at the 3840px reference width, expressed in the SVG's own 100-unit viewBox instead of vw — thinned twice now from the original 0.1 (~2px) along with the site's other white strokes */
+  /* circumference of r=49.95 in the 100-unit viewBox = 2 * PI * 49.95 ≈
+     313.85 — dasharray set to exactly that so the stroke is one
+     unbroken lap with no gap; dashoffset is driven live by js/main.js
+     from 313.85 (fully hidden) down to 0 (fully drawn) as scroll
+     progress moves through the Prozess section, --process-draw is just
+     the live hook JS writes to instead of touching stroke-dashoffset
+     directly so the CSS keeps ownership of the actual property. Starts
+     at the top (rotate -90deg) and draws clockwise, so the visible
+     right-hand bulge — top-right through to bottom-right — is exactly
+     the first half of the draw; the invisible left half (off-screen)
+     draws during the back half of the scroll. */
+  stroke-dasharray:313.85;
+  stroke-dashoffset:var(--process-draw, 313.85);
+  transform:rotate(-90deg);
+  transform-origin:50% 50%;
+}
+@media (prefers-reduced-motion:reduce){
+  .process-circle-path{ stroke-dashoffset:0; }
+}
+.process-content{
+  grid-area:1/1;
+  position:relative; z-index:1;
+}
+.process-fade{
+  /* was position:absolute;inset:0 *inside* .process-content, with gradient
+     stops tuned as a fraction of the WHOLE section's (multi-thousand-px)
+     scroll height — meaning it only ever faded in at the very start of
+     the section and out at the very end, hard-cutting at the viewport's
+     own top/bottom edges for the entire middle of the scroll. Made it
+     sticky+100vh instead so it reads as a vignette at every scroll
+     position — but a sticky box still occupies space in normal flow
+     (unlike absolute), so leaving it nested inside .process-content added
+     a full spurious 100vh of dead space before .process-list even
+     started. Fixed by moving it OUT to be a direct child of .process,
+     grid-area:1/1 alongside .process-circle-wrap and .process-content —
+     same trick that already lets the circle-wrap sit at 100vh without
+     adding flow height: siblings sharing one grid cell don't stack their
+     heights, the row is just sized by the tallest (.process-content). */
+  grid-area:1/1;
+  position:sticky; top:0; height:100vh; width:100%;
+  z-index:2; pointer-events:none;
+  background:linear-gradient(180deg, var(--black) 0%, transparent 18%, transparent 82%, var(--black) 100%);
+  mix-blend-mode:multiply;
+  /* hidden until js/main.js confirms the circle is actually stuck to the
+     viewport top (i.e. the section has genuinely been scrolled to) — see
+     the JS comment above ".process-circle-wrap"/".process-fade". Without
+     this, the fade's own top-black band could already be visible the
+     moment the section first peeks up from below, while Cases was still
+     also on screen above it — not literally darkening Cases (verified:
+     toggling this element off changed nothing there), but reading as the
+     vignette showing up too soon. */
+  opacity:0;
+  transition:opacity .4s cubic-bezier(.4,0,.2,1);
+}
+.process-fade.is-visible{ opacity:1; }
+@media (prefers-reduced-motion:reduce){
+  .process-fade{ transition:none; }
+}
+.process-list{
+  position:relative; margin:0; padding:50vh 0 30vh; list-style:none;
+  display:flex; flex-direction:column; gap:9.74vw;
+  /* padding-top: was 100vh (a full viewport of empty scroll before "01"
+     even starts flying in) — reduced to 50vh per explicit direction so
+     less scrolling between Hero/Cases and here is needed before something
+     happens, while still leaving "01" below the fold at section-start so
+     it flies in from below rather than already being in place (see the
+     "01" fix this replaces the exact number from).
+     padding-bottom: was 100vh (mirroring the old top value), giving "05"
+     a full viewport of centered time before the section released — that
+     same 100vh, plus Team's own top padding on top of it, is what made
+     the Prozess→Team gap read as an oversized dead scroll once Team was
+     added below. Reduced to 30vh per explicit direction ("näher dran an
+     die vorherige Section") — still enough for 05's curve animation to
+     finish and hold briefly before Team starts, just not a full empty
+     viewport of it.
+     gap doubled (was 4.87vw) per earlier explicit direction for more
+     breathing room between steps. */
+}
+.process-item{
+  position:relative;
+  display:flex; align-items:center; gap:var(--process-num-gap); /* number + text side by side, vertically centered on each other — matches the prototype's flex row (previously the number was absolutely positioned with a fixed offset on the text, a rougher approximation) */
+  transform:translateX(var(--item-x, 39.708vw)); /* --item-x is set live by js/main.js; 39.708vw (the max possible reach, i.e. an item exactly at the viewport's vertical center) is just the pre-JS/first-paint fallback */
+  will-change:transform;
+}
+/* .process-item::before (the gray connector dash/pill between the circle's
+   curve and each number) removed per explicit direction. */
+.process-number{
+  flex:none;
+  font-family:var(--font-display); font-weight:400; font-size:11.0417vw; line-height:1; color:var(--white);
+}
+.process-text{
+  position:relative; max-width:30.339vw;
+  display:flex; flex-direction:column; gap:1.1719vw;
+}
+.process-text h3{
+  margin:0; font-family:var(--font-display); font-weight:400; font-size:1.6146vw; line-height:1.2; color:var(--white);
+}
+.process-text p{
+  margin:0; font-family:var(--font-display-bold); font-weight:300; font-size:1.6146vw; line-height:1.2; color:var(--white);
+  opacity:.8;
+}
+
+/* ---------- Team ----------
+   Figma node 539:1879 (3840px reference, same conversion as everywhere
+   else: vw = px/3840*100). The frame's own x=404 exactly equals
+   --grid-margin, i.e. it's left-aligned to the content grid's left edge —
+   same as .wrap — so every child position below is just that child's
+   Figma x/y converted straight to vw and used as left/top from .wrap's
+   own origin, no extra offset needed.
+   Circles are a scattered/organic arrangement (not a grid), so absolute
+   positioning per member is the only faithful way to reproduce it —
+   mirrors the technique already used for .process-item's curve, just
+   static instead of scroll-driven.
+   Each member's photo is a plain circle (border-radius:50% + object-fit
+   cover, no CSS mask needed — the source design uses an SVG alpha mask
+   for the same circular clip, which border-radius already achieves
+   directly). Name/role/contact icons are hidden until hover — confirmed
+   from Figma: a plain screenshot of the resting "Mask group/false"
+   component shows only the bare photo, no visible text or icons, so
+   the reveal-on-hover behavior in the reference code's opacity-0 "txt"
+   layer is the real default state, not just an export artifact.
+   Mail/phone icons (images/mail.svg, images/phone.svg) are hand-drawn
+   standins, not exact exports: the Figma asset CDN wasn't reachable from
+   this environment (both direct download and the MCP's own asset-fetch
+   path failed for these two specific nodes — isolated icon screenshots
+   came back as degenerate 1x1 renders even though the full circle
+   rendered fine), so exact bytes couldn't be pulled the way the team
+   photos and other icons on this page were. They're positioned at the
+   exact Figma insets regardless (top/left below match the design's own
+   percentages), so swapping in the real assets later is a one-line
+   change per icon if the exact files are provided.
+   The bottom-right arrow (images/team-arrow.svg) is likewise hand-drawn
+   from the node's own geometry (a 560.5px line + a ~211px chevron
+   arrowhead, per get_metadata) rather than fetched, same reachability
+   issue. */
+.team{
+  position:relative;
+  padding:2vw 0 12vw; /* top was 8vw — reduced per explicit direction so it sits closer to Prozess above instead of leaving a big gap; bottom increased for more breathing room before the next section */
+}
+.team-inner{
+  position:relative;
+  height:55.5729vw; /* 2134px frame height */
+}
+.team-heading{
+  position:absolute; left:33.3333vw; top:0; width:37.7604vw; margin:0;
+  font-family:var(--font-display); font-weight:400; font-size:3.3854vw; line-height:1.2;
+  color:var(--white);
+}
+.team-member{
+  position:absolute;
+  width:14.7917vw; height:14.7917vw; /* 568px circle */
+}
+.team-member--christian{ left:44.375vw; top:11.1979vw; }
+.team-member--sophia{ left:29.5833vw; top:11.1979vw; }
+.team-member--andre{ left:36.9792vw; top:25.9896vw; }
+.team-member--thomas{ left:0; top:25.9896vw; }
+.team-member--melissa{ left:14.7917vw; top:40.7813vw; }
+.team-member--steven{ left:59.1667vw; top:25.9896vw; }
+.team-circle{
+  position:absolute; inset:0;
+  border-radius:50%;
+  overflow:hidden;
+  /* Checked the actual hover-state Figma node (539:1877, hover=true
+     variant): the photo isn't a circle with icons floating outside it —
+     on hover the circle UN-ROUNDS into a plain square (the reference
+     code literally drops the `rounded-[999px]` class in the hover
+     variant) at the same time the name/role/icons fade in. That's why
+     the top-right icons and bottom text sit at insets that would
+     otherwise fall outside a strict inscribed circle (an earlier
+     implementation, done before this reference was available, worked
+     around that by pulling the icons out of the circular clip entirely
+     — no longer needed now that the clip itself becomes a square right
+     when they appear). border-radius is transitioned together with the
+     overlay's opacity below. */
+  transition:border-radius .35s cubic-bezier(.4,0,.2,1);
+}
+.team-member:hover .team-circle,
+.team-member:focus-within .team-circle{ border-radius:0; }
+.team-photo{ width:100%; height:100%; object-fit:cover; }
+.team-overlay{
+  position:absolute; inset:0;
+  opacity:0;
+  transition:opacity .35s cubic-bezier(.4,0,.2,1);
+}
+.team-overlay::before{
+  /* dark bottom scrim so the name/role stay legible over the photo —
+     the real hover screenshot doesn't show an obvious separate scrim
+     (Christian Noll's dark jacket already provides contrast there), but
+     that's photo-dependent — kept a soft one here as a legibility safety
+     net since not every team photo will have a naturally dark area right
+     behind the text. */
+  content:'';
+  position:absolute; inset:0;
+  background:linear-gradient(180deg, transparent 60%, rgba(0,0,0,.6) 100%);
+}
+.team-member:hover .team-overlay,
+.team-member:focus-within .team-overlay{ opacity:1; }
+.team-icon{
+  position:absolute;
+  display:flex; align-items:center; justify-content:center;
+  pointer-events:none; /* decorative — see the note above on why these aren't real mailto:/tel: links */
+}
+.team-icon img{ width:100%; height:auto; display:block; }
+.team-icon--mail{ top:7.3%; left:84.86%; width:1.15vw; } /* was 1.6vw/top:5.81% — smaller, plus a touch more top spacing per explicit direction */
+.team-icon--phone{ top:6.4%; left:71%; width:0.8vw; } /* was 1.1vw/top:4.93%, left:74.65%, then left:68% — nudged back right slightly (minimal) to bring the two icons a touch closer together again, per explicit direction */
+.team-info{
+  position:absolute; left:9.15%; right:8.98%; bottom:10.04%;
+  display:flex; flex-direction:column; gap:0.1563vw;
+}
+.team-info h3{
+  margin:0; font-family:var(--font-display); font-weight:400; font-size:0.9896vw; line-height:1.2; color:var(--white);
+}
+.team-info p{
+  margin:0; font-family:var(--font-display-bold); font-weight:300; font-size:0.9896vw; line-height:1.2; color:var(--white);
+}
+.team-arrow{
+  position:absolute; left:59.1667vw; top:45.4427vw; width:10vw; height:auto; /* was 14.686vw (exact Figma size) — reduced per explicit direction */
+  animation:team-arrow-nudge 1.8s ease-in-out infinite; /* subtle looping nudge to the right and back, per explicit direction ("bisschen animieren") — small enough to read as a gentle hint of motion, not a distraction */
+}
+@keyframes team-arrow-nudge{
+  0%, 100%{ transform:translateX(0); }
+  50%{ transform:translateX(0.6vw); }
+}
+@media (prefers-reduced-motion:reduce){
+  .team-overlay, .team-circle{ transition:none; }
+  .team-arrow{ animation:none; }
+}
+
+/* ---------- Creativity section (Figma 545:1979) ----------
+   Frame is 3546px wide @ 3840px reference — narrower than the full
+   canvas but wider than the 3032px content grid (--grid-width), i.e.
+   it deliberately bleeds past the standard grid margins. So it gets its
+   own centered container (--creativity-width) rather than .wrap. All
+   child positions below are converted the same way as the Team section:
+   px / 3840 * 100 = vw, relative to this container's top-left. */
+.creativity{
+  position:relative;
+  padding:4vw 0 12vw;
+}
+.creativity-inner{
+  position:relative;
+  width:92.3438vw; /* 3546px */
+  margin:0 auto;
+  height:72.2272vw; /* 2744.457px Figma height + 0.757vw extra so heading->images gap matches Team section */
+}
+.creativity-heading{
+  position:absolute; left:13.2263vw; top:0; width:43.3823vw; margin:0;
+  font-family:var(--font-display); font-weight:400; font-size:3.3854vw; line-height:1.1;
+  color:var(--white);
+}
+.creativity-images{
+  /* top nudged down from the raw Figma value (9.7634vw) by +0.757vw so the
+     heading->images gap matches the Team section's heading->photos gap,
+     per explicit direction ("Gleicher Abstand ... wie in der Team section"). */
+  position:absolute; left:0; top:10.5204vw; width:100%; height:61.7068vw;
+}
+.creativity-img{
+  position:absolute;
+  border-radius:0.625vw; /* 24px */
+  overflow:hidden;
+  object-fit:cover;
+  will-change:transform;
+}
+.creativity-img--1{ left:0; top:0; width:56.6086vw; height:40.0156vw; }
+.creativity-img--2{ left:46.8933vw; top:20.0078vw; width:32.0317vw; height:29.1941vw; }
+.creativity-img--3{ left:18.9978vw; top:34.3403vw; width:20.8735vw; height:27.3665vw; }
+.creativity-cta{
+  position:absolute; left:46.9010vw; top:67.4236vw; /* shifted down with .creativity-images by the same +0.757vw */
+  display:flex; align-items:center;
+  text-decoration:none;
+}
+.creativity-cta-label{
+  position:relative; z-index:2; /* pill stays in front of the icon while they cross-slide on hover */
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:#000; white-space:nowrap;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.creativity-cta-icon{
+  position:relative; z-index:1;
+  flex-shrink:0; width:2.0833vw; height:2.0833vw;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+/* Hover state (Figma 219:942): icon swaps to the left of the pill and
+   rotates 45deg — the icon artwork itself is a NE arrow (↗), rotating it
+   45deg clockwise turns it into a horizontal E arrow (→), matching the
+   two distinct icon graphics (imgKreis / imgKreis1) used in the Figma
+   hover variant without needing a second asset.
+   Swapping via the CSS `order` property is a hard cut (order can't be
+   transitioned), so instead both elements cross-slide via transform:
+   the label slides right by the icon's width, the icon slides left by
+   the label's width, landing exactly in each other's old slot. Widths
+   are measured in JS (label text length varies) and exposed as
+   --cta-label-w / --cta-icon-w custom properties on .creativity-cta. */
+.creativity-cta:hover .creativity-cta-label,
+.creativity-cta:focus-visible .creativity-cta-label{
+  transform:translateX(var(--cta-icon-w, 2.0833vw));
+}
+.creativity-cta:hover .creativity-cta-icon,
+.creativity-cta:focus-visible .creativity-cta-icon{
+  transform:translateX(calc(-1 * var(--cta-label-w, 10vw))) rotate(45deg);
+}
+@media (prefers-reduced-motion:reduce){
+  .creativity-img{ transition:none; }
+  .creativity-cta-label, .creativity-cta-icon{ transition:none; }
+}
+
+/* ---------- Leistungen (Figma node 684:1738, "Frame 352") ----------
+   Header row reuses .slider-btn as-is (see Cases carousel above) and
+   mirrors .cases-header's layout (flex row, padding-left:var(--grid-margin)).
+   Card track: see the HTML comment above this section for why only 4 of
+   Figma's 5 card frames are built, and why the 4 cards' combined width
+   equals --grid-width exactly (so there's nothing to actually scroll at
+   desktop widths — .leistungen-track's overflow-x + the prev/next
+   buttons mainly matter on narrower viewports). js/main.js wires the
+   buttons to scrollBy() one card+gap; no endless-loop logic needed since
+   every card is the same size (unlike Cases' grow-on-active card). */
+.leistungen{
+  position:relative;
+  padding:6vw 0 10vw;
+}
+.leistungen-header{
+  position:relative;
+  display:flex; align-items:center; gap:2.0833vw;
+  padding-left:var(--grid-margin);
+  margin-bottom:clamp(16px, 3vw, 48px);
+}
+.leistungen-heading{
+  margin:0; font-family:var(--font-display); font-weight:400; font-size:3.3854vw; line-height:1.1;
+  color:var(--white);
+}
+.leistungen-track{
+  display:flex; gap:1.0417vw;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  /* Left inset is a margin, not padding: padding lives inside the
+     scrollport and would scroll away on the very first tick, so the
+     "start at the content edge" boundary would move with it. A margin
+     sits outside the scrolling box entirely — the track's own left edge
+     stays pinned at the content grid's edge, and cards only disappear
+     once they scroll past that fixed boundary (i.e. slide out to the
+     left), instead of the whole inset sliding away immediately. */
+  margin-left:var(--grid-margin);
+  padding:0 var(--grid-margin) clamp(16px, 2vw, 40px) 0;
+  scrollbar-width:none; -ms-overflow-style:none;
+}
+.leistungen-track::-webkit-scrollbar{ display:none; }
+.leistung-card{
+  scroll-snap-align:start;
+  flex:0 0 18.9583vw; min-width:230px;
+  min-height:23.9806vw;
+  display:flex; flex-direction:column; align-items:flex-start; gap:1.5vw;
+  padding:1.9vw 1.25vw 2.5vw;
+  border:1px solid var(--white); border-radius:0.625vw;
+}
+.leistung-icon{ align-self:center; height:6.5vw; width:auto; display:block; }
+.leistung-card h3{
+  margin:0; font-family:var(--font-display); font-weight:400; font-size:1.4462vw; line-height:1.1;
+  color:var(--white);
+}
+.leistung-card p{
+  margin:0; font-family:var(--font-body); font-weight:300; font-size:0.729vw; line-height:1.2;
+  color:var(--white);
+}
+.leistung-cta{
+  margin-top:auto;
+  display:flex; align-items:center;
+  text-decoration:none;
+}
+/* Hover: same cross-slide + rotate pattern as .creativity-cta (icon is
+   the same btn_pfeil.svg NE arrow, 45deg rotation turns it into a
+   horizontal E arrow) — label slides right by the icon's width, icon
+   slides left by the label's width and rotates, landing in each other's
+   old slot. --leistung-cta-label-w / --leistung-cta-icon-w are measured
+   per-instance in js/main.js since every card has its own CTA. */
+.leistung-cta-label{
+  position:relative; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:#000; white-space:nowrap;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.leistung-cta-icon{
+  position:relative; z-index:1;
+  flex-shrink:0; width:2.0833vw; height:2.0833vw;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.leistung-cta:hover .leistung-cta-label,
+.leistung-cta:focus-visible .leistung-cta-label{
+  transform:translateX(var(--leistung-cta-icon-w, 2.0833vw));
+}
+.leistung-cta:hover .leistung-cta-icon,
+.leistung-cta:focus-visible .leistung-cta-icon{
+  transform:translateX(calc(-1 * var(--leistung-cta-label-w, 6vw))) rotate(45deg);
+}
+@media (prefers-reduced-motion:reduce){
+  .leistung-cta-label, .leistung-cta-icon{ transition:none; }
+}
+@media (max-width:860px){
+  .leistungen-heading{ font-size:6vw; }
+  .leistung-card{ flex-basis:78vw; min-height:auto; }
+  .leistung-icon{ height:14vw; }
+  .leistung-card h3{ font-size:5vw; }
+  .leistung-card p{ font-size:3.6vw; }
+  .leistung-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
+  .leistung-cta-icon{ width:9vw; height:9vw; }
+}
+
+/* ---------- Kundenzitate / Testimonial (Figma node 191:974, "Group 2") ----------
+   3164px wide @ 3840px reference (px/3840*100=vw, same conversion as
+   Team/Creativity), sitting right before the footer. Round portrait
+   (30.651vw = 1177px, matches the frame's own height exactly) + quote,
+   laid out as a flex row instead of the per-line absolutely-positioned
+   text Figma exports — see the HTML comment above this section for why.
+   Gap between photo and quote (4.922vw) and the quote block's width are
+   both derived from Figma's own numbers: quote text starts at 35.573vw
+   (1366px) in the reference, 30.651vw of that is the photo, leaving a
+   4.922vw gap.
+   Container's right edge is pinned to the standard content grid's right
+   edge (margin-right:var(--grid-margin), same as .wrap) instead of being
+   centered — the quote text must not run past the grid, matching the
+   rest of the site's copy. Left edge is left auto (margin-left:auto),
+   which lands the photo ~7.08vw from the viewport edge — intentionally
+   bleeding slightly past the grid on the left, close to Figma's own
+   276px (7.1875vw) frame offset; only the right/text side needed
+   capping. */
+.testimonial{
+  position:relative;
+  padding:6vw 0 10vw;
+}
+.testimonial-inner{
+  position:relative;
+  width:82.3958vw; margin:0 var(--grid-margin) 0 auto;
+  display:flex; align-items:center; gap:4.922vw;
+  min-height:30.651vw;
+}
+.testimonial-photo{
+  flex:none;
+  width:30.651vw; height:30.651vw;
+  border-radius:50%;
+  overflow:hidden;
+}
+.testimonial-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+.testimonial-quote{
+  flex:1; margin:0; min-width:0;
+  display:flex; flex-direction:column;
+}
+.testimonial-quote p{
+  position:relative;
+  margin:0;
+  font-family:var(--font-body); font-weight:500; font-size:3.125vw; line-height:1.15;
+  color:var(--white);
+}
+/* Opening quote mark hangs outside the text block (outdented to the
+   left), closing mark stays inline as normal punctuation at the end of
+   the text — generated via ::before instead of typed inline so the
+   outdent doesn't disturb the paragraph's own left edge/wrapping. */
+.testimonial-quote p::before{
+  content:"\201C";
+  position:absolute;
+  left:-0.5em; top:0;
+}
+.testimonial-attribution{
+  margin-top:2.5vw;
+  display:flex; flex-direction:column; align-items:flex-end; gap:0.3125vw;
+  text-align:right;
+}
+.testimonial-name{
+  font-family:var(--font-body); font-weight:700; font-size:1.25vw; line-height:1.2; color:var(--white);
+}
+.testimonial-role{
+  font-family:var(--font-body); font-weight:500; font-size:1.25vw; line-height:1.2; color:var(--white);
+}
+@media (max-width:860px){
+  .testimonial-inner{ flex-direction:column; align-items:flex-start; gap:2vw; width:auto; margin:0 var(--grid-margin); }
+  .testimonial-photo{ width:40vw; height:40vw; }
+  .testimonial-quote p{ font-size:5.5vw; }
+  .testimonial-attribution{ align-items:flex-start; text-align:left; }
+  .testimonial-name, .testimonial-role{ font-size:3.2vw; }
+}
+
+/* ---------- Kundenleiste / "Wir sprechen aus Erfahrung" (Figma node
+   171:1509) ----------
+   Figma's frame is 4491px wide @ 3840px reference — wider than the
+   reference viewport itself, i.e. deliberately full-bleed/overflowing
+   past both edges rather than confined to the content grid like the
+   rest of the page. Built as two independent endless-marquee rows
+   instead of replicating Figma's static logo positions, since the whole
+   point is continuous horizontal motion: each row's 7 real client logos
+   (see the HTML comment above this section for why 2 of Figma's 9
+   "bikeleasing" placeholder instances are excluded) are duplicated once
+   inside .kundenleiste-track so a translateX(0→-50%) / (-50%→0)
+   animation loops seamlessly regardless of the logos' actual combined
+   width. Row 2 runs the opposite direction at a different duration (also
+   uses a different logo order, matching the Figma file) so the two rows
+   read as independent, not mirrored. */
+.kundenleiste{
+  position:relative;
+  padding:6vw 0 10vw;
+  overflow:hidden;
+}
+.kundenleiste-heading{
+  margin:0 0 1.8vw;
+  /* One step down from the site's standard section-heading size
+     (3.3854vw, used by .team-heading / .leistungen-heading / the
+     Creativity heading) — reuses the system's own next-smaller rung
+     (1.6146vw, already used for .process-text h3) instead of a custom
+     Figma-literal size. */
+  font-family:var(--font-display); font-weight:400; font-size:1.6146vw; line-height:1.1;
+  color:var(--white); text-align:center;
+}
+.kundenleiste-rows{
+  display:flex; flex-direction:column;
+  gap:1.6vw;
+}
+.kundenleiste-row{
+  overflow:hidden;
+  width:100%;
+  -webkit-mask-image:linear-gradient(to right, transparent 0, #000 6vw, #000 94%, transparent 100%);
+  mask-image:linear-gradient(to right, transparent 0, #000 6vw, #000 94%, transparent 100%);
+}
+.kundenleiste-track{
+  display:flex; align-items:center;
+  width:max-content;
+  will-change:transform;
+  /* Endless, no snap-back at the loop point: each track is the 7-logo
+     set duplicated once (14 items). The naive version of this (flex
+     `gap` between items + translateX(-50%)) actually has a tiny but
+     real seam — with `gap` there are 13 gaps across 14 items, so the
+     rendered width is 2×(logos)+13×gap, and half of THAT isn't the same
+     as one true repeat unit (7 logos + 7 gaps), so the wrap point jumps
+     by half a gap. Fixed by giving every logo its own trailing
+     margin-right (--kunden-gap) instead of a track-level `gap`: with a
+     trailing margin after the 14th logo too, the rendered width is
+     exactly 2×(7 logos + 7 gaps), so translateX(-50%) lands on an exact
+     repeat boundary and the loop is pixel-perfect/invisible. */
+  --kunden-gap:6.5104vw;
+  animation:kunden-scroll-left 36s linear infinite;
+}
+.kundenleiste-row--right .kundenleiste-track{
+  animation-name:kunden-scroll-right;
+  animation-duration:42s;
+}
+/* Hover pauses that row's own line only, not both. */
+.kundenleiste-row:hover .kundenleiste-track{
+  animation-play-state:paused;
+}
+@keyframes kunden-scroll-left{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-50%); }
+}
+@keyframes kunden-scroll-right{
+  from{ transform:translateX(-50%); }
+  to{ transform:translateX(0); }
+}
+.kunden-logo{
+  flex:none;
+  display:flex; align-items:center;
+  height:6.2vw;
+  margin-right:var(--kunden-gap);
+}
+.kunden-logo img{
+  display:block;
+  height:100%; width:auto;
+}
+@media (prefers-reduced-motion:reduce){
+  .kundenleiste-track{ animation:none; }
+}
+@media (max-width:860px){
+  .kundenleiste-heading{ font-size:4.2vw; }
+  .kundenleiste-rows{ gap:3.5vw; }
+  .kunden-logo{ height:14.5vw; }
+  .kundenleiste-track{ --kunden-gap:13vw; }
+}
+
+/* ---------- Social media rail ----------
+   Sits outside the content grid on the right, centered in the margin
+   band, and stays vertically centered to the viewport while scrolling
+   through the main content. Docks (position:absolute, pinned to a spot
+   just above the footer) once the footer scrolls close enough that the
+   fixed/centered rail would start overlapping it — see the scroll
+   handler in js/main.js ("Social rail: dock above the footer"), which
+   toggles .is-docked and writes the computed `top` inline. From that
+   point on the rail scrolls away normally with the page like any other
+   in-flow content, instead of sliding over the footer.
+   Base sizes from Figma (node 205:1121, 3840px reference), then scaled
+   down: Instagram/X/LinkedIn x0.85, then everything (incl. Facebook) x0.85
+   again, so relative proportions to each other are preserved. */
+.social-rail{
+  position:fixed;
+  top:50%;
+  right:calc(var(--grid-margin) / 2 - 10px);
+  transform:translateY(-50%);
+  z-index:50;
+  display:flex; flex-direction:column; align-items:center; gap:1.25vw;
+}
+.social-rail.is-docked{
+  position:absolute;
+  transform:none; /* `top` is set inline by the scroll handler in this state */
+}
+.social-rail a{ display:block; }
+.social-rail img{ width:100%; height:100%; display:block; opacity:1; transition:opacity .25s ease; }
+/* hovering the rail dims every icon; the one actually hovered/focused stays fully opaque */
+.social-rail:hover a img,
+.social-rail:focus-within a img{ opacity:.5; }
+.social-rail a:hover img,
+.social-rail a:focus-visible img{ opacity:1; }
+.social-instagram{ width:0.9809vw; height:0.9809vw; }
+.social-facebook{ width:0.5664vw; height:1.1335vw; }
+.social-x{ width:1.0247vw; height:1.1179vw; }
+.social-linkedin{ width:1.0304vw; height:0.9931vw; }
+
+/* ---------- Insights (Figma node 684:1843, "Frame 353") ----------
+   Frame is 404px/3032px @ 3840px reference — exactly --grid-margin/
+   --grid-width, so it sits inside .wrap with no bleed (same as Team/
+   Creativity). 3 columns of 984px + 40px gaps = 3032px reproduced as
+   repeat(3,1fr) with a 1.0417vw gap instead of hard-coded widths.
+   Heading uses the site's standard 3.3854vw section-heading size (see
+   the HTML comment above this section for why, over Figma's literal
+   162px). Card title/date/category map onto --font-body (Helvetica
+   Neue Bold/Medium in Figma). The CTA reuses the footer-newsletter
+   button's exact pattern (white pill + separate rotating arrow circle)
+   since its own figures land exactly on that pattern's vw values. */
+.insights{
+  position:relative;
+  padding:6vw 0 10vw;
+}
+.insights-heading{
+  margin:0 0 3vw;
+  font-family:var(--font-display); font-weight:400; font-size:3.3854vw; line-height:1.1;
+  color:var(--white);
+}
+.insights-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:0 1.0417vw;
+}
+.insight-card{
+  display:flex; flex-direction:column;
+  gap:2.0833vw;
+}
+.insight-card-image{
+  background:var(--white);
+  aspect-ratio:984/696;
+  overflow:hidden;
+}
+.insight-card-image img{ display:block; width:100%; height:100%; object-fit:cover; }
+.insight-card-body{
+  display:flex; flex-direction:column;
+  gap:1.9271vw;
+}
+.insight-card-body h3{
+  margin:0; font-family:var(--font-body); font-weight:700; font-size:1.9271vw; line-height:1.15;
+  color:var(--white);
+  /* Fixed to exactly 3 lines' worth of height (this card set's tallest
+     title is 3 lines) so the divider below always sits at the same
+     height across all cards, regardless of how many lines a given
+     title actually wraps to — a 1- or 2-line title just leaves empty
+     space above the divider instead of pulling it upward. */
+  min-height:3.45em; /* 3 × line-height */
+}
+.insight-card-divider{
+  height:2px; width:100%;
+  background:var(--white);
+}
+.insight-card-meta{
+  display:flex; align-items:center; justify-content:space-between;
+}
+.insight-card-date{
+  font-family:var(--font-body); font-weight:700; font-size:1.1458vw; line-height:1;
+  color:var(--white);
+}
+.insight-card-category{
+  font-family:var(--font-body); font-weight:500; font-size:1.1458vw; line-height:1;
+  color:var(--white);
+}
+/* Hover: cross-slide + rotate — the site's standard CTA hover for every
+   pill-label + circular-arrow button (.creativity-cta / .leistung-cta):
+   label slides right by the icon's width, icon slides left by the
+   label's width and rotates 45deg (btn_pfeil.svg's NE arrow becomes
+   horizontal), landing in each other's old slot. --insights-cta-label-w
+   / --insights-cta-icon-w are measured in js/main.js, same as the other
+   two CTAs. */
+.insights-cta{
+  margin:4vw auto 0;
+  width:max-content;
+  display:flex; align-items:center;
+  text-decoration:none;
+}
+.insights-cta-label{
+  position:relative; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:#000; white-space:nowrap;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.insights-cta-icon{
+  position:relative; z-index:1;
+  flex-shrink:0; width:2.0833vw; height:2.0833vw;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.insights-cta:hover .insights-cta-label,
+.insights-cta:focus-visible .insights-cta-label{
+  transform:translateX(var(--insights-cta-icon-w, 2.0833vw));
+}
+.insights-cta:hover .insights-cta-icon,
+.insights-cta:focus-visible .insights-cta-icon{
+  transform:translateX(calc(-1 * var(--insights-cta-label-w, 10vw))) rotate(45deg);
+}
+@media (prefers-reduced-motion:reduce){
+  .insights-cta-label, .insights-cta-icon{ transition:none; }
+}
+@media (max-width:860px){
+  .insights-heading{ font-size:6vw; }
+  .insights-grid{ grid-template-columns:1fr; gap:8vw 0; }
+  .insight-card{ gap:4vw; }
+  .insight-card-body{ gap:3.5vw; }
+  .insight-card-body h3{ font-size:5.5vw; }
+  .insight-card-date, .insight-card-category{ font-size:3.4vw; }
+  .insights-cta{ margin-top:8vw; }
+  .insights-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
+  .insights-cta-icon{ width:9vw; height:9vw; }
+}
+
+/* ---------- Footer (Figma node 192:1023) ----------
+   Frame is 3722px wide @ 3840px reference, same conversion as Team/
+   Creativity: px / 3840 * 100 = vw. All child positions below are
+   relative to .footer-inner's own top-left, exactly as Figma's metadata
+   gives them (no half-percent/translate guessing needed — get_metadata
+   returned clean local x/y/width/height per node).
+   Two stacked bands: .footer-black (contact info, footer nav, newsletter
+   signup — framed by its own rounded-top-corners white border, standing
+   in for the black background that's already the page default) then
+   .footer-white (legal links + social) in normal flow right after it.
+   The circular "n" seal straddles the seam between the two bands, so
+   it's a direct child of .footer-inner, positioned with the same
+   frame-relative coordinates, and layered above both via z-index. */
+.site-footer{ position:relative; }
+.footer-inner{ position:relative; width:96.9271vw; margin:0 auto; }
+
+.footer-black{
+  position:relative;
+  height:27.8385vw; /* 1069px */
+  border:1px solid var(--white);
+  border-radius:0.3125vw 0.3125vw 0 0; /* 12px */
+}
+.footer-lead{
+  position:absolute; left:8.8542vw; top:4.6875vw; margin:0;
+  font-family:var(--font-body); font-weight:500; font-size:1.1458vw; line-height:1;
+  color:var(--white); white-space:nowrap;
+}
+.footer-contact-link{
+  position:absolute;
+  font-family:var(--font-display); font-weight:400; font-size:1.4323vw; line-height:1.25;
+  color:var(--white); text-decoration:underline; text-underline-offset:0.06em;
+  white-space:nowrap; transition:text-underline-offset .25s ease;
+}
+.footer-contact-link:hover, .footer-contact-link:focus-visible{ text-underline-offset:0.45vw; }
+.footer-mail{ left:8.8802vw; top:7.4219vw; }
+.footer-phone{ left:8.8542vw; top:10.3125vw; }
+
+.footer-nav-link{
+  position:absolute; margin:0;
+  font-family:var(--font-body); font-weight:500; font-size:1.1458vw; line-height:1;
+  color:var(--white); white-space:nowrap;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.footer-nav-link::before{
+  content:""; position:absolute; left:-0.7vw; top:50%;
+  width:0.35vw; height:0.35vw; border-radius:50%; background:currentColor;
+  opacity:0; transform:translateY(calc(-50% + 0.4vw));
+  transition:transform .35s cubic-bezier(.4,0,.2,1), opacity .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+.footer-nav-link:hover, .footer-nav-link:focus-visible{ transform:translateX(0.6vw); }
+.footer-nav-link:hover::before, .footer-nav-link:focus-visible::before{
+  opacity:1; transform:translateY(-50%);
+}
+@media (prefers-reduced-motion:reduce){
+  .footer-nav-link, .footer-nav-link::before{ transition:none; }
+}
+.footer-nav-col-1{ left:8.8542vw; }   /* 340px */
+.footer-nav-col-2{ left:22.1875vw; }  /* 852px */
+.footer-nav-col-3{ left:34.8698vw; }  /* 1339px */
+.footer-nav-row-1{ top:16.276vw; }    /* 625px */
+.footer-nav-row-2{ top:18.5156vw; }   /* 711px (Ressourcen's Figma value, 706px, is snapped in here — a 5px/3840px difference is invisible) */
+.footer-nav-row-3{ top:20.7552vw; }   /* 797px */
+
+.footer-newsletter-heading{
+  position:absolute; left:62.1875vw; top:4.2969vw; width:24.6875vw; margin:0;
+  font-family:var(--font-display); font-weight:400; font-size:1.4323vw; line-height:1.25;
+  color:var(--white); text-align:center;
+}
+.footer-subscribe-input{
+  position:absolute; left:62.1875vw; top:8.1771vw; width:18.2396vw; height:2.0833vw; margin:0;
+  border:0.35px solid var(--white); border-right:none; border-radius:1.0417vw 0 0 1.0417vw;
+  background:transparent; padding:0 0.8594vw;
+  font-family:var(--font-display); font-weight:400; font-size:0.8247vw;
+  color:var(--white);
+}
+.footer-subscribe-input::placeholder{ color:rgba(255,255,255,.5); opacity:1; }
+.footer-subscribe-input:focus-visible{ outline:2px solid var(--white); outline-offset:2px; }
+/* Figma specs the placeholder as "Medium", which isn't among the four
+   weights we have (Light/Regular/SemiBold/Bold) — substituted SemiBold
+   (var(--font-display)), same fallback used for .process-number. */
+.footer-subscribe-btn{
+  position:absolute; left:78.5156vw; top:8.1771vw;
+  display:flex; align-items:center; height:2.0833vw;
+}
+.footer-subscribe-label{
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:#000; white-space:nowrap;
+}
+.footer-subscribe-arrow{
+  flex-shrink:0; width:2.0833vw; height:2.0833vw;
+  transition:transform .25s ease;
+}
+.footer-subscribe-btn:hover .footer-subscribe-arrow,
+.footer-subscribe-btn:focus-visible .footer-subscribe-arrow{
+  transform:rotate(45deg);
+}
+
+.footer-white{
+  position:relative;
+  height:12.1875vw; /* 468px */
+  background:var(--white);
+  color:#000;
+}
+.footer-legal{
+  position:absolute; left:50%; top:4.5052vw; transform:translateX(-50%);
+  display:flex; gap:1.6667vw;
+}
+.footer-legal a{
+  font-family:var(--font-body); font-weight:700; font-size:0.8854vw; line-height:1.2;
+  white-space:nowrap; transition:transform .25s ease;
+}
+.footer-legal a:hover, .footer-legal a:focus-visible{ transform:translateY(-0.3vw); }
+.footer-social-heading{
+  position:absolute; left:29.8958vw; top:7.5vw; width:22.7344vw; margin:0;
+  font-family:var(--font-body); font-weight:700; font-size:0.8854vw; line-height:1.2;
+  text-align:center;
+}
+.footer-social{
+  position:absolute; left:47.6823vw; top:7.0833vw;
+  display:flex; align-items:center; gap:0.7552vw;
+}
+.footer-social img{ width:1.901vw; height:1.901vw; transition:transform .25s ease; }
+.footer-social a:hover img, .footer-social a:focus-visible img{ transform:translateY(-0.3vw); }
+
+.footer-seal{
+  position:absolute; left:44.6875vw; top:24.1927vw; z-index:2;
+  width:7.2917vw; height:7.2917vw;
+}
+.footer-seal img{ width:100%; height:100%; }
+
+.visually-hidden{
+  position:absolute; width:1px; height:1px; padding:0; margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+
+/* ---------- Debug column grid (testing only) ----------
+   Reference: 3840px viewport, 12 columns x 216px + 11 gutters x 40px
+   = 3032px content width. Expressed in vw so it scales proportionally
+   at any window size and always fits fully on screen.
+   216px  -> 5.625vw   (216/3840*100)
+   40px   -> 1.0417vw  (40/3840*100)
+   256px  -> 6.6667vw  (column + gutter)
+   3032px -> 78.9583vw (total content width)
+   Toggle with the "g" key.
+   Was briefly changed to default-hidden (suspecting it was the source of
+   an unwanted "vignette" look on Hero/Cases) — reverted per explicit
+   direction: the grid should stay visible by default as before, "g"
+   hides it. The actual vignette issue was the .site-header gradient
+   (removed separately), not this. ---------------------------------------- */
+.debug-grid{
+  position:fixed;
+  inset:0;
+  left:50%;
+  transform:translateX(-50%);
+  width:var(--grid-width);
+  height:100vh;
+  pointer-events:none;
+  z-index:9999;
+  background-image:repeating-linear-gradient(
+    to right,
+    rgba(255,0,0,.1) 0,
+    rgba(255,0,0,.1) 5.625vw,
+    transparent 5.625vw,
+    transparent 6.6667vw
+  );
+}
+body.hide-grid .debug-grid{ display:none; }
