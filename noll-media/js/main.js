@@ -18,8 +18,17 @@
      direction — closes itself the moment the user scrolls at all
      (closeCompactExpanded(), called from the scroll handler below),
      not just once they cross back over the threshold. */
+  /* Single source of truth for "are we on the phone layout" — must stay in
+     step with the @media (max-width:860px) breakpoint in style.css. Used by
+     the scroll effects below to stand down at that width: both of them write
+     INLINE styles (--item-x on the Prozess steps, transform on the
+     Creativity photos), which no stylesheet rule can override, so the mobile
+     layout can only take effect if the JS itself stops writing them. */
+  const isMobileLayout = () => window.matchMedia('(max-width:860px)').matches;
+
   const navToggle = document.getElementById('navToggle');
   const mobileNav = document.getElementById('mobileNav');
+  const mobileBarToggle = document.getElementById('mobileBarToggle');
   const isDesktopNavCompact = () =>
     document.body.classList.contains('nav-compact') && window.matchMedia('(min-width:861px)').matches;
   const closeCompactExpanded = () => {
@@ -30,6 +39,52 @@
       navToggle.setAttribute('aria-label', 'Menü öffnen');
     }
   };
+  /* Page scroll lock for the open menu. body{overflow:hidden} is not enough
+     on its own — iOS Safari happily keeps scrolling the page behind a fixed
+     overlay — so the page is taken out of the scroll flow entirely
+     (body.scroll-locked is position:fixed in style.css) and held at the
+     offset it was on via an inline top, which is then handed back on
+     unlock. Without restoring that offset, closing the menu would dump the
+     reader back at the top of the page. */
+  let scrollLockY = 0;
+  const setScrollLock = (locked) => {
+    const body = document.body;
+    if (locked === body.classList.contains('scroll-locked')) return;
+    if (locked) {
+      scrollLockY = window.scrollY;
+      body.style.top = `-${scrollLockY}px`;
+      body.classList.add('scroll-locked');
+    } else {
+      body.classList.remove('scroll-locked');
+      body.style.top = '';
+      // Two things to get right on the way back:
+      // 1. while body was position:fixed the document had no scrollable
+      //    height left (measured: 844px vs 5662px), so read a layout
+      //    property first to flush the reflow — otherwise the restore below
+      //    is clamped to the collapsed height and lands short.
+      // 2. html{scroll-behavior:smooth} is set for the anchor links, which
+      //    would turn this restore into a visible scroll animation back to
+      //    where the reader already was. 'instant' opts this one call out.
+      void body.offsetHeight;
+      window.scrollTo({ top: scrollLockY, left: 0, behavior: 'instant' });
+    }
+  };
+
+  /* One switch for the mobile menu, used by all three entry points (header
+     burger, bottom-bar burger, and a link inside the panel). Keeping the
+     class, both toggles' aria state and the scroll lock in a single place
+     is what stops them drifting apart — e.g. the panel closing via a link
+     while the page stays locked. */
+  const setNavOpen = (isOpen) => {
+    document.body.classList.toggle('nav-open', isOpen);
+    [navToggle, mobileBarToggle].forEach((btn) => {
+      if (!btn) return;
+      btn.setAttribute('aria-expanded', String(isOpen));
+      btn.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
+    });
+    setScrollLock(isOpen);
+  };
+
   if (navToggle && mobileNav) {
     navToggle.addEventListener('click', () => {
       // Desktop compact header un-collapse — see the comment above.
@@ -39,15 +94,100 @@
         navToggle.setAttribute('aria-label', isExpanded ? 'Menü schließen' : 'Menü öffnen');
         return;
       }
-      const isOpen = document.body.classList.toggle('nav-open');
-      navToggle.setAttribute('aria-expanded', String(isOpen));
-      navToggle.setAttribute('aria-label', isOpen ? 'Menü schließen' : 'Menü öffnen');
+      setNavOpen(!document.body.classList.contains('nav-open'));
     });
     mobileNav.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => {
-        document.body.classList.remove('nav-open');
-        navToggle.setAttribute('aria-expanded', 'false');
+      // Unlock before the browser acts on the #anchor: while body is
+      // position:fixed there is nothing to scroll, so the jump would land
+      // nowhere and then be undone by the lock's own scroll restore.
+      link.addEventListener('click', () => setNavOpen(false));
+    });
+  }
+  /* Services dropdown (desktop hover) + its touch counterpart in the mobile
+     panel. See the ".nav-dropdown" block in style.css for why the panel is
+     positioned rather than nested, and why this is scripted instead of a
+     pure :hover chain. */
+  {
+    const navServices = document.getElementById('navServices');
+    const navDropdown = document.getElementById('navDropdown');
+    const siteHeader = document.querySelector('.site-header');
+    const navServicesLink = navServices ? navServices.querySelector('a') : null;
+
+    if (navServices && navDropdown && siteHeader && navServicesLink) {
+      // The trigger sits in a centred nav whose width depends on the loaded
+      // font, so the offset is measured rather than hard-coded — and
+      // remeasured before every open, on resize, and once the webfont swaps in.
+      const positionDropdown = () => {
+        const headerLeft = siteHeader.getBoundingClientRect().left;
+        const itemLeft = navServices.getBoundingClientRect().left;
+        siteHeader.style.setProperty('--nav-dropdown-x', `${Math.round(itemLeft - headerLeft)}px`);
+      };
+
+      let closeTimer = null;
+      const setDropdownOpen = (isOpen) => {
+        clearTimeout(closeTimer);
+        if (isOpen) positionDropdown();
+        document.body.classList.toggle('nav-dropdown-open', isOpen);
+        navServices.classList.toggle('is-open', isOpen);
+        navServicesLink.setAttribute('aria-expanded', String(isOpen));
+      };
+      // Closing is delayed: the pointer has to cross the header's own bottom
+      // padding to reach the panel, and without this grace period the panel
+      // would close out from under it halfway across.
+      const closeSoon = () => {
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(() => setDropdownOpen(false), 180);
+      };
+
+      [navServices, navDropdown].forEach((el) => {
+        el.addEventListener('mouseenter', () => setDropdownOpen(true));
+        el.addEventListener('mouseleave', closeSoon);
       });
+      // Keyboard: opens as soon as focus reaches the trigger, closes once
+      // focus has left both the trigger and the panel entirely.
+      navServices.addEventListener('focusin', () => setDropdownOpen(true));
+      document.addEventListener('focusin', (e) => {
+        if (!navServices.contains(e.target) && !navDropdown.contains(e.target)) {
+          setDropdownOpen(false);
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && document.body.classList.contains('nav-dropdown-open')) {
+          setDropdownOpen(false);
+          navServicesLink.focus();
+        }
+      });
+      // Scrolling closes it, same as the manually expanded compact nav does.
+      window.addEventListener('scroll', () => {
+        if (document.body.classList.contains('nav-dropdown-open')) setDropdownOpen(false);
+      }, { passive: true });
+      navDropdown.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => setDropdownOpen(false));
+      });
+
+      window.addEventListener('resize', positionDropdown);
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(positionDropdown);
+      positionDropdown();
+    }
+
+    // Mobile accordion — same sub-items, tapped open instead of hovered.
+    const mobileSubToggle = document.getElementById('mobileSubToggle');
+    const mobileNavGroup = mobileSubToggle ? mobileSubToggle.closest('.mobile-nav-group') : null;
+    if (mobileSubToggle && mobileNavGroup) {
+      mobileSubToggle.addEventListener('click', () => {
+        const isOpen = mobileNavGroup.classList.toggle('is-open');
+        mobileSubToggle.setAttribute('aria-expanded', String(isOpen));
+      });
+    }
+  }
+
+  /* Mobile bottom bar's own burger (Figma node 466:3626) — same #mobileNav
+     overlay, same body.nav-open switch as the header toggle above; kept as
+     a second listener (rather than re-dispatching a click on navToggle) so
+     it works even though navToggle is display:none at this breakpoint. */
+  if (mobileBarToggle && mobileNav) {
+    mobileBarToggle.addEventListener('click', () => {
+      setNavOpen(!document.body.classList.contains('nav-open'));
     });
   }
 
@@ -130,13 +270,15 @@
     window.addEventListener('resize', requestUpdate);
   })();
 
-  /* Debug column grid (testing only) — press "g" to toggle.
-     Reverted to default-visible per explicit direction (was briefly
-     switched to default-hidden, see CSS comment). */
+  /* Debug column grid (testing only) — hidden by default, press "g" to show
+     it. Ignored while typing, so the key still works in the contact form and
+     the search field. */
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'g' || e.key === 'G') {
-      document.body.classList.toggle('hide-grid');
-    }
+    if (e.key !== 'g' && e.key !== 'G') return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const el = document.activeElement;
+    if (el && (el.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName))) return;
+    document.body.classList.toggle('show-grid');
   });
 
   /* Cases carousel — an endless loop, transform-only.
@@ -215,7 +357,13 @@
     // grid ever changes. Computed fresh on every call instead of cached
     // once, so it stays correct across viewport resizes.
     const ACTIVE_COL_OFFSET_VW = 20;
-    const activeColOffsetPx = () => (window.innerWidth * ACTIVE_COL_OFFSET_VW) / 100;
+    // On the phone layout there is no 12-column grid to anchor to and a 20vw
+    // indent would leave almost no room for the active card, so it starts at
+    // the content edge instead. Must stay in step with --active-col-offset
+    // in the responsive block of style.css, which moves .case-active-title
+    // by the same amount.
+    const activeColOffsetVw = () => (isMobileLayout() ? 0 : ACTIVE_COL_OFFSET_VW);
+    const activeColOffsetPx = () => (window.innerWidth * activeColOffsetVw()) / 100;
 
     const setTitleAndTransform = (pos, targetOffsetLeft) => {
       if (caseTitle) caseTitle.textContent = laid[pos].dataset.title || '';
@@ -351,6 +499,116 @@
     }
   }
 
+  /* Leistung Detail page CTA hover swap — same cross-slide/rotate pattern
+     as the Leistungen CTAs above, generalized across .leistung-detail-cta
+     (this page has two instances: hero + contact band). Only present on
+     the standalone Leistung Detail pages, so this is a no-op elsewhere. */
+  {
+    const detailCtas = document.querySelectorAll('.leistung-detail-cta');
+    if (detailCtas.length) {
+      const measureDetailCtas = () => {
+        detailCtas.forEach((cta) => {
+          const label = cta.querySelector('.leistung-detail-cta-label');
+          const icon = cta.querySelector('.leistung-detail-cta-icon');
+          if (!label || !icon) return;
+          cta.style.setProperty('--ldcta-label-w', `${label.offsetWidth}px`);
+          cta.style.setProperty('--ldcta-icon-w', `${icon.offsetWidth}px`);
+        });
+      };
+      measureDetailCtas();
+      window.addEventListener('resize', measureDetailCtas);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(measureDetailCtas);
+      }
+    }
+  }
+
+  /* Feature accordion on the Leistung Detail pages (Figma component 785:4372).
+     Rows toggle independently — opening one does not close the others, so
+     nothing collapses under the reader while they are looking at it. The
+     height itself is animated in CSS (grid-template-rows 0fr -> 1fr), so this
+     only has to flip a class and keep aria-expanded honest. */
+  {
+    document.querySelectorAll('.leistung-detail-feature-row').forEach((row) => {
+      const item = row.closest('.leistung-detail-feature');
+      if (!item) return;
+      row.addEventListener('click', () => {
+        const isOpen = item.classList.toggle('is-open');
+        row.setAttribute('aria-expanded', String(isOpen));
+      });
+    });
+  }
+
+  /* Drip morph — the Websites & Online-Shops icon.
+     images/leistungen/websites-shops.svg and ..._hover.svg are the same drawing
+     except for one path: the drip across the screen, which runs further down in
+     the hover state. Both `d` strings use the identical sequence of commands and
+     differ only in six numbers, so morphing between them is a plain numeric
+     interpolation — no path-matching library needed, and the shape stays exactly
+     the artwork at both ends.
+     Done in script rather than with a CSS transition on `d`: that property is
+     not animatable in every browser (Firefox has no support at all), so a
+     CSS-only version silently does nothing there. Writing the attribute frame by
+     frame works everywhere. Each drip finds its own trigger — the card on the
+     homepage, the illustration on a detail page. */
+  {
+    const drips = document.querySelectorAll('.ws-drip');
+    const DURATION = 550;
+    // splits "M202,21.4v8.4..." into its numbers and the separators between them
+    const NUM = /-?\d*\.?\d+/g;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion:reduce)');
+
+    drips.forEach((drip) => {
+      const fromD = drip.getAttribute('d');
+      const toD = drip.getAttribute('data-hover-d');
+      const trigger = drip.closest('.leistung-card, .leistung-detail-illustration');
+      if (!fromD || !toD || !trigger) return;
+
+      const from = fromD.match(NUM).map(Number);
+      const to = toD.match(NUM).map(Number);
+      const skeleton = fromD.split(NUM);
+      // Bail out rather than draw nonsense if the two shapes ever stop lining
+      // up (e.g. one of the two SVGs gets re-exported differently).
+      if (from.length !== to.length || fromD.split(NUM).join('') !== toD.split(NUM).join('')) return;
+
+      const render = (t) => {
+        let d = '';
+        for (let i = 0; i < from.length; i++) {
+          d += skeleton[i] + Math.round((from[i] + (to[i] - from[i]) * t) * 100) / 100;
+        }
+        drip.setAttribute('d', d + skeleton[skeleton.length - 1]);
+      };
+
+      let raf = null;
+      let progress = 0;
+      const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+
+      const animateTo = (target) => {
+        if (reduceMotion.matches) { progress = target; render(progress); return; }
+        cancelAnimationFrame(raf);
+        const start = progress;
+        const startedAt = performance.now();
+        // Scale the duration by how far there is left to go, so reversing
+        // mid-morph comes back at the same speed instead of easing over the
+        // full time from wherever it happened to be.
+        const span = Math.abs(target - start);
+        if (!span) return;
+        const step = (now) => {
+          const t = Math.min(1, (now - startedAt) / (DURATION * span));
+          progress = start + (target - start) * easeInOut(t);
+          render(progress);
+          if (t < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      };
+
+      trigger.addEventListener('mouseenter', () => animateTo(1));
+      trigger.addEventListener('mouseleave', () => animateTo(0));
+      trigger.addEventListener('focusin', () => animateTo(1));
+      trigger.addEventListener('focusout', () => animateTo(0));
+    });
+  }
+
   /* Prozess — scroll-following curve + vignette visibility, merged into
      one scroll handler.
      Curve: the circle (.process-circle) is sticky-pinned vertically
@@ -442,7 +700,7 @@
         const drawAmount = progress <= 0.5 ? progress * 2 : (1 - progress) * 2;
         processCirclePath.style.setProperty('--process-draw', String(CIRCLE_CIRCUMFERENCE * (1 - drawAmount)));
       }
-      if (processItems.length) {
+      if (processItems.length && !isMobileLayout()) {
         const radiusPx = (RADIUS_VW / 100) * window.innerWidth;
         const circleCenterXPx = ((CIRCLE_LEFT_VW + RADIUS_VW) / 100) * window.innerWidth;
         const gapPx = (GAP_VW / 100) * window.innerWidth;
@@ -479,6 +737,13 @@
       let cTicking = false;
       const updateParallax = () => {
         cTicking = false;
+        // Mobile lays the collage out as a plain grid (see the responsive
+        // block in style.css) — a leftover inline translateY would push the
+        // photos out of their cells, so clear it and stand down.
+        if (isMobileLayout()) {
+          creativityImgs.forEach((img) => { img.style.transform = ''; });
+          return;
+        }
         // --- read phase ---
         const rect = creativitySection.getBoundingClientRect();
         // --- write phase ---
@@ -543,4 +808,336 @@
       }
     }
   }
+
+  // Über uns — facts row. A horizontal accordion: exactly one card is open,
+  // clicking a closed one moves the open state to it. Clicking the open one
+  // is a no-op rather than a close, because the row has no "all closed"
+  // layout in the design (the widths have to add up to the full track).
+  {
+    const factsRow = document.getElementById('ueberFacts');
+    if (factsRow) {
+      const facts = Array.from(factsRow.querySelectorAll('.ueber-fact'));
+      facts.forEach((fact) => {
+        fact.addEventListener('click', () => {
+          // The row starts with nothing open, so "all closed" is a real state
+          // and clicking the open card closes it again.
+          const opening = !fact.classList.contains('is-open');
+          facts.forEach((other) => {
+            const open = opening && other === fact;
+            other.classList.toggle('is-open', open);
+            other.setAttribute('aria-expanded', open ? 'true' : 'false');
+          });
+        });
+      });
+    }
+  }
+
+  // Über uns — team columns. Two effects on one scroll handler:
+  //   * parallax: the two columns drift in opposite directions as the section
+  //     passes, so they slide against each other rather than moving as one
+  //     block. Same progress maths as the Creativity collage above.
+  //   * reveal: each portrait fades up once as it comes into view.
+  // Both stand down on mobile (single column, see the responsive block in
+  // style.css) and under prefers-reduced-motion.
+  {
+    const teamSection = document.getElementById('ueberTeam');
+    if (teamSection) {
+      const cols = Array.from(teamSection.querySelectorAll('[data-parallax]'));
+
+      // Fresh order on every visit: the six portraits are shuffled and dealt
+      // back out alternately, so both columns stay filled evenly and nobody
+      // holds a permanent top slot. Done before anything else in this block,
+      // since the drift amplitudes below are assigned by position.
+      if (cols.length) {
+        const shuffled = Array.from(teamSection.querySelectorAll('.ueber-person'));
+        for (let i = shuffled.length - 1; i > 0; i -= 1) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        shuffled.forEach((person, i) => {
+          cols[i % cols.length].appendChild(person);
+        });
+      }
+
+      const people = Array.from(teamSection.querySelectorAll('.ueber-person'));
+      const reduce = window.matchMedia('(prefers-reduced-motion:reduce)');
+      // vw, applied +/- so the columns travel a full 2x this against each other,
+      // plus a smaller per-circle drift on top of it.
+      const AMPLITUDE_VW = 3.6;
+      const PERSON_DRIFT_VW = 1.4;
+
+      if (reduce.matches) {
+        people.forEach((p) => p.classList.add('is-in'));
+      } else if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          });
+        }, { rootMargin: '0px 0px -12% 0px', threshold: 0.15 });
+        people.forEach((p) => io.observe(p));
+      } else {
+        people.forEach((p) => p.classList.add('is-in'));
+      }
+
+      // The scroll position feeds a target; what actually gets written is a
+      // value that eases towards it every frame. That takes the 1:1 stickiness
+      // out of the parallax — the circles keep drifting for a moment after the
+      // wheel stops instead of locking to the scrollbar.
+      const EASE = 0.075;
+      let target = 0;
+      let current = 0;
+      let rafId = 0;
+
+      const readTarget = () => {
+        const rect = teamSection.getBoundingClientRect();
+        const vh = window.innerHeight;
+        const center = rect.top + rect.height / 2;
+        const span = vh / 2 + rect.height / 2;
+        target = span > 0 ? Math.max(-1, Math.min(1, (vh / 2 - center) / span)) : 0;
+      };
+
+      const write = () => {
+        cols.forEach((col) => {
+          const dir = col.dataset.parallax === 'right' ? -1 : 1;
+          col.style.transform = `translateY(${(current * AMPLITUDE_VW * dir).toFixed(3)}vw)`;
+        });
+        // Within a column the circles drift against each other too, so the
+        // whole grid keeps shifting rather than moving as two solid blocks.
+        people.forEach((person) => {
+          const amp = parseFloat(person.dataset.drift || '0');
+          person.style.transform = `translateY(${(current * amp).toFixed(3)}vw)`;
+        });
+      };
+
+      const clear = () => {
+        cols.forEach((col) => { col.style.transform = ''; });
+        people.forEach((person) => { person.style.transform = ''; });
+      };
+
+      // Alternating amplitudes per position in the column; the sign flips with
+      // the column so neighbours across the gutter never travel together.
+      cols.forEach((col) => {
+        const dir = col.dataset.parallax === 'right' ? -1 : 1;
+        Array.from(col.querySelectorAll('.ueber-person')).forEach((person, i) => {
+          person.dataset.drift = ((i % 2 === 0 ? 1 : -1) * dir * PERSON_DRIFT_VW).toFixed(3);
+        });
+      });
+
+      const tick = () => {
+        current += (target - current) * EASE;
+        write();
+        if (Math.abs(target - current) > 0.0004) {
+          rafId = requestAnimationFrame(tick);
+        } else {
+          current = target;
+          write();
+          rafId = 0;
+        }
+      };
+
+      const requestTeamParallax = () => {
+        if (isMobileLayout() || reduce.matches) {
+          if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+          clear();
+          return;
+        }
+        readTarget();
+        if (!rafId) rafId = requestAnimationFrame(tick);
+      };
+
+      if (!isMobileLayout() && !reduce.matches) {
+        readTarget();
+        current = target;
+        write();
+      }
+      window.addEventListener('scroll', requestTeamParallax, { passive: true });
+      window.addEventListener('resize', requestTeamParallax);
+    }
+  }
+
+
+  // --header-h: the sticky header's rendered height, published on :root so CSS
+  // can reach it. The Über-uns stage uses it to pull itself up under the
+  // header (full-bleed photo from the very top of the window) and to keep its
+  // own content clear of the nav again. Re-measured on resize and once the
+  // webfonts land, since the nav row's height follows its type.
+  {
+    const header = document.querySelector('.site-header');
+    if (header) {
+      const measureHeader = () => {
+        document.documentElement.style.setProperty(
+          '--header-h', `${Math.round(header.getBoundingClientRect().height)}px`);
+      };
+      measureHeader();
+      window.addEventListener('resize', measureHeader);
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(measureHeader);
+      }
+    }
+  }
+
+
+  // Über uns — the two text/image blocks. Each picture drifts inside its own
+  // frame while that block passes the viewport: the frame stays put, the
+  // oversized image travels through it. Progress is read per image from its
+  // own frame rather than from one shared section, since the two blocks are
+  // far apart on the page. Same eased follow as the team columns, so the
+  // movement carries on for a moment after the wheel stops.
+  {
+    const kombiImgs = Array.from(document.querySelectorAll('.ueber-kombi-img img'));
+    if (kombiImgs.length) {
+      const reduceKombi = window.matchMedia('(prefers-reduced-motion:reduce)');
+      // percent of the image's own height; the frame leaves 15% of its height
+      // spare at each end, which is 11.5% of the 130%-tall image.
+      const TRAVEL = 11.5;
+      const EASE = 0.08;
+      // Alternating sign, so the two pictures travel against each other: as
+      // one rides up through its frame the other rides down. The blocks
+      // already mirror each other left/right, and this gives the pair the
+      // same counter-motion the team columns have.
+      const state = kombiImgs.map((_, i) => ({ target: 0, current: 0, dir: i % 2 === 0 ? 1 : -1 }));
+      let kRaf = 0;
+
+      const readKombi = () => {
+        const vh = window.innerHeight;
+        kombiImgs.forEach((img, i) => {
+          const rect = img.parentElement.getBoundingClientRect();
+          const center = rect.top + rect.height / 2;
+          const span = vh / 2 + rect.height / 2;
+          state[i].target = span > 0
+            ? Math.max(-1, Math.min(1, (vh / 2 - center) / span))
+            : 0;
+        });
+      };
+
+      const kombiTick = () => {
+        let moving = false;
+        kombiImgs.forEach((img, i) => {
+          const st = state[i];
+          st.current += (st.target - st.current) * EASE;
+          if (Math.abs(st.target - st.current) > 0.0004) moving = true;
+          else st.current = st.target;
+          img.style.transform = `translateY(${(st.current * TRAVEL * st.dir).toFixed(3)}%)`;
+        });
+        kRaf = moving ? requestAnimationFrame(kombiTick) : 0;
+      };
+
+      const requestKombi = () => {
+        if (reduceKombi.matches) {
+          if (kRaf) { cancelAnimationFrame(kRaf); kRaf = 0; }
+          kombiImgs.forEach((img) => { img.style.transform = ''; });
+          return;
+        }
+        readKombi();
+        if (!kRaf) kRaf = requestAnimationFrame(kombiTick);
+      };
+
+      if (!reduceKombi.matches) {
+        readKombi();
+        state.forEach((st) => { st.current = st.target; });
+        kombiImgs.forEach((img, i) => {
+          img.style.transform = `translateY(${(state[i].current * TRAVEL * state[i].dir).toFixed(3)}%)`;
+        });
+      }
+      window.addEventListener('scroll', requestKombi, { passive: true });
+      window.addEventListener('resize', requestKombi);
+    }
+  }
+
+
+  // Page transition, departure half. Any click on an internal link is held
+  // back: the white panel sweeps in to cover the page, the direction is handed
+  // to the next page through sessionStorage, and only then does the navigation
+  // run — so the panel carries straight on across the page change instead of
+  // restarting. The arrival half is the inline snippet in each <head>.
+  {
+    const reduceWipe = window.matchMedia('(prefers-reduced-motion:reduce)');
+    const COVER_MS = 620; // keep in step with the cover animation in style.css
+
+    // Right-to-left when the link leads back to the homepage, left-to-right for
+    // anything deeper in.
+    const isHome = (url) => {
+      const path = url.pathname.replace(/\/+$/, '');
+      return path === '' || /\/index\.html$/.test(path);
+    };
+
+    const sameDocument = (url) =>
+      url.pathname === window.location.pathname && url.search === window.location.search;
+
+    document.addEventListener('click', (event) => {
+      if (reduceWipe.matches) return;
+      if (event.defaultPrevented) return;
+      if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+      const link = event.target.closest('a[href]');
+      if (!link) return;
+      if (link.target && link.target !== '_self') return;
+      if (link.hasAttribute('download')) return;
+
+      const href = link.getAttribute('href');
+      // in-page anchors, mailto:, tel:, and anything off-site keep their normal
+      // behaviour — there is no page change to cover
+      if (!href || href.startsWith('#')) return;
+
+      let url;
+      try { url = new URL(href, window.location.href); } catch (e) { return; }
+      if (url.origin !== window.location.origin) return;
+      if (!/\.html?$/.test(url.pathname) && !url.pathname.endsWith('/')) return;
+      if (sameDocument(url)) return;
+
+      event.preventDefault();
+      const dir = isHome(url) ? 'rtl' : 'ltr';
+      try { sessionStorage.setItem('nollWipe', dir); } catch (e) {}
+      // Drop the arrival classes first: a reveal that has finished still holds
+      // the panel in its end state, and two animation rules on the same
+      // pseudo-element would otherwise be decided by stylesheet order.
+      document.documentElement.classList.remove(
+        'wipe-hold', 'wipe-reveal-ltr', 'wipe-reveal-rtl');
+      document.documentElement.classList.add(`wipe-cover-${dir}`);
+      setTimeout(() => { window.location.href = url.href; }, COVER_MS);
+    });
+
+    // Coming back via the browser's cache, the panel would still be sitting on
+    // the classes it was left with — clear them so the page is not covered.
+    window.addEventListener('pageshow', (event) => {
+      if (!event.persisted) return;
+      document.documentElement.classList.remove(
+        'wipe-hold', 'wipe-cover-ltr', 'wipe-cover-rtl', 'wipe-reveal-ltr', 'wipe-reveal-rtl');
+    });
+  }
+
+
+  // Cases overview — the category filter. Each project carries its categories
+  // in data-case-tags, each chip the one it selects in data-case-filter;
+  // "alle" matches everything. Rows are hidden with the `hidden` attribute
+  // rather than a class, so they leave the flow and the left/right alternation
+  // re-forms on whatever is still showing.
+  {
+    const filterBar = document.getElementById('casesFilter');
+    const grid = document.getElementById('casesGrid');
+    if (filterBar && grid) {
+      const chips = Array.from(filterBar.querySelectorAll('[data-case-filter]'));
+      const rows = Array.from(grid.querySelectorAll('[data-case-tags]'));
+
+      const apply = (value) => {
+        rows.forEach((row) => {
+          const tags = (row.dataset.caseTags || '').split(/\s+/);
+          row.hidden = value !== 'alle' && !tags.includes(value);
+        });
+        chips.forEach((chip) => {
+          const on = chip.dataset.caseFilter === value;
+          chip.classList.toggle('is-active', on);
+          chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+      };
+
+      chips.forEach((chip) => {
+        chip.setAttribute('aria-pressed', chip.classList.contains('is-active') ? 'true' : 'false');
+        chip.addEventListener('click', () => apply(chip.dataset.caseFilter));
+      });
+    }
+  }
+
 })();

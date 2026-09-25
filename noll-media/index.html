@@ -7,7 +7,34 @@
 <meta name="description" content="noll media – Ihr Partner für Web, Branding &amp; Marketing.">
 <link rel="preconnect" href="fonts">
 <link rel="stylesheet" href="fonts/stylesheet.css">
-<link rel="stylesheet" href="css/style.css?v=60">
+<link rel="stylesheet" href="css/style.css?v=139">
+<script>
+/* Page transition, arrival half. Inline and in the head on purpose: the white
+   panel has to be covering the screen before this page's first paint, which a
+   deferred external file could not manage. js/main.js handles the departure
+   half and writes the direction into sessionStorage just before navigating. */
+(function(){
+  try{
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var dir = sessionStorage.getItem('nollWipe');
+    if (dir !== 'ltr' && dir !== 'rtl') return;
+    sessionStorage.removeItem('nollWipe');
+    var html = document.documentElement;
+    html.classList.add('wipe-hold');
+    var done = false;
+    var reveal = function(){
+      if (done) return;
+      done = true;
+      html.classList.remove('wipe-hold');
+      html.classList.add('wipe-reveal-' + dir);
+      setTimeout(function(){ html.classList.remove('wipe-reveal-' + dir); }, 1400);
+    };
+    document.addEventListener('DOMContentLoaded', reveal);
+    /* never leave the screen white if anything above misfires */
+    setTimeout(reveal, 1200);
+  }catch(e){}
+})();
+</script>
 </head>
 <body>
 
@@ -36,22 +63,53 @@
       </span>
     </a>
     <nav class="main-nav" aria-label="Hauptnavigation">
-      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="#ueber-uns">Über uns</a></span>
-      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="#cases">Cases</a></span>
-      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="#services">Services</a></span>
-      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="#insights">Insights</a></span>
-      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="#kontakt">Kontakt</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="ueber-uns.html">Über uns</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="cases.html">Cases</a></span>
+      <span class="nav-item nav-item--has-dropdown" id="navServices"><span class="nav-dot" aria-hidden="true"></span><a href="leistungen.html" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown">Services</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="insights.html">Insights</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="kontakt.html">Kontakt</a></span>
     </nav>
     <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
       <span></span><span></span><span></span>
     </button>
   </div>
+  <!-- Services dropdown (desktop). Deliberately a sibling of .header-inner,
+       not a child of .main-nav: .header-inner is overflow:hidden (it clips
+       the nav's compact-scroll slide-out), so a panel nested inside the nav
+       would be cut off at the header's bottom edge. Sitting here instead, it
+       anchors to .site-header (already position:sticky, so a positioned
+       ancestor) and is aligned under its trigger via --nav-dropdown-x, which
+       js/main.js measures from the Services item. -->
+  <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
+    <div class="nav-dropdown-inner">
+      <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
+      <a href="leistungen-social-media.html">Social Media</a>
+      <a href="leistungen-media-content.html">Media &amp; Content</a>
+      <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
+      <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+    </div>
+  </div>
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
-    <a href="#ueber-uns">Über uns</a>
-    <a href="#cases">Cases</a>
-    <a href="#services">Services</a>
-    <a href="#insights">Insights</a>
-    <a href="#kontakt">Kontakt</a>
+    <a href="ueber-uns.html">Über uns</a>
+    <a href="cases.html">Cases</a>
+    <!-- Touch has no hover, so the same sub-items are an accordion here. -->
+    <div class="mobile-nav-group">
+      <button class="mobile-nav-sub-toggle" id="mobileSubToggle" type="button" aria-expanded="false" aria-controls="mobileSubnav">
+        Services
+        <span class="mobile-nav-sub-icon" aria-hidden="true"></span>
+      </button>
+      <div class="mobile-subnav" id="mobileSubnav">
+        <div class="mobile-subnav-inner">
+          <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
+          <a href="leistungen-social-media.html">Social Media</a>
+          <a href="leistungen-media-content.html">Media &amp; Content</a>
+          <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
+          <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+        </div>
+      </div>
+    </div>
+    <a href="insights.html">Insights</a>
+    <a href="kontakt.html">Kontakt</a>
   </nav>
 </header>
 
@@ -62,14 +120,41 @@
   <a href="#" class="social-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
 </aside>
 
+<!-- Mobile bottom bar — Figma node 466:3626/466:3627, ≤860px only.
+     Replaces the desktop .social-rail (hidden at this breakpoint, its
+     vw-based sizing would render illegibly small) and the header's
+     .nav-toggle (also hidden at this breakpoint) with a single fixed
+     white bar: the same 4 social icons on the left, a "Menü" label +
+     burger on the right. The burger drives the exact same #mobileNav
+     overlay as the header toggle, via body.nav-open (see js/main.js) —
+     aria-expanded is mirrored onto both toggle elements so either one
+     reflects the current state correctly if ever both were visible. -->
+<div class="mobile-bar" aria-label="Mobile Menüleiste">
+  <div class="mobile-bar-socials">
+    <a href="#" class="mobile-bar-social mobile-bar-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+    <a href="#" class="mobile-bar-social mobile-bar-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+    <a href="#" class="mobile-bar-social mobile-bar-x" aria-label="X"><img src="images/x.svg" alt=""></a>
+    <a href="#" class="mobile-bar-social mobile-bar-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+  </div>
+  <button class="mobile-bar-toggle" id="mobileBarToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+    <span class="mobile-bar-toggle-label">Menü</span>
+    <span class="mobile-bar-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</div>
+
 <main id="main">
 
   <section class="hero">
     <div class="wrap">
-      <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>noll media Ihr Partner für</p>
+      <p class="eyebrow"><span class="eyebrow-dot" aria-hidden="true"></span>Mehr als eine Website</p>
+      <!-- The two nouns carry the message, so they are the filled words;
+           the connecting words stay outlined. Split across three rows
+           because .hero-row is nowrap at desktop sizes and the full line is
+           far wider than the content grid at 7.6042vw. -->
       <h1 class="hero-title">
-        <span class="hero-row hero-outline">WEBSITES,</span>
-        <span class="hero-row"><span class="hero-outline">DIE </span><span class="hero-fill">BEGEISTERN.</span></span>
+        <span class="hero-row"><span class="hero-outline">EIN </span><span class="hero-fill">WERKZEUG</span></span>
+        <span class="hero-row hero-outline">FÜR DEIN</span>
+        <span class="hero-row hero-fill">UNTERNEHMEN.</span>
       </h1>
     </div>
   </section>
@@ -101,11 +186,9 @@
     </div>
   </section>
 
-  <!-- Prozess — Figma node 512:1531, extended to 5 steps + scroll effect
-       per follow-up direction. "01" and "05" have no Figma source (the node
-       only covered 02–04) — their copy is explicitly placeholder text,
-       swap in real copy when it's ready. "03" still repeats "Umsetzung" as
-       literally authored in the Figma file.
+  <!-- Prozess — Figma node 512:1531, 4 steps + scroll effect.
+       Copy is the user's real, final content (VERSTEHEN / DENKEN / MACHEN /
+       VERBESSERN).
        The circle is sticky (position:sticky in CSS), pinned vertically
        centered in the viewport while the list scrolls past it in normal
        document flow (no scroll-jacking, per explicit direction). js/main.js
@@ -134,36 +217,29 @@
         <li class="process-item">
           <span class="process-number" aria-hidden="true">01</span>
           <div class="process-text">
-            <h3>Analyse</h3>
-            <p>Wir analysieren Ihre Ausgangslage, Ihren Markt und Ihre Zielgruppe, um die richtigen Maßnahmen abzuleiten.</p>
+            <h3>Verstehen</h3>
+            <p>Wir lernen Ihr Unternehmen kennen und schauen, wo digitales Potenzial steckt – für mehr Kunden, passende Mitarbeiter und effizientere Abläufe.</p>
           </div>
         </li>
         <li class="process-item">
           <span class="process-number" aria-hidden="true">02</span>
           <div class="process-text">
-            <h3>Umsetzung</h3>
-            <p>Wir setzen die festgelegten Maßnahmen, wie z.B. den Relaunch Ihrer Website oder die Google Kampagne um.</p>
+            <h3>Denken</h3>
+            <p>Wir entwickeln die passende Lösung und denken Website, Marketing und Automatisierung von Anfang an zusammen.</p>
           </div>
         </li>
         <li class="process-item">
           <span class="process-number" aria-hidden="true">03</span>
           <div class="process-text">
-            <h3>Umsetzung</h3>
-            <p>Wir setzen die festgelegten Maßnahmen, wie z.B. den Relaunch Ihrer Website oder die Google Kampagne um.</p>
+            <h3>Machen</h3>
+            <p>Wir gestalten, entwickeln und setzen gemeinsam um. Dabei sorgen wir dafür, dass am Ende alles einfach funktioniert.</p>
           </div>
         </li>
         <li class="process-item">
           <span class="process-number" aria-hidden="true">04</span>
           <div class="process-text">
-            <h3>Controlling</h3>
-            <p>Wir sind erst zufrieden, wenn Sie es sind. Wir arbeiten mit messbaren Kennzahlen, die wir dauerhaft kontrollieren.</p>
-          </div>
-        </li>
-        <li class="process-item">
-          <span class="process-number" aria-hidden="true">05</span>
-          <div class="process-text">
-            <h3>Reporting</h3>
-            <p>Wir fassen die Ergebnisse verständlich zusammen und zeigen transparent, was die Maßnahmen gebracht haben.</p>
+            <h3>Verbessern</h3>
+            <p>Wir messen, was funktioniert und wo noch Potenzial steckt. So optimieren und entwickeln wir kontinuierlich weiter.</p>
           </div>
         </li>
       </ol>
@@ -212,20 +288,6 @@
             <div class="team-info">
               <h3>Andre Krafft</h3>
               <p>Webdesign</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="team-member team-member--thomas">
-        <div class="team-circle">
-          <img class="team-photo" src="images/team/thomas-christian.jpg" alt="Thomas Busenkell">
-          <div class="team-overlay">
-            <span class="team-icon team-icon--phone" aria-label="Thomas Busenkell anrufen"><img src="images/team/phone.svg" alt=""></span>
-            <span class="team-icon team-icon--mail" aria-label="Thomas Busenkell eine E-Mail schreiben"><img src="images/team/mail.svg" alt=""></span>
-            <div class="team-info">
-              <h3>Thomas Busenkell</h3>
-              <p>Creative Director</p>
             </div>
           </div>
         </div>
@@ -325,40 +387,60 @@
       <article class="leistung-card">
         <img class="leistung-icon" src="images/leistungen/kampagne.svg" alt="" aria-hidden="true">
         <h3>Wirkungsstarke<br>Kampagnen</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <a class="leistung-cta" href="#">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
       <article class="leistung-card">
-        <img class="leistung-icon" src="images/leistungen/websites-shops.svg" alt="" aria-hidden="true">
+        <!-- Inlined from images/leistungen/websites-shops.svg so the drip can be
+             addressed on its own; images/leistungen/websites-shops_hover.svg is
+             the counterpart state and differs in exactly this one path, which is
+             why it is morphed here instead of being swapped in as a file.
+             Illustrator's own .st0/.st1 classes and the clip-path are dropped:
+             the class names are generic enough to collide with the other inline
+             SVGs on the page, the ids would be duplicated by the second card,
+             and the clip rect matches the viewBox exactly, so it clips nothing. -->
+        <svg class="leistung-icon leistung-icon--websites" viewBox="0 0 231.3 235.3" fill="none" stroke="#fff" stroke-width="2" stroke-miterlimit="10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M179.7,129.5c6.1,0,11-4.9,11-11s-4.9-11-11-11-11,4.9-11,11,4.9,11,11,11Z"/>
+          <path d="M230,150.2H1.3v20.1h228.7v-20.1Z"/>
+          <path d="M80.5,170.4l-24.4,63.6h-29.5l24.4-63.6h29.5Z"/>
+          <path d="M149.8,170.4l24.4,63.6h29.5l-24.4-63.6h-29.5Z"/>
+          <path d="M230,1.3H1.3v20.1h228.7V1.3Z"/>
+          <path d="M211,21.4H23v128.8h188V21.4Z"/>
+          <path d="M23,203.6h15.2"/>
+          <path d="M192.1,203.6h15.2"/>
+          <path d="M67.7,203.6h95.9"/>
+          <path d="M117,189.1v29.1"/>
+          <path class="ws-drip" data-hover-d="M202,21.4v8.4c0,3.8-3.1,6.9-6.9,6.9h-9.8c-3.8,0-6.9,3.1-6.9,6.9v6.1c0,3.8-3.1,6.9-6.9,6.9h-.9c-3.8,0-6.9,3.1-6.9,6.9v34.1c0,3.8-3.1,6.9-6.9,6.9s-6.9-3.1-6.9-6.9v-25.1c0-7.3-5.9-13.3-13.3-13.3s-13.3,5.9-13.3,13.3v108c0,7.3-5.9,13.3-13.3,13.3s-13.3-5.9-13.3-13.3v-102.8c0-5.7-4.6-10.3-10.3-10.3s-10.3,4.6-10.3,10.3v32.5c0,6.2-5,11.3-11.3,11.3s-11.3-5-11.3-11.3v-47.9c0-7.7-6.2-14-14-14h-16.6" d="M202,21.4v8.4c0,3.8-3.1,6.9-6.9,6.9h-9.8c-3.8,0-6.9,3.1-6.9,6.9v6.1c0,3.8-3.1,6.9-6.9,6.9h-.9c-3.8,0-6.9,3.1-6.9,6.9v26.5c0,3.8-3.1,6.9-6.9,6.9s-6.9-3.1-6.9-6.9v-17.5c0-7.3-5.9-13.3-13.3-13.3s-13.3,5.9-13.3,13.3v43.6c0,7.3-5.9,13.3-13.3,13.3s-13.3-5.9-13.3-13.3v-38.3c0-5.7-4.6-10.3-10.3-10.3s-10.3,4.6-10.3,10.3v10.5c0,6.2-5,11.3-11.3,11.3s-11.3-5-11.3-11.3v-25.8c0-7.7-6.2-14-14-14h-16.6"/>
+        </svg>
         <h3>Leistungsstarke<br>Websites &amp; Shops</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-        <a class="leistung-cta" href="#">
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <a class="leistung-cta" href="leistungen-website-online-shops.html">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
       <article class="leistung-card">
         <img class="leistung-icon" src="images/leistungen/seo.svg" alt="" aria-hidden="true">
         <h3>Gezielte<br>SEO-Maßnahmen</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <a class="leistung-cta" href="#">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
       <article class="leistung-card">
         <img class="leistung-icon" src="images/leistungen/media.svg" alt="" aria-hidden="true">
         <h3>Nachhaltige<br>Mediaproduktion</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <a class="leistung-cta" href="#">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
@@ -369,40 +451,60 @@
       <article class="leistung-card">
         <img class="leistung-icon" src="images/leistungen/kampagne.svg" alt="" aria-hidden="true">
         <h3>Wirkungsstarke<br>Kampagnen</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <a class="leistung-cta" href="#">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
       <article class="leistung-card">
-        <img class="leistung-icon" src="images/leistungen/websites-shops.svg" alt="" aria-hidden="true">
+        <!-- Inlined from images/leistungen/websites-shops.svg so the drip can be
+             addressed on its own; images/leistungen/websites-shops_hover.svg is
+             the counterpart state and differs in exactly this one path, which is
+             why it is morphed here instead of being swapped in as a file.
+             Illustrator's own .st0/.st1 classes and the clip-path are dropped:
+             the class names are generic enough to collide with the other inline
+             SVGs on the page, the ids would be duplicated by the second card,
+             and the clip rect matches the viewBox exactly, so it clips nothing. -->
+        <svg class="leistung-icon leistung-icon--websites" viewBox="0 0 231.3 235.3" fill="none" stroke="#fff" stroke-width="2" stroke-miterlimit="10" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+          <path d="M179.7,129.5c6.1,0,11-4.9,11-11s-4.9-11-11-11-11,4.9-11,11,4.9,11,11,11Z"/>
+          <path d="M230,150.2H1.3v20.1h228.7v-20.1Z"/>
+          <path d="M80.5,170.4l-24.4,63.6h-29.5l24.4-63.6h29.5Z"/>
+          <path d="M149.8,170.4l24.4,63.6h29.5l-24.4-63.6h-29.5Z"/>
+          <path d="M230,1.3H1.3v20.1h228.7V1.3Z"/>
+          <path d="M211,21.4H23v128.8h188V21.4Z"/>
+          <path d="M23,203.6h15.2"/>
+          <path d="M192.1,203.6h15.2"/>
+          <path d="M67.7,203.6h95.9"/>
+          <path d="M117,189.1v29.1"/>
+          <path class="ws-drip" data-hover-d="M202,21.4v8.4c0,3.8-3.1,6.9-6.9,6.9h-9.8c-3.8,0-6.9,3.1-6.9,6.9v6.1c0,3.8-3.1,6.9-6.9,6.9h-.9c-3.8,0-6.9,3.1-6.9,6.9v34.1c0,3.8-3.1,6.9-6.9,6.9s-6.9-3.1-6.9-6.9v-25.1c0-7.3-5.9-13.3-13.3-13.3s-13.3,5.9-13.3,13.3v108c0,7.3-5.9,13.3-13.3,13.3s-13.3-5.9-13.3-13.3v-102.8c0-5.7-4.6-10.3-10.3-10.3s-10.3,4.6-10.3,10.3v32.5c0,6.2-5,11.3-11.3,11.3s-11.3-5-11.3-11.3v-47.9c0-7.7-6.2-14-14-14h-16.6" d="M202,21.4v8.4c0,3.8-3.1,6.9-6.9,6.9h-9.8c-3.8,0-6.9,3.1-6.9,6.9v6.1c0,3.8-3.1,6.9-6.9,6.9h-.9c-3.8,0-6.9,3.1-6.9,6.9v26.5c0,3.8-3.1,6.9-6.9,6.9s-6.9-3.1-6.9-6.9v-17.5c0-7.3-5.9-13.3-13.3-13.3s-13.3,5.9-13.3,13.3v43.6c0,7.3-5.9,13.3-13.3,13.3s-13.3-5.9-13.3-13.3v-38.3c0-5.7-4.6-10.3-10.3-10.3s-10.3,4.6-10.3,10.3v10.5c0,6.2-5,11.3-11.3,11.3s-11.3-5-11.3-11.3v-25.8c0-7.7-6.2-14-14-14h-16.6"/>
+        </svg>
         <h3>Leistungsstarke<br>Websites &amp; Shops</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
-        <a class="leistung-cta" href="#">
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <a class="leistung-cta" href="leistungen-website-online-shops.html">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
       <article class="leistung-card">
         <img class="leistung-icon" src="images/leistungen/seo.svg" alt="" aria-hidden="true">
         <h3>Gezielte<br>SEO-Maßnahmen</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <a class="leistung-cta" href="#">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
 
       <article class="leistung-card">
         <img class="leistung-icon" src="images/leistungen/media.svg" alt="" aria-hidden="true">
         <h3>Nachhaltige<br>Mediaproduktion</h3>
-        <p>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
+        <p data-placeholder>Ased diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>
         <a class="leistung-cta" href="#">
           <span class="leistung-cta-label">Mehr erfahren</span>
-          <img class="leistung-cta-icon" src="images/btn_pfeil.svg" alt="">
+          <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
       </article>
     </div>
@@ -424,14 +526,14 @@
        Figma's own 276px (7.1875vw) frame offset. -->
   <section class="testimonial" id="kundenzitate" aria-label="Kundenzitate">
     <div class="testimonial-inner">
-      <div class="testimonial-photo">
+      <div class="testimonial-photo" data-placeholder-media>
         <img src="images/testimonial/photo.jpg" alt="Jordan Doe">
       </div>
       <blockquote class="testimonial-quote">
-        <p>Lorem ipsum dolor sit duo dolores et eamet. At vero eos et accusam et jus tet clita kasd gubergren”</p>
+        <p data-placeholder>Lorem ipsum dolor sit duo dolores et eamet. At vero eos et accusam et jus tet clita kasd gubergren”</p>
         <footer class="testimonial-attribution">
-          <span class="testimonial-name">Jordan Doe</span>
-          <span class="testimonial-role">CEO Ursa Chemie</span>
+          <span class="testimonial-name" data-placeholder>Jordan Doe</span>
+          <span class="testimonial-role" data-placeholder>CEO Ursa Chemie</span>
         </footer>
       </blockquote>
     </div>
@@ -537,7 +639,7 @@
       <h2 class="insights-heading">Insights aus Kompetenz</h2>
       <div class="insights-grid">
         <article class="insight-card">
-          <div class="insight-card-image">
+          <div class="insight-card-image" data-placeholder-media>
             <img src="images/blog/teaser1.svg" alt="">
           </div>
           <div class="insight-card-body">
@@ -550,7 +652,7 @@
           </div>
         </article>
         <article class="insight-card">
-          <div class="insight-card-image">
+          <div class="insight-card-image" data-placeholder-media>
             <img src="images/blog/teaser2.svg" alt="">
           </div>
           <div class="insight-card-body">
@@ -563,7 +665,7 @@
           </div>
         </article>
         <article class="insight-card">
-          <div class="insight-card-image">
+          <div class="insight-card-image" data-placeholder-media>
             <img src="images/blog/teaser3.svg" alt="">
           </div>
           <div class="insight-card-body">
@@ -576,7 +678,7 @@
           </div>
         </article>
       </div>
-      <a class="insights-cta" href="#">
+      <a class="insights-cta" href="insights.html">
         <span class="insights-cta-label">Alle Beiträge anzeigen</span>
         <img class="insights-cta-icon" src="images/btn_pfeil.svg" alt="">
       </a>
@@ -604,13 +706,13 @@
       <a class="footer-contact-link footer-phone" href="tel:+4926029191500">+49 2602 9191 500</a>
 
       <nav class="footer-nav" aria-label="Footer Navigation">
-        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-1" href="#ueber-uns">Über uns</a>
-        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-1" href="#insights">Insights</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-1" href="ueber-uns.html">Über uns</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-1" href="insights.html">Insights</a>
         <a class="footer-nav-link footer-nav-col-3 footer-nav-row-1" href="#">Presse</a>
         <a class="footer-nav-link footer-nav-col-3 footer-nav-row-2" href="#">Ressourcen</a>
-        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-2" href="#cases">Cases</a>
-        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-2" href="#kontakt">Kontakt</a>
-        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-3" href="#services">Services</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-2" href="cases.html">Cases</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-2" href="kontakt.html">Kontakt</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-3" href="leistungen.html">Services</a>
         <a class="footer-nav-link footer-nav-col-2 footer-nav-row-3" href="#newsletter">Newsletter</a>
       </nav>
 
@@ -628,7 +730,7 @@
     <div class="footer-white">
       <div class="footer-legal">
         <a href="#">Impressum</a>
-        <a href="#kontakt">Kontakt</a>
+        <a href="kontakt.html">Kontakt</a>
         <a href="#">Datenschutz</a>
       </div>
       <p class="footer-social-heading">Folgen Sie uns!</p>
@@ -646,6 +748,6 @@
   </div>
 </footer>
 
-<script src="js/main.js?v=21"></script>
+<script src="js/main.js?v=39"></script>
 </body>
 </html>

@@ -62,13 +62,29 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 /* ---------- Header ---------- */
 .site-header{
   position:sticky; top:0; z-index:100;
+  /* How far the nav row spreads apart around a hovered item. Declared here,
+     on the common ancestor, because the dropdown needs the same number: its
+     panel aligns to the trigger's SHIFTED position, which is where the word
+     actually sits while the panel is open. .nav-dropdown is a sibling of
+     .header-inner, so declaring it on .main-nav would not reach it. */
+  --nav-hover-shift:10px;
   /* was a linear-gradient scrim (black 85% at top fading to transparent) —
      removed per explicit direction, this was reading as an unwanted
      "vignette" always present at the very top of the page (Hero, Cases,
      with the menu open, everywhere), same complaint as the debug-grid fix
      above. background left unset: body is already solid black, so no
      gradient/scrim is needed for contrast against the nav.
-     backdrop-filter:blur removed earlier per explicit direction. */
+     backdrop-filter:blur removed earlier per explicit direction.
+     It does get a black background in one state — while the compact nav is
+     manually expanded (see body.nav-compact-expanded below) — and that one
+     is faded in rather than switched on, so the backing arrives with the
+     nav sliding back out instead of snapping in ahead of it. Declared here
+     on the base rule so the fade runs in both directions. */
+  background:transparent;
+  transition:background .6s cubic-bezier(.4,0,.2,1);
+}
+@media (prefers-reduced-motion:reduce){
+  .site-header{ transition:none; }
 }
 .header-inner{
   display:grid; grid-template-columns:1fr auto 1fr; align-items:center; column-gap:24px;
@@ -136,16 +152,92 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
    the hovered item and everything after it move right — spreading apart from the dot */
 .nav-item:has(~ .nav-item:hover) a,
 .nav-item:has(~ .nav-item:focus-within) a{
-  transform:translateX(-10px);
+  transform:translateX(calc(-1 * var(--nav-hover-shift)));
 }
 .nav-item:hover a,
 .nav-item:hover ~ .nav-item a,
 .nav-item:focus-within a,
 .nav-item:focus-within ~ .nav-item a{
-  transform:translateX(10px);
+  transform:translateX(var(--nav-hover-shift));
 }
+/* While the dropdown is open its trigger keeps the hover choreography — the
+   dot stays lit and the neighbours stay spread — even though the pointer has
+   moved off the item and down into the panel. Without this the whole row
+   would snap back the moment the mouse crossed the gap. */
+.nav-item--has-dropdown.is-open .nav-dot{ opacity:1; transform:translateY(-50%); }
+.nav-item:has(~ .nav-item.is-open) a{ transform:translateX(calc(-1 * var(--nav-hover-shift))); }
+.nav-item.is-open a,
+.nav-item.is-open ~ .nav-item a{ transform:translateX(var(--nav-hover-shift)); }
 @media (prefers-reduced-motion:reduce){
   .main-nav a, .nav-dot{ transition:none; }
+}
+
+/* ---------- Services dropdown (desktop) ----------
+   Anchored to .site-header rather than to the nav item itself — see the HTML
+   comment above this panel for why it can't live inside .header-inner.
+   --nav-dropdown-x is written by js/main.js from the Services item's offset,
+   recomputed on resize and once the webfont has loaded (the item shifts as
+   the fallback font is swapped out).
+   Opening is JS-driven with a short grace period rather than a pure :hover
+   chain: there is a real gap between the nav text and the panel (the
+   header's own bottom padding), and bridging it with an invisible hit area
+   would sit on top of the trigger and swallow clicks on it. */
+.nav-dropdown{
+  /* --nav-dropdown-x is the trigger's own left edge. The panel is shifted
+     left of it by exactly its own inner inset (border + panel padding + the
+     links' dot indent) so that the sub-item TEXT starts on the same vertical
+     line as "Services" above it, while the panel box itself still has its
+     breathing room. Expressed as variables rather than one magic number so
+     the alignment survives a change to either padding. */
+  --nav-dropdown-pad-x:1.4vw;
+  --nav-dropdown-dot:0.9vw;
+  position:absolute; top:100%;
+  /* + the hover shift: --nav-dropdown-x is measured from the item's resting
+     box, but while the panel is open the trigger's own text is shifted right
+     by that amount (see .main-nav above), and it is the visible word the
+     sub-items have to line up with. */
+  left:calc(var(--nav-dropdown-x, 0px) + var(--nav-hover-shift) - var(--nav-dropdown-pad-x) - var(--nav-dropdown-dot) - 1px);
+  z-index:99;
+  padding-top:10px; /* visual offset from the header edge, not a hit area */
+  visibility:hidden; pointer-events:none;
+  transition:visibility 0s linear .3s;
+}
+.nav-dropdown-inner{
+  display:flex; flex-direction:column;
+  padding:1vw var(--nav-dropdown-pad-x);
+  background:var(--black);
+  border:1px solid rgba(255,255,255,.25);
+  border-radius:0.3125vw;
+  opacity:0; transform:translateY(-8px);
+  transition:opacity .3s cubic-bezier(.4,0,.2,1), transform .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-dropdown a{
+  position:relative;
+  padding:0.5vw 0 0.5vw var(--nav-dropdown-dot);
+  /* same family and size as the nav item above, separated from it by weight
+     alone: 300 is the Light face of ES Klarheit Kurrent (see fonts/stylesheet.css). */
+  font-family:var(--font-display-bold); font-weight:300; font-size:18px; line-height:1.2;
+  color:var(--white); white-space:nowrap;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+/* same dot-and-slide vocabulary as the nav row above it */
+.nav-dropdown a::before{
+  content:""; position:absolute; left:0; top:50%;
+  width:5px; height:5px; border-radius:50%; background:currentColor;
+  opacity:0; transform:translateY(calc(-50% + 6px));
+  transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-dropdown a:hover,
+.nav-dropdown a:focus-visible{ transform:translateX(6px); }
+.nav-dropdown a:hover::before,
+.nav-dropdown a:focus-visible::before{ opacity:1; transform:translateY(-50%); }
+body.nav-dropdown-open .nav-dropdown{
+  visibility:visible; pointer-events:auto;
+  transition:visibility 0s linear 0s;
+}
+body.nav-dropdown-open .nav-dropdown-inner{ opacity:1; transform:translateY(0); }
+@media (prefers-reduced-motion:reduce){
+  .nav-dropdown-inner, .nav-dropdown a, .nav-dropdown a::before{ transition:none; }
 }
 /* Menu icon design from Figma node 337:2318 ("menu" component,
    Property 1=default/hover/active), same file as the header animation
@@ -188,15 +280,128 @@ button{ font:inherit; color:inherit; background:none; border:0; cursor:pointer; 
 @media (prefers-reduced-motion:reduce){
   .nav-toggle span{ transition:none; }
 }
+/* Mobile menu panel — a white sheet that drives up ("auffährt") out of the
+   bottom bar rather than the old dark dropdown pinned under the header.
+   Geometry is deliberately the bar's: same left/right inset, and its bottom
+   edge sits exactly on the bar's top edge, so open they read as one
+   continuous white surface with the burger (now an X) at its foot. It runs
+   all the way up to the top of the screen, keeping the same distance there
+   as the bar keeps to the bottom edge — inset + the matching safe-area
+   inset on each side, so a notch or home indicator can't cut into it.
+   Closed it is parked a full panel height + the whole bar block below the
+   viewport, so nothing of it can peek out past the bar's bottom inset.
+   display can't be toggled (that kills the transition), so visibility does
+   the a11y/tab-order job instead, delayed until the slide finishes on close.
+   Lives outside any media query: the panel is only ever reachable at ≤860px,
+   where .mobile-bar-toggle is the sole control that opens it. */
 .mobile-nav{
-  display:none; flex-direction:column; gap:0; background:#0a0a0a;
-  border-top:1px solid rgba(255,255,255,.1);
+  position:fixed; z-index:89;
+  left:var(--mobile-bar-inset); right:var(--mobile-bar-inset);
+  top:calc(var(--mobile-bar-inset) + env(safe-area-inset-top));
+  bottom:calc(var(--mobile-bar-inset) + var(--mobile-bar-h) + env(safe-area-inset-bottom));
+  display:flex; flex-direction:column;
+  /* "safe" so that if the open accordion ever makes the list taller than the
+     panel, the overflow spills downward (scrollable) instead of centring and
+     pushing the first entries above the top edge, out of reach. Browsers
+     without it fall back to the plain centring on the line above. */
+  justify-content:center;
+  justify-content:safe center;
+  background:var(--white);
+  /* full-height now, so it can outgrow the screen on a short viewport —
+     scroll inside itself, and don't chain that scroll to the page behind. */
+  overflow-y:auto; overscroll-behavior:contain;
+  transform:translateY(calc(100% + var(--mobile-bar-h) + var(--mobile-bar-inset) * 2 + env(safe-area-inset-bottom)));
+  visibility:hidden; pointer-events:none;
+  transition:transform .55s cubic-bezier(.4,0,.2,1), visibility 0s linear .55s;
 }
-.mobile-nav a{
-  padding:16px var(--gutter); border-bottom:1px solid rgba(255,255,255,.08);
-  font-family:var(--font-display-bold); font-weight:700; font-size:18px;
+body.nav-open .mobile-nav{
+  transform:translateY(0);
+  visibility:visible; pointer-events:auto;
+  transition:transform .55s cubic-bezier(.4,0,.2,1), visibility 0s linear 0s;
 }
-body.nav-open .mobile-nav{ display:flex; }
+.mobile-nav a,
+.mobile-nav-sub-toggle{
+  padding:5vw 6vw;
+  border-bottom:1px solid rgba(0,0,0,.12);
+  font-family:var(--font-display-bold); font-weight:700; font-size:6vw; line-height:1.2;
+  color:var(--black);
+}
+.mobile-nav > a:last-child{ border-bottom:0; }
+
+/* Services accordion — the touch counterpart of the desktop hover panel.
+   The open/close height is animated with grid-template-rows 0fr -> 1fr
+   (the inner wrapper needs min-height:0 for that to collapse fully), which
+   transitions smoothly without having to measure the content in JS. */
+.mobile-nav-sub-toggle{
+  display:flex; align-items:center; justify-content:space-between; gap:4vw;
+  width:100%; text-align:left;
+  background:none; border:0; border-bottom:1px solid rgba(0,0,0,.12);
+  cursor:pointer;
+}
+/* The slider controls' own arrow, without the disc it normally sits on —
+   images/arrow-chevron.svg carries that exact path, stroke width and colour,
+   just with the white circle dropped and the viewBox cropped to the chevron.
+   It points right in the file, so it is turned down while collapsed and up
+   while expanded. 2.52 x 3.6vw keeps the asset's 0.7 aspect ratio. */
+.mobile-nav-sub-icon{
+  flex:none; width:2.52vw; height:3.6vw;
+  background:url("../images/arrow-chevron.svg") center / contain no-repeat;
+  transform:rotate(90deg);
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.mobile-nav-sub-toggle[aria-expanded="true"] .mobile-nav-sub-icon{
+  transform:rotate(-90deg);
+}
+.mobile-subnav{
+  display:grid; grid-template-rows:0fr;
+  transition:grid-template-rows .4s cubic-bezier(.4,0,.2,1);
+}
+.mobile-nav-group.is-open .mobile-subnav{ grid-template-rows:1fr; }
+.mobile-subnav-inner{ min-height:0; overflow:hidden; }
+/* Flush with "Services" above them and at the same size — the level is
+   carried by the weight alone (300 = the family's Light face), same as in
+   the desktop panel. */
+.mobile-subnav a{
+  display:block;
+  padding:5vw 6vw;
+  font-size:6vw; font-weight:300;
+}
+@media (prefers-reduced-motion:reduce){
+  .mobile-subnav, .mobile-nav-sub-icon{ transition:none; }
+}
+@media (prefers-reduced-motion:reduce){
+  .mobile-nav{ transition:none; }
+}
+/* Solid black backdrop behind the open menu, so the page underneath is
+   covered rather than showing through around the panel's frame. Declared
+   permanently (transparent, click-through) rather than only under
+   body.nav-open, so it has something to fade from — a pseudo-element that
+   only comes into existence with the class would pop in instead. Sits
+   below the panel (89) and the bar (90), above everything else. */
+body::before{
+  content:"";
+  position:fixed; inset:0; z-index:88;
+  background:var(--black);
+  opacity:0; pointer-events:none;
+  transition:opacity .55s cubic-bezier(.4,0,.2,1);
+}
+body.nav-open::before{ opacity:1; }
+@media (prefers-reduced-motion:reduce){
+  body::before{ transition:none; }
+}
+
+/* Scroll lock while the menu is open. overflow:hidden on <body> alone is not
+   enough — iOS Safari keeps scrolling the page behind a fixed overlay
+   regardless — so js/main.js takes the page out of the scroll flow entirely
+   (position:fixed) and pins it at the offset it was on via an inline `top`,
+   restoring both when the menu closes. The fixed .mobile-bar / .mobile-nav
+   are positioned against the viewport and so are unaffected. */
+body.scroll-locked{
+  position:fixed;
+  left:0; right:0; width:100%;
+  overflow:hidden;
+  overscroll-behavior:none;
+}
 
 /* ---------- Compact header on scroll (desktop) ----------
    Figma prototype node 248:496 / component 334:2271 (variants "active=no"
@@ -277,28 +482,31 @@ body.nav-open .mobile-nav{ display:flex; }
 
 @media (max-width:860px){
   .main-nav{ display:none; }
-  .nav-toggle{ display:flex; }
+  /* was display:flex — the burger's job at this breakpoint now belongs to
+     .mobile-bar-toggle in the fixed bottom bar (see ".mobile-bar" below),
+     so the header's own copy stays out of the way instead of doubling up. */
+  .nav-toggle{ display:none; }
 }
 
 /* ---------- Hero: top line + headline ----------
    Figma node 497:1572 (3840px reference), converted to vw:
    bullet 22px -> 0.5729vw, gap 42px -> 1.0938vw, top-line 38px -> 0.9896vw
    headline 292px -> 7.6042vw, tracking 2.92px -> 0.076vw */
-.hero{ padding-top:clamp(24px, 4vw, 90px); padding-bottom:clamp(32px, 4.5vw, 90px); }
+.hero{ padding-top:clamp(16px, 2.5vw, 56px); padding-bottom:clamp(24px, 3vw, 60px); } /* both reduced so the Cases slider sits higher on first paint */
 .eyebrow{
   display:flex; align-items:center; gap:1.0938vw;
   font-family:var(--font-display); font-weight:400; font-size:0.9896vw;
-  color:var(--white); margin:0 0 1.8vw;
+  color:var(--white); margin:0 0 1.2vw; /* was 1.8vw — tightened so the slider below reaches further into the viewport */
   white-space:nowrap;
 }
 .eyebrow-dot{ width:6px; height:6px; border-radius:50%; background:var(--white); flex:none; }
 .hero-title{
   margin:0;
   font-family:var(--font-display-bold); font-weight:700; text-transform:uppercase;
-  font-size:7.6042vw; line-height:1.1; letter-spacing:0.076vw;
+  font-size:7.6042vw; line-height:0.95; letter-spacing:0.076vw; /* line-height was 1.1 — the three rows set solid read as one block and free up ~55px */
 }
 .hero-row{ display:block; white-space:nowrap; }
-.hero-outline{ color:transparent; -webkit-text-stroke:0.026vw var(--white); }
+.hero-outline{ color:transparent; -webkit-text-stroke:0.04vw var(--white); } /* was 0.026vw — thickened per direction */
 .hero-fill{ color:var(--white); }
 
 /* ---------- Slider controls ----------
@@ -309,7 +517,7 @@ body.nav-open .mobile-nav{ display:flex; }
    same base — so instead of swapping images, the ring is a separate layer
    that fades/scales in on hover, "smart animating" between the two Figma
    states with a real CSS transition. */
-.slider-section{ padding-top:clamp(24px, 3vw, 64px); padding-bottom:clamp(24px, 3.5vw, 72px); }
+.slider-section{ padding-top:clamp(16px, 2vw, 40px); padding-bottom:clamp(40px, 6vw, 120px); }
 .slider-controls{ display:flex; align-items:center; gap:0.8333vw; }
 .slider-btn{
   position:relative; flex:none;
@@ -391,7 +599,7 @@ body.nav-open .mobile-nav{ display:flex; }
 }
 .case-media{
   width:100%; height:19.922vw; min-height:170px;
-  border-radius:0.625vw; overflow:hidden; background:#552828;
+  border-radius:0.625vw; overflow:hidden; background:var(--black);
   will-change:height;
   transition:height .5s cubic-bezier(.4,0,.2,1);
 }
@@ -635,7 +843,7 @@ body.nav-open .mobile-nav{ display:flex; }
    issue. */
 .team{
   position:relative;
-  padding:2vw 0 12vw; /* top was 8vw — reduced per explicit direction so it sits closer to Prozess above instead of leaving a big gap; bottom increased for more breathing room before the next section */
+  padding:3vw 0 16vw; /* top was 8vw — reduced per explicit direction so it sits closer to Prozess above instead of leaving a big gap; bottom increased for more breathing room before the next section */
 }
 .team-inner{
   position:relative;
@@ -650,12 +858,14 @@ body.nav-open .mobile-nav{ display:flex; }
   position:absolute;
   width:14.7917vw; height:14.7917vw; /* 568px circle */
 }
-.team-member--christian{ left:44.375vw; top:11.1979vw; }
-.team-member--sophia{ left:29.5833vw; top:11.1979vw; }
-.team-member--andre{ left:36.9792vw; top:25.9896vw; }
-.team-member--thomas{ left:0; top:25.9896vw; }
-.team-member--melissa{ left:14.7917vw; top:40.7813vw; }
-.team-member--steven{ left:59.1667vw; top:25.9896vw; }
+/* Thomas' Kreis (ehemals left:0 / Reihe 2) ist entfernt; die verbliebene
+   Konstellation ist unveraendert, nur um 4.8958vw nach links geschoben,
+   damit sie wieder mittig im Raster sitzt. */
+.team-member--christian{ left:39.4792vw; top:11.1979vw; }
+.team-member--sophia{ left:24.6875vw; top:11.1979vw; }
+.team-member--andre{ left:32.0833vw; top:25.9896vw; }
+.team-member--melissa{ left:9.8958vw; top:40.7813vw; }
+.team-member--steven{ left:54.2708vw; top:25.9896vw; }
 .team-circle{
   position:absolute; inset:0;
   border-radius:50%;
@@ -735,7 +945,7 @@ body.nav-open .mobile-nav{ display:flex; }
    px / 3840 * 100 = vw, relative to this container's top-left. */
 .creativity{
   position:relative;
-  padding:4vw 0 12vw;
+  padding:6vw 0 16vw;
 }
 .creativity-inner{
   position:relative;
@@ -819,7 +1029,7 @@ body.nav-open .mobile-nav{ display:flex; }
    every card is the same size (unlike Cases' grow-on-active card). */
 .leistungen{
   position:relative;
-  padding:6vw 0 10vw;
+  padding:8vw 0 14vw;
 }
 .leistungen-header{
   position:relative;
@@ -856,6 +1066,16 @@ body.nav-open .mobile-nav{ display:flex; }
   border:1px solid var(--white); border-radius:0.625vw;
 }
 .leistung-icon{ align-self:center; height:6.5vw; width:auto; display:block; }
+/* The drip is a filled shape, not just a line: black, so that where it hangs
+   over the easel — which is what the hover state does — it covers the frame
+   behind it and reads as paint in front of the picture rather than a line
+   crossing it. Everywhere else it is black on black and therefore invisible,
+   which is also why the path can stay open: the browser closes a filled path
+   with a straight line back to its start, and here that line falls in an area
+   where nothing but background sits behind it.
+   It is the last element in the SVG, so it paints over the rest. */
+.ws-drip{ fill:var(--black); }
+
 .leistung-card h3{
   margin:0; font-family:var(--font-display); font-weight:400; font-size:1.4462vw; line-height:1.1;
   color:var(--white);
@@ -875,20 +1095,42 @@ body.nav-open .mobile-nav{ display:flex; }
    slides left by the label's width and rotates, landing in each other's
    old slot. --leistung-cta-label-w / --leistung-cta-icon-w are measured
    per-instance in js/main.js since every card has its own CTA. */
+/* Secondary variant of the site's CTA. The section-level calls to action
+   (Creativity, Insights) stay primary — solid white pill, black label,
+   solid white icon disc — while these per-card ones step back one level:
+   the same shapes and the exact same cross-slide interaction, drawn as
+   outlines on transparent instead of solid fills. The icon needs no second
+   asset for that: btn_pfeil.svg is a white disc with a black arrow filling
+   its whole viewBox, so inverting it yields a black disc (invisible on the
+   page's black ground) with a white arrow, and a 1px ring on the <img>
+   itself lands exactly where the disc's edge was. */
 .leistung-cta-label{
   position:relative; z-index:2;
   display:flex; align-items:center; justify-content:center;
   height:2.0833vw; padding:0 1.25vw;
-  background:var(--white); border-radius:999px;
+  /* solid black rather than transparent: the pill passes over the icon
+     during the cross-slide, and only an opaque fill keeps the arrow from
+     showing through the label mid-transition. Reads as transparent on the
+     card either way, since the page ground is the same black. */
+  background:var(--black); border:1px solid var(--white); border-radius:999px;
   font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
-  color:#000; white-space:nowrap;
+  color:var(--white); white-space:nowrap;
   transition:transform .4s cubic-bezier(.4,0,.2,1);
 }
+/* The ring has to live on a wrapper, not on the <img>: a CSS filter applies
+   to the element's whole rendering, border included, so a white border on
+   the inverted image would be inverted to black along with it and vanish
+   against the page. The wrapper carries the ring and the sizing (and so
+   keeps the class the width measurement in js/main.js reads), the image
+   inside carries the inversion. */
 .leistung-cta-icon{
   position:relative; z-index:1;
   flex-shrink:0; width:2.0833vw; height:2.0833vw;
+  border:1px solid var(--white); border-radius:50%;
+  overflow:hidden;
   transition:transform .4s cubic-bezier(.4,0,.2,1);
 }
+.leistung-cta-icon img{ display:block; width:100%; height:100%; filter:invert(1); }
 .leistung-cta:hover .leistung-cta-label,
 .leistung-cta:focus-visible .leistung-cta-label{
   transform:translateX(var(--leistung-cta-icon-w, 2.0833vw));
@@ -901,9 +1143,15 @@ body.nav-open .mobile-nav{ display:flex; }
   .leistung-cta-label, .leistung-cta-icon{ transition:none; }
 }
 @media (max-width:860px){
-  .leistungen-heading{ font-size:6vw; }
-  .leistung-card{ flex-basis:78vw; min-height:auto; }
-  .leistung-icon{ height:14vw; }
+  .leistungen-heading{ font-size:var(--mobile-heading); }
+  .leistung-card{
+    flex-basis:78vw; min-height:auto;
+    /* the desktop padding (1.9vw/1.25vw/2.5vw) is only ~7px/5px/10px on a
+       phone, so the copy sat almost on the card's border */
+    padding:6vw 5vw; gap:4vw;
+    border-radius:2vw;
+  }
+  .leistung-icon{ height:18vw; }
   .leistung-card h3{ font-size:5vw; }
   .leistung-card p{ font-size:3.6vw; }
   .leistung-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
@@ -930,7 +1178,7 @@ body.nav-open .mobile-nav{ display:flex; }
    capping. */
 .testimonial{
   position:relative;
-  padding:6vw 0 10vw;
+  padding:8vw 0 14vw;
 }
 .testimonial-inner{
   position:relative;
@@ -976,10 +1224,15 @@ body.nav-open .mobile-nav{ display:flex; }
   font-family:var(--font-body); font-weight:500; font-size:1.25vw; line-height:1.2; color:var(--white);
 }
 @media (max-width:860px){
-  .testimonial-inner{ flex-direction:column; align-items:flex-start; gap:2vw; width:auto; margin:0 var(--grid-margin); }
-  .testimonial-photo{ width:40vw; height:40vw; }
+  .testimonial-inner{ flex-direction:column; align-items:stretch; gap:6vw; width:auto; margin:0 var(--grid-margin); }
+  /* Photo spans the full content column. Kept round — that is this
+     element's shape in the design, and unlike the team portraits (whose
+     Figma hover variant un-rounds them as soon as the name appears) there
+     is no square state for it. aspect-ratio instead of a fixed height so
+     the circle stays a circle at any width. */
+  .testimonial-photo{ width:100%; height:auto; aspect-ratio:1 / 1; }
   .testimonial-quote p{ font-size:5.5vw; }
-  .testimonial-attribution{ align-items:flex-start; text-align:left; }
+  .testimonial-attribution{ margin-top:5vw; align-items:flex-start; text-align:left; }
   .testimonial-name, .testimonial-role{ font-size:3.2vw; }
 }
 
@@ -1000,7 +1253,7 @@ body.nav-open .mobile-nav{ display:flex; }
    read as independent, not mirrored. */
 .kundenleiste{
   position:relative;
-  padding:6vw 0 10vw;
+  padding:8vw 0 14vw;
   overflow:hidden;
 }
 .kundenleiste-heading{
@@ -1073,8 +1326,8 @@ body.nav-open .mobile-nav{ display:flex; }
 @media (max-width:860px){
   .kundenleiste-heading{ font-size:4.2vw; }
   .kundenleiste-rows{ gap:3.5vw; }
-  .kunden-logo{ height:14.5vw; }
-  .kundenleiste-track{ --kunden-gap:13vw; }
+  .kunden-logo{ height:18vw; }
+  .kundenleiste-track{ --kunden-gap:14vw; }
 }
 
 /* ---------- Social media rail ----------
@@ -1102,17 +1355,128 @@ body.nav-open .mobile-nav{ display:flex; }
   position:absolute;
   transform:none; /* `top` is set inline by the scroll handler in this state */
 }
-.social-rail a{ display:block; }
-.social-rail img{ width:100%; height:100%; display:block; opacity:1; transition:opacity .25s ease; }
-/* hovering the rail dims every icon; the one actually hovered/focused stays fully opaque */
-.social-rail:hover a img,
-.social-rail:focus-within a img{ opacity:.5; }
-.social-rail a:hover img,
-.social-rail a:focus-visible img{ opacity:1; }
+.social-rail a{
+  display:block;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.social-rail img{ width:100%; height:100%; display:block; }
+/* hover is motion-only (lift + scale) — no opacity/color change on any icon. */
+.social-rail a:hover,
+.social-rail a:focus-visible{
+  transform:translateY(-0.25vw) scale(1.15);
+}
 .social-instagram{ width:0.9809vw; height:0.9809vw; }
 .social-facebook{ width:0.5664vw; height:1.1335vw; }
 .social-x{ width:1.0247vw; height:1.1179vw; }
 .social-linkedin{ width:1.0304vw; height:0.9931vw; }
+@media (prefers-reduced-motion:reduce){
+  .social-rail a{ transition:none; }
+}
+
+/* ---------- Mobile bottom bar (Figma node 466:3626/466:3627) ----------
+   ≤860px only — a fixed white bar pinned to the bottom of the viewport:
+   the same 4 social icons as .social-rail on the left (that rail is
+   hidden at this breakpoint instead, since its vw-based sizing would
+   render illegibly small on a phone), and a "Menü" label + burger on the
+   right, replacing the header's own .nav-toggle (also hidden at this
+   breakpoint — see the max-width:860px rule near .nav-toggle above).
+   Icon and type sizes are the Figma frame's px values halved: the file's
+   "iPhone 16 & 17 Pro Max" frame is exported at 2x (880px wide for a
+   440pt-wide device), so raw/2 gives real CSS px. The burger itself
+   reuses .nav-toggle's exact bar widths/gap (26/22/26px, 6px gap) rather
+   than Figma's very slightly different 32/26.5/32 — same taper ratio,
+   and it keeps one hamburger drawing on the whole site instead of two
+   near-identical ones. */
+:root{
+  /* Figma frame is exported at 2x (880px wide for a 440pt device), so every
+     raw value below is halved to get real CSS px. The bar is NOT full-bleed:
+     Frame 301 sits at x=29 with width 822 inside the 880 frame and ends 29
+     above the frame's bottom edge — i.e. an even 29/2 = 14.5px inset on the
+     left, right and bottom. Height 155/2 = 77.5px. Corners are square
+     (verified pixel-wise against the rendered frame, the apparent rounding
+     in a downscaled preview was just resampling).
+
+     The inset is the one value NOT taken from that frame: it is the page's
+     own content gutter instead. Figma's 14.5px is a hair narrower than the
+     20px the content sits at on a phone, and the bar runs directly under
+     the footer's white band — the two edges being a few px apart read as a
+     misalignment rather than a design decision. Tying it to --gutter puts
+     the bar, the menu panel and the page content on exactly the same left
+     and right edge at every width, and keeps the frame even all the way
+     around (the same value is used top and bottom). */
+  --mobile-bar-inset:var(--gutter);
+  --mobile-bar-h:77.5px;
+}
+.mobile-bar{
+  display:none;
+  position:fixed; z-index:90;
+  left:var(--mobile-bar-inset); right:var(--mobile-bar-inset);
+  bottom:calc(var(--mobile-bar-inset) + env(safe-area-inset-bottom));
+  height:var(--mobile-bar-h);
+  align-items:center; justify-content:space-between;
+  background:var(--white);
+  /* 14px each side: the social row starts at x=29 raw (14.5px) inside the
+     bar, and the burger's own glyph ends 28 raw (14px) before its right
+     edge — the icon's 120px-square box is flush with the bar's right edge
+     but carries that padding internally, so a 14px box padding reproduces
+     both without double-counting. */
+  padding:0 14px;
+}
+.mobile-bar-socials{ display:flex; align-items:center; gap:21px; }
+.mobile-bar-social{ display:block; }
+/* the shared icon assets are solid white fills (built for the dark
+   desktop rail) — inverted here since this bar's background is white
+   and the Figma design calls for solid black icons. */
+.mobile-bar-social img{ display:block; width:100%; height:100%; filter:invert(1); }
+.mobile-bar-instagram{ width:18px; height:18px; }
+/* Instagram is the only outline glyph in the row and reads noticeably
+   lighter than the three solid marks beside it. Its SVG has no strokes to
+   widen (the camera is drawn as filled shapes with even-odd holes) and an
+   <img> exposes no inner nodes to style, so it gets dilated optically
+   instead: four offset drop-shadows in the same colour thicken every edge
+   by that offset, on the outside of the ring and into its hole alike.
+   Order matters — these come after invert(1), so the shadows are cast from
+   the already-black glyph. */
+.mobile-bar-instagram img{
+  filter:invert(1)
+    drop-shadow(0.08px 0 0 #000) drop-shadow(-0.08px 0 0 #000)
+    drop-shadow(0 0.08px 0 #000) drop-shadow(0 -0.08px 0 #000);
+}
+.mobile-bar-facebook{ width:9px; height:18px; }
+.mobile-bar-x{ width:19px; height:21px; }
+.mobile-bar-linkedin{ width:19px; height:19px; }
+.mobile-bar-toggle{
+  display:flex; align-items:center; gap:13px;
+  background:none; border:0; padding:0; cursor:pointer;
+}
+.mobile-bar-toggle-label{
+  font-family:var(--font-display-bold); font-weight:700; font-size:19px; line-height:1;
+  color:var(--black);
+}
+/* Burger at the Figma frame's own mobile scale: bars 64/53/64 raw wide,
+   4 raw tall, tops 18 raw apart -> 32/26.5/32px, 2px tall, 7px gaps. Same
+   "menu" component as the desktop .nav-toggle (Figma 337:2318), which is
+   drawn at a smaller scale up in the header — the taper ratio is identical. */
+.mobile-bar-toggle-icon{ display:flex; flex-direction:column; gap:7px; }
+.mobile-bar-toggle-icon span{
+  height:2px; width:32px; background:var(--black); display:block;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s cubic-bezier(.4,0,.2,1);
+}
+.mobile-bar-toggle-icon span:nth-child(2){ width:26.5px; }
+.mobile-bar-toggle[aria-expanded="true"] .mobile-bar-toggle-icon span:nth-child(1){ transform:translateY(9px) rotate(45deg); }
+.mobile-bar-toggle[aria-expanded="true"] .mobile-bar-toggle-icon span:nth-child(2){ opacity:0; }
+.mobile-bar-toggle[aria-expanded="true"] .mobile-bar-toggle-icon span:nth-child(3){ width:32px; transform:translateY(-9px) rotate(-45deg); }
+@media (prefers-reduced-motion:reduce){
+  .mobile-bar-toggle-icon span{ transition:none; }
+}
+@media (max-width:860px){
+  .mobile-bar{ display:flex; }
+  /* function moved down here at this breakpoint — see the comment block above */
+  .social-rail{ display:none; }
+  /* clears the fixed bar (its own height + the inset above and below it) so
+     it never covers the footer's last row */
+  body{ padding-bottom:calc(var(--mobile-bar-h) + var(--mobile-bar-inset) * 2 + env(safe-area-inset-bottom)); }
+}
 
 /* ---------- Insights (Figma node 684:1843, "Frame 353") ----------
    Frame is 404px/3032px @ 3840px reference — exactly --grid-margin/
@@ -1127,7 +1491,7 @@ body.nav-open .mobile-nav{ display:flex; }
    since its own figures land exactly on that pattern's vw values. */
 .insights{
   position:relative;
-  padding:6vw 0 10vw;
+  padding:8vw 0 14vw;
 }
 .insights-heading{
   margin:0 0 3vw;
@@ -1217,7 +1581,7 @@ body.nav-open .mobile-nav{ display:flex; }
   .insights-cta-label, .insights-cta-icon{ transition:none; }
 }
 @media (max-width:860px){
-  .insights-heading{ font-size:6vw; }
+  .insights-heading{ font-size:var(--mobile-heading); }
   .insights-grid{ grid-template-columns:1fr; gap:8vw 0; }
   .insight-card{ gap:4vw; }
   .insight-card-body{ gap:3.5vw; }
@@ -1226,6 +1590,1385 @@ body.nav-open .mobile-nav{ display:flex; }
   .insights-cta{ margin-top:8vw; }
   .insights-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
   .insights-cta-icon{ width:9vw; height:9vw; }
+}
+
+
+/* ---------- Leistung Detail pages (Figma node 770:4159, "Frame 354") ----------
+   Rebuilt from that node after the previous version of this block was lost.
+   Same conversion as the rest of the site: px / 3840 * 100 = vw, so the page
+   scales with the viewport like every other section. The frame's content
+   column is left:404 / width:3032 — exactly --grid-margin / --grid-width —
+   so everything sits in a plain .wrap.
+   Type maps onto the existing families: Figma's "ES Klarheit Kurrent
+   TRIAL:Bold/Light/Semibold" are var(--font-display-bold) at weight 700/300
+   and var(--font-display) at 400 (see fonts/stylesheet.css); the feature
+   titles are Red Hat Display in Figma, which the site doesn't license —
+   var(--font-body) bold stands in, as elsewhere. */
+.leistung-detail-hero{ padding-top:5.677vw; }
+.leistung-detail-hero-row{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:4vw; padding-right:2.5vw;
+}
+/* The illustration is sticky while this column scrolls past it — hence the
+   two of them being siblings in one row rather than the Figma frame's
+   absolute placement. */
+.leistung-detail-scroll-col{
+  flex:1 1 auto; min-width:0;
+  display:flex; flex-direction:column; gap:6vw;
+}
+.leistung-detail-illustration{
+  position:sticky; top:8vw;
+  flex:none; width:20vw; /* 768px */
+}
+.leistung-detail-illustration img{ display:block; width:100%; height:auto; }
+
+.leistung-detail-content{
+  display:flex; flex-direction:column; gap:3.3333vw; /* 128px */
+  max-width:52.4219vw; /* 2013px */
+}
+.leistung-detail-intro{ display:flex; flex-direction:column; gap:1.25vw; }
+/* Two outline pills, sitting flush against each other exactly as in the
+   frame (no gap between them) — the same shape as the site's secondary
+   button. */
+.leistung-detail-tags{ display:flex; align-items:center; }
+.leistung-detail-tag{
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--black); border:1px solid var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:var(--white); white-space:nowrap;
+}
+.leistung-detail-title{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+  /* German service names run long ("Suchmaschinenoptimierung") — at this size
+     one word is wider than the text column and would slide under the sticky
+     illustration. The break point is set in the markup with a soft hyphen
+     (&shy;), which works without a hyphenation dictionary; break-word is only
+     the safety net for anything longer that comes later. */
+  overflow-wrap:break-word;
+}
+.leistung-detail-lead{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4;
+  color:var(--white); opacity:.8;
+}
+
+/* Feature rows: title, plus badge, full-width rule under each. */
+.leistung-detail-feature-list{
+  list-style:none; margin:0; padding:0;
+  display:flex; flex-direction:column; gap:2.5521vw;
+  max-width:38.9583vw; /* 1496px */
+}
+.leistung-detail-feature{ display:flex; flex-direction:column; gap:1.0417vw; }
+/* The whole row is the control (as in the Figma component), so it is a button
+   — reset to inherit the page's own type instead of the UA's. */
+.leistung-detail-feature-row{
+  width:100%; padding:0; border:0; background:none; cursor:pointer;
+  font:inherit; color:inherit; text-align:left;
+  /* flex-start, not center: centring would measure against the title AND the
+     open panel, so the icon would wander downwards as the copy unfolds. Top
+     aligned it stays on the heading; the negative margin below lifts it by
+     half the difference between its own box and the heading's line, so it
+     sits centred on that line rather than hanging under it. */
+  display:flex; align-items:flex-start; justify-content:space-between; gap:2vw;
+}
+.leistung-detail-feature-text{ display:block; flex:1 1 auto; min-width:0; }
+.leistung-detail-feature-title{
+  display:block;
+  font-family:var(--font-body); font-weight:700; font-size:1.4063vw; line-height:1.4;
+  color:var(--white);
+}
+/* Open/close: the panel is a grid whose single row goes from 0fr to 1fr, so the
+   height animates from nothing to exactly the copy's own height without any
+   measuring in script. The inner wrapper needs min-height:0 and overflow:hidden
+   for the collapsed state to actually reach zero. */
+.leistung-detail-feature-panel{
+  display:grid; grid-template-rows:0fr;
+  transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1);
+}
+.leistung-detail-feature.is-open .leistung-detail-feature-panel{ grid-template-rows:1fr; }
+.leistung-detail-feature-panel-inner{ display:block; min-height:0; overflow:hidden; }
+.leistung-detail-feature-copy{
+  display:block; padding-top:0.5vw;
+  font-family:var(--font-display-bold); font-weight:300; font-size:1.0938vw; line-height:1.4;
+  color:var(--white); opacity:0;
+  transition:opacity .3s ease;
+}
+.leistung-detail-feature.is-open .leistung-detail-feature-copy{ opacity:.8; transition-delay:.12s; }
+/* Plus to minus: the upright bar of the inlined plus collapses into the
+   horizontal one. Origin is the bar's own centre in the icon's 96-unit
+   viewBox, so it closes from both ends rather than sliding. */
+/* heading line box = 1.4063vw x 1.4 = 1.9688vw, icon 2.5vw -> lift 0.2656vw */
+.leistung-detail-feature-icon{ flex:none; width:2.5vw; height:2.5vw; display:block; margin-top:-0.2656vw; }
+.leistung-detail-feature-icon svg{ display:block; width:100%; height:100%; }
+.ldf-icon-bar{
+  /* The upright bar turns a quarter and comes to rest exactly on the
+     horizontal one, which leaves the minus of the open state. Origin is its
+     own centre in the icon's 96-unit viewBox: the two bars in plus.svg are
+     the same rectangle rotated, their centres a tenth of a unit apart, so
+     turning about this point lands them on top of each other. */
+  transform-box:view-box; transform-origin:49px 47.95px;
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+}
+.leistung-detail-feature.is-open .ldf-icon-bar{ transform:rotate(90deg); }
+@media (prefers-reduced-motion:reduce){
+  .leistung-detail-feature-panel, .leistung-detail-feature-copy, .ldf-icon-bar{ transition:none; }
+}
+.leistung-detail-feature-divider{ height:2px; width:100%; background:var(--white); }
+
+/* Same cross-slide CTA as the rest of the site; js/main.js measures both
+   halves into --ldcta-label-w / --ldcta-icon-w per instance. */
+.leistung-detail-cta{
+  display:flex; align-items:center; width:max-content;
+  text-decoration:none;
+}
+.leistung-detail-cta-label{
+  position:relative; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:#000; white-space:nowrap;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.leistung-detail-cta-icon{
+  position:relative; z-index:1;
+  flex:none; width:2.0833vw; height:2.0833vw;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.leistung-detail-cta-icon img{ display:block; width:100%; height:100%; }
+.leistung-detail-cta:hover .leistung-detail-cta-label,
+.leistung-detail-cta:focus-visible .leistung-detail-cta-label{
+  transform:translateX(var(--ldcta-icon-w, 2.0833vw));
+}
+.leistung-detail-cta:hover .leistung-detail-cta-icon,
+.leistung-detail-cta:focus-visible .leistung-detail-cta-icon{
+  transform:translateX(calc(-1 * var(--ldcta-label-w, 10vw))) rotate(45deg);
+}
+@media (prefers-reduced-motion:reduce){
+  .leistung-detail-cta-label, .leistung-detail-cta-icon{ transition:none; }
+}
+
+/* Contact band — full-bleed white, so its type flips to black. The CTA
+   inverts with it: black pill, and the arrow disc (a white circle with a
+   black arrow) inverted so it reads on the light ground. */
+.leistung-detail-contact{
+  margin-top:11vw;
+  padding:11.0938vw 0;
+  background:var(--white); color:var(--black);
+}
+.leistung-detail-contact-inner{ display:flex; align-items:center; gap:4.2708vw; }
+.leistung-detail-contact-text{ display:flex; flex-direction:column; gap:1.25vw; }
+.leistung-detail-contact-text h2{
+  margin:0; max-width:28.6458vw;
+  font-family:var(--font-display-bold); font-weight:700; font-size:2.2917vw; line-height:1.25;
+  color:inherit;
+}
+.leistung-detail-contact .leistung-detail-cta-label{ background:var(--black); color:var(--white); }
+.leistung-detail-contact .leistung-detail-cta-icon img{ filter:invert(1); }
+.leistung-detail-person{ display:flex; align-items:center; gap:2.0833vw; flex:none; }
+.leistung-detail-person-photo{
+  flex:none; width:14.7917vw; height:14.7917vw;
+  border-radius:50%; overflow:hidden;
+}
+.leistung-detail-person-photo img{ width:100%; height:100%; object-fit:cover; display:block; }
+.leistung-detail-person-info{ display:flex; flex-direction:column; gap:1.25vw; }
+.leistung-detail-person-name{
+  display:flex; flex-direction:column;
+  font-size:1.4063vw; line-height:1.4; white-space:nowrap;
+}
+.leistung-detail-person-name strong{ font-family:var(--font-display-bold); font-weight:700; }
+.leistung-detail-person-name span{ font-family:var(--font-display-bold); font-weight:400; }
+.leistung-detail-person-kontakt{
+  display:flex; flex-direction:column; gap:0.2083vw;
+  font-size:0.9375vw; line-height:1.5; white-space:nowrap;
+}
+.leistung-detail-person-row{ display:flex; gap:1.4vw; }
+.leistung-detail-person-row span{ font-family:var(--font-display-bold); font-weight:300; }
+.leistung-detail-person-row a{
+  font-family:var(--font-display-bold); font-weight:700; color:inherit;
+  text-decoration:none;
+}
+.leistung-detail-person-row a:hover,
+.leistung-detail-person-row a:focus-visible{ text-decoration:underline; }
+
+/* Cases teaser — same card width and gap as the Leistungen cards on the
+   homepage (728px / 40px), heading at the site's standard section grade. */
+.leistung-detail-cases{ padding:11vw 0 14vw; }
+.leistung-detail-cases-heading{
+  margin:0 0 3vw; text-align:center;
+  font-family:var(--font-display); font-weight:400; font-size:3.3854vw; line-height:1.1;
+  color:var(--white);
+}
+.leistung-detail-cases-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.0417vw; }
+.leistung-detail-case{ display:flex; flex-direction:column; gap:0.625vw; }
+/* Placeholder plate until real case imagery exists — drawn as an outline
+   rather than a fill, so it carries no colour of its own. */
+.leistung-detail-case-media{
+  height:12.5vw; border-radius:0.3125vw;
+  background:var(--black); border:1px solid var(--white);
+}
+.leistung-detail-case-body{ display:flex; flex-direction:column; align-items:flex-start; gap:1.25vw; }
+.leistung-detail-case-text{ display:flex; flex-direction:column; gap:0.3125vw; }
+.leistung-detail-case-subtitle{
+  margin:0; font-family:var(--font-body); font-weight:300; font-size:0.7292vw; line-height:1.2;
+  color:var(--white);
+}
+.leistung-detail-case-title{
+  margin:0; font-family:var(--font-display-bold); font-weight:700; font-size:1.4462vw; line-height:1.1;
+  color:var(--white);
+}
+/* Hovering a case turns its arrow disc a quarter of the way — the NE arrow
+   comes to rest horizontal, the same 45deg the site's CTAs use. Lives on the
+   shared class, so every page carrying this module gets it. */
+.leistung-detail-case-icon{
+  flex:none; width:2.0833vw; height:2.0833vw; display:block;
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.leistung-detail-case:hover .leistung-detail-case-icon,
+.leistung-detail-case:focus-within .leistung-detail-case-icon{ transform:rotate(45deg); }
+@media (prefers-reduced-motion:reduce){
+  .leistung-detail-case-icon{ transition:none; }
+}
+
+@media (max-width:860px){
+  .leistung-detail-hero{ padding-top:6vw; }
+  /* the sticky illustration has nowhere to stick beside a single column —
+     it moves above the copy and scrolls with it */
+  .leistung-detail-hero-row{ flex-direction:column; gap:8vw; padding-right:0; }
+  .leistung-detail-illustration{ position:static; width:60vw; align-self:center; order:-1; }
+  .leistung-detail-scroll-col{ gap:12vw; }
+  .leistung-detail-content{ max-width:none; gap:8vw; }
+  .leistung-detail-intro{ gap:5vw; }
+  .leistung-detail-tag{ height:9vw; padding:0 5vw; font-size:3.4vw; }
+  .leistung-detail-title{ font-size:10.5vw; letter-spacing:0; }
+  .leistung-detail-lead{ font-size:4vw; }
+  .leistung-detail-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
+  .leistung-detail-cta-icon{ width:9vw; height:9vw; }
+  .leistung-detail-feature-list{ max-width:none; gap:7vw; }
+  .leistung-detail-feature{ gap:3.5vw; }
+  .leistung-detail-feature-title{ font-size:5vw; }
+  .leistung-detail-feature-copy{ font-size:4vw; padding-top:2vw; }
+  .leistung-detail-feature-icon{ width:8vw; height:8vw; margin-top:-0.5vw; }
+  .leistung-detail-contact{ margin-top:16vw; padding:14vw 0; }
+  .leistung-detail-contact-inner{ flex-direction:column; align-items:flex-start; gap:10vw; }
+  .leistung-detail-contact-text{ gap:6vw; }
+  .leistung-detail-contact-text h2{ max-width:none; font-size:7vw; }
+  /* width:100% so the block actually spans the column — without it the flex
+     item shrinks to its widest child (the photo), and there is nothing left
+     to centre the photo within. */
+  .leistung-detail-person{ flex-direction:column; align-items:flex-start; gap:6vw; width:100%; }
+  .leistung-detail-person-photo{ width:45vw; height:45vw; align-self:center; }
+  .leistung-detail-person-info{ gap:5vw; }
+  .leistung-detail-person-name{ font-size:5vw; }
+  .leistung-detail-person-kontakt{ font-size:3.6vw; gap:1.5vw; }
+  .leistung-detail-person-row{ gap:4vw; }
+  .leistung-detail-cases{ padding:16vw 0 20vw; }
+  .leistung-detail-cases-heading{ margin-bottom:8vw; font-size:var(--mobile-heading); text-align:left; }
+  .leistung-detail-cases-grid{ grid-template-columns:1fr; gap:10vw; }
+  .leistung-detail-case{ gap:3vw; }
+  .leistung-detail-case-media{ height:52vw; border-radius:2vw; }
+  .leistung-detail-case-body{ gap:5vw; }
+  .leistung-detail-case-subtitle{ font-size:3.4vw; }
+  .leistung-detail-case-title{ font-size:5.5vw; }
+  .leistung-detail-case-icon{ width:9vw; height:9vw; }
+}
+
+/* ---------- Blog overview (Figma node 810:3479, "Frame 356") ----------
+   Same conversion as everywhere else: px / 3840 * 100 = vw. The frame's
+   content column is left:404 / width:3032 — --grid-margin / --grid-width —
+   so hero, card grid and newsletter strip all sit in a plain .wrap.
+   Card grid: three 984px columns on a 3032px track => 40px gutters
+   (1.0417vw), used for both axes. */
+.blog-hero{ padding-top:5.677vw; }
+.blog-hero-row{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:4vw;
+}
+.blog-intro{
+  flex:1 1 auto; min-width:0; max-width:52.4219vw; /* 2013px */
+  display:flex; flex-direction:column; gap:1.25vw; /* 48px */
+}
+.blog-title{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+}
+.blog-lead{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4;
+  color:var(--white); opacity:.8;
+}
+/* Filter pills — the site's secondary button shape. Flush against each other
+   horizontally, exactly like .leistung-detail-tags; only the rows are spaced
+   (Figma's gap:12px 0). */
+.blog-chips{ display:flex; flex-wrap:wrap; align-items:center; gap:0.3125vw 0; }
+.blog-chip{
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--black); border:1px solid var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:var(--white); white-space:nowrap; cursor:pointer;
+  transition:background .3s ease, color .3s ease;
+}
+.blog-chip:hover, .blog-chip:focus-visible{ background:var(--white); color:#000; }
+.blog-chip.is-active{ background:var(--white); color:#000; }
+@media (prefers-reduced-motion:reduce){ .blog-chip{ transition:none; } }
+
+.blog-search{
+  flex:none; width:23.3854vw; height:3.3333vw; /* 898 x 128 */
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0.2083vw 0.4167vw 0.2083vw 1.0417vw;
+  border:2px solid var(--white); border-radius:0.3125vw;
+  background:transparent;
+}
+.blog-search-input{
+  flex:1 1 auto; min-width:0;
+  background:none; border:0; outline:none; padding:0;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:var(--white);
+}
+.blog-search-input::placeholder{ color:var(--white); opacity:1; }
+/* The browser's own clear button is replaced with a cross drawn to the same
+   spec as the magnifier beside it: same 96-unit box, same 4-unit white stroke,
+   same rendered size — so the two glyphs read as one pair. Chrome/Safari only;
+   Firefox shows no clear button for search inputs at all. */
+.blog-search-input::-webkit-search-cancel-button{
+  -webkit-appearance:none; appearance:none;
+  width:2.5vw; height:2.5vw; margin-right:0.5vw;
+  cursor:pointer;
+  background:center/contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 96 96' fill='none'%3E%3Cpath d='M23 23L73 73M73 23L23 73' stroke='%23ffffff' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+.blog-search-input::-webkit-search-decoration,
+.blog-search-input::-webkit-search-results-button{ -webkit-appearance:none; appearance:none; }
+.blog-search-btn{
+  flex:none; width:2.5vw; height:2.5vw;
+  padding:0; border:0; background:none; cursor:pointer;
+}
+.blog-search-btn svg{ display:block; width:100%; height:100%; }
+
+.blog-list{ padding-top:4vw; }
+.blog-grid{
+  display:grid; grid-template-columns:repeat(3, 1fr);
+  gap:1.0417vw; /* 40px, both axes */
+  align-items:start;
+}
+/* Light card at rest, inverted on hover: black plate, white type, flipped
+   illustration. Every piece that carries its own colour flips with it — the
+   artwork and the black arrow-ne.svg via invert(), the type via `color`. The
+   hairline is always there (matched to the fill while the card is light, so
+   it doesn't show) and turns white with the dark state, which is what keeps
+   the hovered card readable against the page's own black. */
+.blog-card{
+  display:flex; flex-direction:column;
+  background:var(--white); border:1px solid var(--white); overflow:hidden;
+  border-radius:0.6853vw; /* 26.315px, all four corners */
+  transition:background-color .4s ease, border-color .4s ease;
+}
+.blog-card:hover{ background:var(--black); border-color:var(--white); }
+/* The teasers are 984x696 illustrations, so the frame's 984x585.5 crop would
+   cut them off top and bottom. The box carries the artwork's own ratio and the
+   image is contained rather than covered, so any teaser is shown whole
+   whatever its proportions; the ground matches the artwork's white plate so a
+   letterboxed image has no visible edge. */
+.blog-card-media{
+  display:block; width:100%; aspect-ratio:984 / 696;
+  overflow:hidden; background:transparent;
+}
+.blog-card-media img{
+  display:block; width:100%; height:100%; object-fit:contain;
+  transition:transform .6s cubic-bezier(.4,0,.2,1), filter .4s ease;
+}
+.blog-card:hover .blog-card-media img{ transform:scale(1.04); filter:invert(1); }
+.blog-card-body{
+  flex:1 1 auto;
+  display:flex; flex-direction:column; gap:1.3706vw; /* 52.63px */
+  padding:1.3706vw; color:#000;
+  transition:color .4s ease;
+}
+.blog-card:hover .blog-card-body{ color:var(--white); }
+.blog-card-head{ display:flex; flex-direction:column; gap:0.3125vw; }
+.blog-card-meta{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.7292vw; line-height:1.2; color:inherit;
+}
+.blog-card-title{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:1.4063vw; line-height:1.1; color:inherit;
+}
+.blog-card-title a{ color:inherit; text-decoration:none; }
+.blog-card-excerpt{
+  margin:0; flex:1 1 auto;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0417vw; line-height:1.4; color:inherit; opacity:.8;
+}
+/* Tertiary button: label plus the site's own CTA arrow with the disc removed
+   (images/arrow-ne.svg), which points north-east like the Figma glyph. */
+.blog-card-link{
+  display:inline-flex; align-items:center; gap:0.6853vw;
+  padding:0.2284vw 0; margin-top:auto;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:1.0417vw; line-height:1.5; color:inherit; text-decoration:none;
+}
+.blog-card-link-icon{
+  display:block; flex:none; width:0.75vw; height:0.75vw;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), filter .4s ease;
+}
+/* arrow-ne.svg is drawn black, so it needs flipping while the card is dark. */
+.blog-card:hover .blog-card-link-icon{ filter:invert(1); }
+.blog-card-link:hover .blog-card-link-icon,
+.blog-card-link:focus-visible .blog-card-link-icon,
+.blog-newsletter-link:hover .blog-card-link-icon,
+.blog-newsletter-link:focus-visible .blog-card-link-icon{
+  transform:rotate(45deg);
+}
+@media (prefers-reduced-motion:reduce){
+  .blog-card, .blog-card-body, .blog-card-media img, .blog-card-link-icon{ transition:none; }
+}
+
+/* Newsletter strip, sitting between the first and second row of cards and
+   spanning the whole grid, as in the frame — drawn as an outline on the page's
+   own ground rather than a white plate, with the cards' corner radius. */
+.blog-newsletter{
+  grid-column:1 / -1;
+  display:flex; align-items:center; justify-content:space-between; gap:2vw;
+  padding:0.6962vw 1.3542vw; /* 26.733 / 52 */
+  background:transparent; color:var(--white);
+  border:1px solid var(--white); border-radius:0.6853vw;
+}
+.blog-newsletter p{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0443vw; line-height:1.5;
+}
+.blog-newsletter-link{
+  display:inline-flex; align-items:center; gap:0.6962vw;
+  padding:0.2321vw 0;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:1.0443vw; line-height:1.5; color:var(--white); text-decoration:none;
+}
+/* arrow-ne.svg is drawn black for the light card surfaces — inverted here so
+   it reads on the black ground. */
+.blog-newsletter .blog-card-link-icon{ filter:invert(1); }
+
+/* "Mehr Beiträge laden" is the same secondary button as the Leistungen cards
+   on the homepage — it carries .leistung-cta, so it inherits those shapes and
+   the cross-slide hover, and js/main.js measures it along with the others.
+   Only the icon differs: Figma puts a plus in the ring here, not an arrow.
+   plus-thick.svg is already white, so it must skip the invert() the arrow
+   asset needs, and it stays upright instead of turning 45deg — a rotated plus
+   would read as a close cross. */
+.blog-more-wrap{ display:flex; justify-content:center; padding-top:7vw; }
+.blog-more .leistung-cta-icon img{ filter:none; }
+.blog-more:hover .leistung-cta-icon,
+.blog-more:focus-visible .leistung-cta-icon{
+  transform:translateX(calc(-1 * var(--leistung-cta-label-w, 6vw)));
+}
+.blog-list + .leistung-detail-contact{ margin-top:13vw; }
+
+@media (max-width:860px){
+  .blog-hero{ padding-top:6vw; }
+  .blog-hero-row{ flex-direction:column; align-items:stretch; gap:7vw; }
+  .blog-intro{ max-width:none; gap:5vw; }
+  .blog-title{ font-size:var(--mobile-heading); letter-spacing:0; }
+  .blog-lead{ font-size:3.8vw; }
+  .blog-chips{ gap:2vw 0; }
+  .blog-chip{ height:8vw; padding:0 4vw; font-size:3.2vw; }
+  .blog-search{ width:100%; height:12vw; padding:0 2vw 0 4vw; border-radius:1.5vw; }
+  .blog-search-input{ font-size:3.4vw; }
+  .blog-search-btn{ width:8vw; height:8vw; }
+  .blog-search-input::-webkit-search-cancel-button{ width:8vw; height:8vw; margin-right:2vw; }
+
+  .blog-list{ padding-top:14vw; }
+  .blog-grid{ grid-template-columns:1fr; gap:8vw; }
+  .blog-card{ border-radius:2.5vw; }
+  .blog-card-body{ gap:5vw; padding:5vw; }
+  .blog-card-head{ gap:1.5vw; }
+  .blog-card-meta{ font-size:3.2vw; }
+  .blog-card-title{ font-size:6vw; }
+  .blog-card-excerpt{ font-size:3.8vw; }
+  .blog-card-link{ gap:2.5vw; font-size:3.8vw; }
+  .blog-card-link-icon{ width:3vw; height:3vw; }
+
+  .blog-newsletter{ flex-direction:column; align-items:flex-start; gap:3vw; padding:5vw; border-radius:2.5vw; }
+  .blog-newsletter p{ font-size:3.8vw; }
+  .blog-newsletter-link{ gap:2.5vw; font-size:3.8vw; }
+
+  .blog-more-wrap{ padding-top:16vw; }
+  .blog-list + .leistung-detail-contact{ margin-top:20vw; }
+}
+
+/* ---------- Über uns (Figma node 816:7174, "Frame 357") ----------
+   3840px reference frame, px / 3840 * 100 = vw like every other block.
+   Type maps onto the site's families as elsewhere: Figma's "ES Klarheit
+   Kurrent TRIAL:Bold/Regular/Light" are var(--font-display-bold) at 700/400/
+   300, "Red Hat Display" and "Barlow" aren't licensed here and fall back to
+   var(--font-body) / var(--font-display-bold) as on the detail pages. */
+/* Full-bleed and full-height: the stage is pulled up under the sticky header
+   (js/main.js measures it into --header-h) so the photo starts at the very
+   top of the window, runs edge to edge, and fills exactly one viewport at any
+   size. svh rather than vh so a phone's collapsing address bar doesn't make
+   it jump. The bottom corners are rounded off against the page's own black,
+   like the picture panels further down. */
+.ueber-stage{
+  position:relative; isolation:isolate;
+  margin-top:calc(-1 * var(--header-h, 0px));
+  height:100vh; height:100svh;
+  display:flex; flex-direction:column; justify-content:flex-end;
+  padding:calc(5.8333vw + var(--header-h, 0px)) 0 5.8333vw;
+  background:var(--black); /* plate behind the photo */
+  border-radius:0 0 1.0417vw 1.0417vw; /* 40px, matching the kombi panels */
+  overflow:hidden;
+}
+.ueber-stage-bg{ position:absolute; inset:0; z-index:-1; }
+.ueber-stage-bg img{ width:100%; height:100%; object-fit:cover; display:block; }
+/* The frame lays two black washes over the photo (6% then 10%, ~16%
+   composited). That alone leaves the headline sitting on the bright half of
+   this particular shot, so the flat wash is joined by a bottom-weighted
+   gradient: the top of the image stays as bright as in Figma and the type
+   gets the contrast it needs where it actually sits. */
+.ueber-stage-bg::after{
+  content:''; position:absolute; inset:0;
+  background:
+    linear-gradient(to bottom, rgba(0,0,0,0) 24%, rgba(0,0,0,.74) 100%),
+    rgba(0,0,0,.16);
+}
+.ueber-stage-inner{ display:flex; flex-direction:column; align-items:flex-start; gap:1.25vw; }
+.ueber-stage-title{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+}
+/* Scroll cue: the frame's arrow-right disc. At rest it points up and to the
+   right at 45deg; hovering turns it the 135deg round to straight down, so the
+   gesture itself says "this takes you down the page". */
+.ueber-stage-scroll{
+  display:block; width:2.1875vw; height:2.1875vw;
+  transform:rotate(-45deg);
+  transition:transform .6s cubic-bezier(.22,1,.36,1);
+}
+.ueber-stage-scroll svg{ display:block; width:100%; height:100%; }
+.ueber-stage-scroll:hover, .ueber-stage-scroll:focus-visible{ transform:rotate(90deg); }
+
+/* Text/image blocks. The frame puts them in a 2518px band centred on the
+   page — narrower than the content grid and not tied to it, so this has its
+   own wrapper rather than .wrap. */
+.ueber-kombis{
+  display:flex; flex-direction:column; gap:7vw; /* 204px, opened up */
+  padding-top:11vw; /* below the stage */
+}
+.ueber-kombi{
+  width:65.5729vw; margin:0 auto; /* 2518px */
+  display:grid; grid-template-columns:1fr 1fr; gap:1.3281vw; /* 51px */
+  align-items:center;
+}
+/* The picture is taller than its frame and centred in it, so it has room to
+   travel while the block passes the viewport (js/main.js writes the shift).
+   The 15% overhang top and bottom is the whole range of the movement; the
+   frame itself never moves. */
+.ueber-kombi-img{
+  position:relative;
+  height:28.6458vw; /* 1100px */
+  border-radius:1.0417vw; overflow:hidden; background:var(--white);
+}
+.ueber-kombi-img img{
+  position:absolute; inset:-15% 0; width:100%; height:130%;
+  display:block; object-fit:cover;
+  will-change:transform;
+}
+@media (prefers-reduced-motion:reduce){
+  .ueber-kombi-img img{ inset:0; height:100%; transform:none !important; }
+}
+.ueber-kombi-text{ display:flex; flex-direction:column; gap:1.25vw; }
+.ueber-kombi-text h2{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:3.3854vw; line-height:1.1; color:var(--white);
+}
+.ueber-kombi-text p{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.9375vw; line-height:1.5; color:var(--white);
+}
+.ueber-kombi-mail{
+  font-weight:700; color:inherit; text-decoration:none;
+  border-bottom:1px solid transparent; transition:border-color .3s ease;
+}
+.ueber-kombi-mail:hover, .ueber-kombi-mail:focus-visible{ border-bottom-color:currentColor; }
+/* Second block flips the sides; the source order stays text-then-image so it
+   still reads text-first when the columns stack on a phone. */
+.ueber-kombi--reverse .ueber-kombi-text{ order:2; }
+.ueber-kombi--reverse .ueber-kombi-img{ order:1; }
+
+/* Facts: a horizontal accordion, exactly one card open. The open one takes
+   the accent fill and the wide track (1332px), the others stay outlined at
+   636px. */
+.ueber-facts{ padding-top:10vw; }
+/* The row has a fixed height (Figma's 516px), which is what keeps the
+   open/close transition from jolting: a card that only changes width can't
+   change the row's height, so there is nothing for the layout to spring
+   back from. The copy stays clamped to three lines in both states — opening
+   makes the card wider, so those three lines simply hold the whole text
+   instead of breaking off on an ellipsis. */
+.ueber-facts-row{
+  --ueber-fact-h:13.4375vw; /* 516px */
+  display:flex; align-items:stretch; justify-content:center;
+  gap:1.5625vw; /* 60px */
+  width:89.0625vw; margin:0 auto; /* 3420px */
+}
+.ueber-fact{
+  position:relative; z-index:1;
+  flex:0 0 16.5625vw; /* 636px */
+  height:var(--ueber-fact-h);
+  display:flex; flex-direction:column; align-items:flex-start; gap:1.25vw;
+  padding:1.25vw; /* 48px */
+  background:transparent; border:0.1042vw solid var(--white); border-radius:0.625vw;
+  font:inherit; color:inherit; text-align:left; cursor:pointer;
+  overflow:hidden;
+  transition:flex-basis .8s cubic-bezier(.22,1,.36,1),
+             background-color .6s ease,
+             transform .5s cubic-bezier(.22,1,.36,1);
+}
+.ueber-fact.is-open{ flex-basis:34.6875vw; background:var(--white); } /* 1332px */
+/* Hover grows the card a touch instead of tinting it, so the fill stays the
+   one signal that says "open". */
+.ueber-fact:hover, .ueber-fact:focus-visible{ transform:scale(1.03); z-index:2; }
+.ueber-fact-txt{ display:flex; flex-direction:column; gap:0.4167vw; width:100%; }
+.ueber-fact-number{
+  font-family:var(--font-body); font-weight:700;
+  font-size:2.2917vw; line-height:1.25; color:var(--white);
+  transition:color .6s ease;
+}
+.ueber-fact.is-open .ueber-fact-number{ color:var(--black); }
+/* Three lines in both states: closed they break off on an ellipsis, open the
+   card is wide enough for the same three lines to carry the whole sentence.
+   Keeping the line count fixed is half of what makes the height stable. */
+.ueber-fact-copy{
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.9375vw; line-height:1.5; color:var(--white);
+  display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3;
+  overflow:hidden;
+  transition:color .6s ease;
+}
+.ueber-fact.is-open .ueber-fact-copy{ color:var(--black); }
+/* Plus to minus by turning the upright bar onto the horizontal one — the same
+   mechanic as the Leistungen accordion. The disc flips white on the open card
+   so the control stays visible once the plate itself is accent-coloured. */
+.ueber-fact-icon{ display:block; flex:none; width:2.1875vw; height:2.1875vw; margin-top:auto; }
+.ueber-fact-icon svg{ display:block; width:100%; height:100%; }
+/* Inactive: white disc, dark mark on the black plate. Active: the plate is
+   white, so the disc turns black and the mark white — the same contrast
+   either way, no third colour. */
+.uf-disc{ fill:var(--white); transition:fill .6s ease; }
+.uf-bar-h, .uf-bar-v{ stroke:var(--black); transition:stroke .6s ease; }
+.uf-bar-v{
+  transform-box:view-box; transform-origin:42px 42px;
+  transition:transform .7s cubic-bezier(.22,1,.36,1), stroke .6s ease;
+}
+.ueber-fact.is-open .uf-disc{ fill:var(--black); }
+.ueber-fact.is-open .uf-bar-h,
+.ueber-fact.is-open .uf-bar-v{ stroke:var(--white); }
+.ueber-fact.is-open .uf-bar-v{ transform:rotate(90deg); }
+
+/* Team: two columns of full circles that drift against each other while the
+   section passes (js/main.js writes --ueber-shift per column), each portrait
+   fading up as it enters. */
+.ueber-team{ padding-top:11.5vw; padding-bottom:0; }
+/* One gap value for both axes: the circles are sized explicitly rather than
+   as "a share of the column", so the space left over sideways is simply
+   reused as the vertical rhythm. --ueber-gap is that single distance; the
+   pair is centred in the content grid and the stagger is half a step
+   (circle + gap), so the two columns interleave evenly. */
+.ueber-team-cols{
+  --ueber-circle:34.2833vw;
+  --ueber-gap:5.7167vw;
+  display:flex; justify-content:center; align-items:flex-start;
+  gap:var(--ueber-gap);
+}
+/* Each column carries a parallax transform, which makes it its own stacking
+   context — so lifting the hovered person alone can't clear the neighbouring
+   column. The whole column rises instead; the two never overlap, so there is
+   nothing to lose by it. */
+.ueber-team-col{
+  position:relative; z-index:1;
+  flex:none; width:var(--ueber-circle);
+  display:flex; flex-direction:column; gap:var(--ueber-gap);
+}
+.ueber-team-col:hover, .ueber-team-col:focus-within{ z-index:4; }
+/* Half a step (circle + gap), so the left column's circles sit exactly
+   between the right column's. */
+.ueber-team-col--left{ margin-top:calc((var(--ueber-circle) + var(--ueber-gap)) / 2); }
+/* The hover card reaches past its own circle, so the hovered person has to
+   sit above its neighbours. Instead of a shadow under the type, the rest of
+   the grid steps back to half opacity while one is hovered — that separates
+   the card from whatever portrait it crosses and picks the person out at the
+   same time. Only opacity is transitioned here: the transform belongs to the
+   parallax loop in js/main.js, which writes it every frame. */
+.ueber-person{ position:relative; z-index:1; transition:opacity .5s ease; }
+.ueber-person:hover, .ueber-person:focus-within{ z-index:3; }
+.ueber-team:has(.ueber-person:hover) .ueber-person:not(:hover),
+.ueber-team:has(.ueber-person:focus-within) .ueber-person:not(:focus-within){ opacity:.5; }
+.ueber-person-photo{
+  width:100%; aspect-ratio:1; border-radius:50%; overflow:hidden;
+  opacity:0; transform:translateY(4vw) scale(.96);
+  transition:opacity 1.2s ease, transform 1.3s cubic-bezier(.16,1,.3,1);
+}
+.ueber-person.is-in .ueber-person-photo{ opacity:1; transform:none; }
+.ueber-person-photo img{ display:block; width:100%; height:100%; object-fit:cover; }
+/* Name and contact sit beside the circle, starting at 75% of its width as in
+   the frame. The card is always set left-aligned; only its anchor changes, so
+   it lands in whichever gutter has the room — to the right of the left-hand
+   column, to the left of the right-hand one (where it is hung by its right
+   edge, but the type inside still reads from the left). */
+.ueber-person-txt{
+  position:absolute; top:31.7%; left:75.2%;
+  display:flex; flex-direction:column; align-items:flex-start; gap:1.7593vw;
+  color:var(--white); text-align:left; white-space:nowrap; pointer-events:none;
+  opacity:0; transform:translateX(-1vw);
+  transition:opacity .55s ease, transform .8s cubic-bezier(.16,1,.3,1);
+}
+.ueber-person:hover .ueber-person-txt,
+.ueber-person:focus-within .ueber-person-txt{ opacity:1; transform:none; }
+.ueber-team-col--right .ueber-person-txt{
+  left:auto; right:75.2%;
+  transform:translateX(1vw);
+}
+.ueber-team-col--right .ueber-person:hover .ueber-person-txt,
+.ueber-team-col--right .ueber-person:focus-within .ueber-person-txt{ transform:none; }
+.ueber-person-name{
+  display:flex; flex-direction:column;
+  font-size:1.9792vw; line-height:1.4;
+}
+.ueber-person-name strong{ font-family:var(--font-display-bold); font-weight:700; }
+.ueber-person-name span{ font-family:var(--font-display); font-weight:400; }
+/* A two-column grid rather than two flex rows: the labels and the values each
+   get their own track, so they line up whichever side the card sits on. */
+.ueber-person-kontakt{
+  display:grid; grid-template-columns:max-content max-content;
+  column-gap:1.4661vw; row-gap:0.2932vw;
+  font-size:1.3194vw; line-height:1.5;
+}
+.ueber-person-row{ display:contents; }
+.ueber-person-row span{ font-family:var(--font-display-bold); font-weight:300; }
+.ueber-person-row a{
+  font-family:var(--font-display-bold); font-weight:700;
+  color:inherit; text-decoration:none; pointer-events:auto;
+}
+.ueber-person-row a:hover, .ueber-person-row a:focus-visible{ text-decoration:underline; }
+@media (prefers-reduced-motion:reduce){
+  .ueber-stage-scroll, .ueber-fact, .ueber-fact-copy, .uf-disc, .uf-bar-h, .uf-bar-v,
+  .ueber-person-photo, .ueber-person-txt{ transition:none; }
+  .ueber-team-col, .ueber-person{ transform:none !important; }
+  .ueber-person{ transition:none; }
+  .ueber-person-photo{ opacity:1; transform:none; }
+}
+
+@media (max-width:860px){
+  .ueber-stage{
+    height:100vh; height:100svh;
+    /* clears the floating mobile bar as well, so the headline and the scroll
+       cue aren't sitting behind it */
+    padding:calc(8vw + var(--header-h, 0px)) 0
+            calc(8vw + var(--mobile-bar-h) + var(--mobile-bar-inset) * 2);
+    border-radius:0 0 3vw 3vw;
+  }
+  .ueber-stage-inner{ gap:6vw; }
+  .ueber-stage-title{ font-size:var(--mobile-heading); letter-spacing:0; }
+  .ueber-stage-scroll{ width:11vw; height:11vw; }
+
+  .ueber-kombis{ gap:20vw; padding-top:20vw; }
+  .ueber-kombi{ width:auto; margin:0 var(--gutter); grid-template-columns:1fr; gap:6vw; }
+  .ueber-kombi-img{ height:auto; aspect-ratio:1231 / 1100; border-radius:3vw; }
+  .ueber-kombi-text{ gap:4vw; }
+  .ueber-kombi-text h2{ font-size:var(--mobile-heading); }
+  .ueber-kombi-text p{ font-size:3.8vw; }
+  /* Stacked, the image belongs under its heading again. */
+  .ueber-kombi--reverse .ueber-kombi-text{ order:1; }
+  .ueber-kombi--reverse .ueber-kombi-img{ order:2; }
+
+  /* No room for four tracks side by side: the row becomes a normal vertical
+     accordion, open card filled, closed cards outlined. */
+  .ueber-facts{ padding-top:20vw; }
+  .ueber-facts-row{
+    width:auto; margin:0 var(--gutter);
+    flex-direction:column; align-items:stretch; gap:4vw;
+  }
+  /* Stacked, the card can only grow downwards, so height is what the
+     accordion animates here — no fixed height, and the open card drops the
+     clamp and shows its copy in full. */
+  .ueber-fact{
+    flex:none; height:auto; gap:5vw; padding:5vw;
+    border-width:2px; border-radius:2.5vw;
+  }
+  .ueber-fact.is-open{ flex-basis:auto; }
+  .ueber-fact.is-open .ueber-fact-copy{ -webkit-line-clamp:none; }
+  .ueber-fact:hover, .ueber-fact:focus-visible{ transform:none; }
+  .ueber-fact-number{ font-size:9vw; }
+  .ueber-fact-copy{ font-size:3.8vw; }
+  .ueber-fact-icon{ width:9vw; height:9vw; }
+
+  /* One column, no parallax (js stands down below 860px), and the hover
+     card has nowhere to go beside the circle — so it becomes a plain caption
+     under each portrait, always visible. */
+  .ueber-team{ padding-top:20vw; padding-bottom:0; }
+  .ueber-team-cols{ flex-direction:column; --ueber-circle:100%; --ueber-gap:10vw; }
+  .ueber-team-col{ width:100%; }
+  .ueber-team-col--left{ margin-top:0; }
+  .ueber-person{ display:flex; flex-direction:column; gap:4vw; opacity:1 !important; }
+  .ueber-person-txt{
+    position:static; opacity:1; transform:none; white-space:normal;
+    gap:3vw;
+  }
+  .ueber-team-col--right .ueber-person-txt{ transform:none; }
+  .ueber-person-name{ font-size:5.5vw; }
+  .ueber-person-kontakt{ font-size:3.6vw; column-gap:4vw; row-gap:1.5vw; }
+}
+
+/* ---------- Über uns: Werte ----------
+   Built to the reference layout the client supplied: centred heading, then a
+   row of left-aligned columns with the icon on top. The icons are the
+   recoloured wert-*.svg copies (white line art, black knockout) of the files
+   in images/ueber-uns/SVG. auto-fit keeps the row honest if the number of
+   values changes. */
+/* Last section before the footer, so it carries its own bottom breathing
+   room now that the contact band is gone. */
+.ueber-werte{ padding:11vw 0; }
+.ueber-werte-heading{
+  margin:0 0 4vw; text-align:center;
+  font-family:var(--font-display); font-weight:400;
+  font-size:3.3854vw; line-height:1.1; color:var(--white);
+}
+.ueber-werte-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(0, 1fr));
+  gap:2.5vw;
+  align-items:start;
+}
+.ueber-wert{ display:flex; flex-direction:column; align-items:flex-start; }
+.ueber-wert-icon{
+  display:block; width:auto; height:9vw; margin-bottom:2.5vw;
+}
+.ueber-wert h3{
+  margin:0 0 1vw;
+  font-family:var(--font-display); font-weight:400;
+  font-size:1.4462vw; line-height:1.2; color:var(--white);
+}
+.ueber-wert p{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.9375vw; line-height:1.5; color:var(--white);
+}
+
+@media (max-width:860px){
+  .ueber-werte{ padding:20vw 0; }
+  .ueber-werte-heading{ margin-bottom:10vw; font-size:var(--mobile-heading); text-align:left; }
+  .ueber-werte-grid{ grid-template-columns:1fr; gap:10vw; }
+  .ueber-wert-icon{ height:28vw; margin-bottom:6vw; }
+  .ueber-wert h3{ margin-bottom:3vw; font-size:5.5vw; }
+  .ueber-wert p{ font-size:3.8vw; }
+}
+
+/* ---------- Page transition: white circle wipe ----------
+   A white circle opens the page change: its centre sits ON the window edge, so
+   only ever half of it is on screen and the covering edge is always an arc. It
+   grows out of the left edge over the page you are leaving; the browser
+   navigates while the screen is covered; on the new page the circle is
+   anchored to the opposite edge and shrinks away into it. The uncovered area
+   therefore grows from the left, so the whole movement reads left-to-right —
+   and right-to-left when a link leads back to the homepage.
+
+   It is a ::before on <html> rather than an element, because the covered state
+   has to be in place before the new page's first paint — a tiny inline script
+   in each <head> sets the class, which no external file could do in time.
+
+   Geometry: a 100vmax square with a 50% radius, centred by margin on
+   (left:0, top:50%); translateX moves that centre onto whichever edge the
+   half-circle hangs off. It is scaled rather than sized to full coverage so
+   the rasterised layer stays small — 3.2 puts the radius at 160vmax, which
+   clears the corner-to-edge distance at any aspect ratio. Translation comes
+   before scale in the transform list, so the anchor is not multiplied by the
+   scale. At rest it sits at scale(0), costing nothing on a normal load. */
+html::before{
+  content:''; position:fixed; z-index:99999;
+  top:50%; left:0;
+  width:100vmax; height:100vmax;
+  margin:-50vmax 0 0 -50vmax;
+  border-radius:50%;
+  background:var(--white);
+  transform:translateX(0) scale(0);
+  pointer-events:none;
+}
+/* Arrival, step one: hold the cover while the new page paints. Anchored
+   mid-window here — at this scale it covers from anywhere, and the reveal
+   below starts from its own edge, so the hand-over is invisible. */
+html.wipe-hold::before{ transform:translateX(50vw) scale(3.2); }
+/* The two halves are eased as one movement: the cover starts gently and is
+   still gaining speed when it hands over, the reveal picks that speed up and
+   glides out. An ease-in-out on both would brake to a standstill at full cover
+   and set off again.
+   The reveal's curve is gentler than a rectangular wipe's would be: a
+   shrinking circle loses covered area with the SQUARE of its scale, so an
+   aggressive ease-out makes the white vanish almost on contact. */
+/* Arrival, step two: shrink away into the far edge. */
+html.wipe-reveal-ltr::before{
+  animation:nollWipeRevealLtr 1.05s cubic-bezier(.36,.12,.22,1) forwards;
+}
+html.wipe-reveal-rtl::before{
+  animation:nollWipeRevealRtl 1.05s cubic-bezier(.36,.12,.22,1) forwards;
+}
+/* Departure: grow out of the near edge and cover before the navigation. */
+html.wipe-cover-ltr::before{
+  animation:nollWipeCoverLtr .62s cubic-bezier(.5,0,.75,.5) forwards;
+}
+html.wipe-cover-rtl::before{
+  animation:nollWipeCoverRtl .62s cubic-bezier(.5,0,.75,.5) forwards;
+}
+@keyframes nollWipeCoverLtr{
+  from{ transform:translateX(0) scale(0); }
+  to{   transform:translateX(0) scale(3.2); }
+}
+@keyframes nollWipeRevealLtr{
+  from{ transform:translateX(100vw) scale(3.2); }
+  to{   transform:translateX(100vw) scale(0); }
+}
+@keyframes nollWipeCoverRtl{
+  from{ transform:translateX(100vw) scale(0); }
+  to{   transform:translateX(100vw) scale(3.2); }
+}
+@keyframes nollWipeRevealRtl{
+  from{ transform:translateX(0) scale(3.2); }
+  to{   transform:translateX(0) scale(0); }
+}
+@media (prefers-reduced-motion:reduce){
+  html::before{ display:none; }
+}
+
+/* ---------- Kontakt (Figma node 839:3519, "Frame 358") ----------
+   3840px reference, px / 3840 * 100 = vw. Type maps onto the site's families
+   as everywhere else: Figma's "ES Klarheit Kurrent TRIAL:Bold/Regular/Light/
+   Medium" are var(--font-display-bold) at 700/400/300/500, "Helvetica Neue"
+   is var(--font-body). The two CTAs reuse .leistung-detail-cta so the pill,
+   the arrow disc and the cross-slide hover are the site's, not this page's. */
+.kontakt-hero{ padding-top:5.677vw; }
+.kontakt-tag{ margin:0 0 1.25vw; display:flex; }
+.kontakt-tag span{
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  border:1px solid var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:var(--white); white-space:nowrap;
+}
+.kontakt-title{
+  margin:0 0 1.875vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+}
+/* Address, direct line and the map button on one baseline. */
+.kontakt-facts{
+  display:flex; align-items:flex-start; flex-wrap:wrap; gap:2vw 6.25vw; /* 240px */
+  font-size:1.0938vw; line-height:1.4; color:var(--white);
+}
+.kontakt-adresse{ display:flex; flex-direction:column; gap:0.3125vw; }
+.kontakt-adresse strong{ font-family:var(--font-display-bold); font-weight:700; }
+.kontakt-adresse span{ font-family:var(--font-display-bold); font-weight:300; }
+/* Label and value in their own tracks so the two rows line up. */
+.kontakt-direkt{
+  display:grid; grid-template-columns:max-content max-content;
+  column-gap:1.25vw; row-gap:0.3125vw;
+}
+.kontakt-direkt-row{ display:contents; }
+.kontakt-direkt-row span{ font-family:var(--font-display-bold); font-weight:700; }
+.kontakt-direkt-row a{
+  font-family:var(--font-display-bold); font-weight:300;
+  color:inherit; text-decoration:none;
+}
+.kontakt-direkt-row a:hover, .kontakt-direkt-row a:focus-visible{ text-decoration:underline; }
+.kontakt-anfahrt{ align-self:center; }
+
+/* Form left, copy and contact person right. */
+.kontakt-main{ padding-top:10vw; padding-bottom:11vw; }
+.kontakt-main-row{
+  display:grid; grid-template-columns:32.2917vw 38.9583vw; /* 1240 / 1496 */
+  gap:7.7083vw; /* 296px */
+  align-items:start;
+}
+.kontakt-form{ display:flex; flex-direction:column; gap:1.0417vw; }
+.kontakt-field{ display:flex; flex-direction:column; gap:0.4vw; }
+.kontakt-field label{
+  padding-left:1.4844vw; /* sits over the field's own text inset */
+  font-family:var(--font-display-bold); font-weight:500; font-size:0.8247vw; line-height:1.2;
+  color:var(--white);
+}
+.kontakt-field input,
+.kontakt-field textarea{
+  width:100%; box-sizing:border-box;
+  padding:0 1.4844vw;
+  background:transparent; color:var(--white);
+  border:2px solid rgba(255,255,255,.5); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:500; font-size:0.8247vw; line-height:1.2;
+  transition:border-color .4s ease;
+}
+.kontakt-field input{ height:3.125vw; } /* 120px */
+.kontakt-field textarea{
+  height:7.3958vw; /* 284px */
+  padding:1.0156vw 1.4844vw; border-radius:1.5625vw; resize:vertical;
+}
+.kontakt-field input::placeholder,
+.kontakt-field textarea::placeholder{ color:rgba(255,255,255,.65); }
+.kontakt-field input:focus,
+.kontakt-field textarea:focus{ outline:none; border-color:var(--white); }
+.kontakt-submit{ display:flex; flex-direction:column; align-items:flex-start; gap:1.5vw; margin-top:0.5vw; }
+/* the CTA is a <button> here, so it needs the UA's own styling reset */
+.kontakt-send{ padding:0; border:0; background:none; font:inherit; cursor:pointer; }
+.kontakt-datenschutz{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300; font-size:0.8073vw; line-height:1.4;
+  color:var(--white);
+}
+.kontakt-datenschutz a{ color:inherit; }
+
+.kontakt-aside{ padding-top:2.1094vw; display:flex; flex-direction:column; gap:4vw; }
+.kontakt-lead{
+  margin:0;
+  font-family:var(--font-body); font-weight:500;
+  font-size:1.9314vw; line-height:1.2; color:var(--white);
+}
+.kontakt-person{ display:flex; align-items:center; gap:2.0833vw; }
+.kontakt-person-photo{
+  flex:none; width:12.6563vw; height:12.6563vw; /* 486px */
+  border-radius:50%; overflow:hidden;
+}
+.kontakt-person-photo img{ display:block; width:100%; height:100%; object-fit:cover; }
+.kontakt-person-txt{ display:flex; flex-direction:column; gap:1.25vw; color:var(--white); }
+.kontakt-person-name{ display:flex; flex-direction:column; font-size:1.4063vw; line-height:1.4; }
+.kontakt-person-name strong{ font-family:var(--font-display-bold); font-weight:700; }
+.kontakt-person-name span{ font-family:var(--font-display); font-weight:400; }
+/* Here the label is the light one and the value bold — the reverse of the
+   header block above, exactly as the frame has it. */
+.kontakt-person-kontakt{
+  display:grid; grid-template-columns:max-content max-content;
+  column-gap:1.0417vw; row-gap:0.2083vw;
+  font-size:0.9375vw; line-height:1.5;
+}
+.kontakt-person-row{ display:contents; }
+.kontakt-person-row span{ font-family:var(--font-display-bold); font-weight:300; }
+.kontakt-person-row a{
+  font-family:var(--font-display-bold); font-weight:700;
+  color:inherit; text-decoration:none;
+}
+.kontakt-person-row a:hover, .kontakt-person-row a:focus-visible{ text-decoration:underline; }
+
+@media (max-width:860px){
+  .kontakt-hero{ padding-top:6vw; }
+  .kontakt-tag{ margin-bottom:5vw; }
+  .kontakt-tag span{ height:8vw; padding:0 4vw; font-size:3.2vw; }
+  .kontakt-title{ margin-bottom:8vw; font-size:var(--mobile-heading); letter-spacing:0; }
+  .kontakt-facts{ flex-direction:column; gap:6vw; font-size:3.8vw; }
+  .kontakt-adresse{ gap:1vw; }
+  .kontakt-direkt{ column-gap:4vw; row-gap:1vw; }
+  .kontakt-anfahrt{ align-self:flex-start; }
+
+  .kontakt-main{ padding-top:18vw; padding-bottom:20vw; }
+  .kontakt-main-row{ grid-template-columns:1fr; gap:14vw; }
+  /* Copy and contact person first on a phone: the invitation should come
+     before the form rather than after it. */
+  .kontakt-form{ order:2; gap:5vw; }
+  .kontakt-aside{ order:1; padding-top:0; gap:10vw; }
+  .kontakt-field{ gap:2vw; }
+  .kontakt-field label{ padding-left:5vw; font-size:3.4vw; }
+  .kontakt-field input,
+  .kontakt-field textarea{ padding:0 5vw; font-size:3.6vw; border-width:1px; }
+  .kontakt-field input{ height:12vw; }
+  .kontakt-field textarea{ height:32vw; padding:4vw 5vw; border-radius:6vw; }
+  .kontakt-submit{ gap:5vw; margin-top:2vw; }
+  .kontakt-datenschutz{ font-size:3.2vw; }
+
+  .kontakt-lead{ font-size:5.5vw; }
+  .kontakt-person{ flex-direction:column; align-items:flex-start; gap:5vw; }
+  .kontakt-person-photo{ width:45vw; height:45vw; align-self:center; }
+  .kontakt-person-txt{ gap:4vw; }
+  .kontakt-person-name{ font-size:5vw; }
+  .kontakt-person-kontakt{ font-size:3.6vw; column-gap:4vw; row-gap:1vw; }
+}
+
+/* ---------- Cases overview ----------
+   No Figma frame for this one — built to the structure of the reference the
+   client supplied (247grad.de/projekte) in this site's own system. The hero
+   reuses the Kontakt page's tag pill and the Insights chips, the card is the
+   .leistung-detail-case vocabulary at overview scale, and the page closes on
+   the client logo band and the standard contact band. */
+.cases-hero{ padding-top:5.677vw; }
+.cases-page-title{
+  margin:0 0 1.25vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+}
+.cases-page-lead{
+  margin:0 0 2.5vw; max-width:52.4219vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4;
+  color:var(--white); opacity:.8;
+}
+.cases-chips{ margin-bottom:0; }
+
+.cases-list{ padding-top:5vw; }
+/* One project per row, text and image swapping sides down the page — the
+   layout the client's reference uses. The image takes the larger share; the
+   text column is narrow enough that the headline breaks into two or three
+   lines, which is what gives the row its rhythm. */
+.cases-grid{ display:flex; flex-direction:column; gap:5vw; }
+.case-row{
+  display:grid; grid-template-columns:31% 1fr; gap:3vw;
+  align-items:center;
+}
+/* Every second row mirrors. The track widths have to flip with it, otherwise
+   the reordered text would land in the wide track and the image in the narrow
+   one. Source order stays text-then-image, so the stacked mobile layout still
+   reads headline first. */
+.case-row:nth-child(even){ grid-template-columns:1fr 31%; }
+.case-row:nth-child(even) .case-row-text{ order:2; }
+.case-row:nth-child(even) .case-row-media{ order:1; }
+.case-row-text{ display:flex; flex-direction:column; align-items:flex-start; }
+/* Two grades below the project title now (2.2917vw -> 1.0938vw, i.e. 88px ->
+   42px on the 3840px reference). 1.6146vw sits between them but reads as a
+   sibling of the title rather than a step away from it. */
+.case-row-client{
+  margin:0 0 0.5vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4; color:var(--white); opacity:.45;
+}
+.case-row-title{
+  margin:0 0 1.5vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:2.2917vw; line-height:1.25; color:var(--white);
+}
+.case-row-title a{ color:inherit; text-decoration:none; }
+.case-row-copy{
+  margin:0 0 2vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.9375vw; line-height:1.5; color:var(--white); opacity:.8;
+}
+/* Tertiary link in the reference's small, letterspaced caps; the arrow keeps
+   the site's own behaviour of turning onto the horizontal on hover. */
+.case-row-link{
+  display:inline-flex; align-items:center; gap:0.6853vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:0.7292vw; line-height:1.5; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--white); text-decoration:none;
+}
+.case-row-link-icon{
+  display:block; flex:none; width:0.75vw; height:0.75vw;
+  filter:invert(1); /* the asset is drawn black for light card surfaces */
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.case-row:hover .case-row-link-icon,
+.case-row-link:focus-visible .case-row-link-icon{ transform:rotate(45deg); }
+.case-row-media{
+  display:block; width:100%; aspect-ratio:3 / 2;
+  border-radius:0.625vw; overflow:hidden; background:var(--black);
+}
+.case-row-media img{
+  display:block; width:100%; height:100%; object-fit:cover;
+  transition:transform .8s cubic-bezier(.22,1,.36,1);
+}
+.case-row:hover .case-row-media img{ transform:scale(1.04); }
+/* Filtered out: removed from the flow rather than faded, so the alternating
+   rhythm re-flows onto whatever is left. */
+.case-row[hidden]{ display:none; }
+@media (prefers-reduced-motion:reduce){
+  .case-row-media img, .case-row-link-icon{ transition:none; }
+}
+/* The load-more is the site's plain secondary button (.leistung-cta) with its
+   normal cross-slide-and-turn hover — no overrides here. */
+.cases-more-wrap{ display:flex; justify-content:center; padding-top:6vw; }
+/* The logo band brings its own top padding; the grid above already has its
+   own bottom rhythm, so this only needs to not double up. */
+.cases-list + .kundenleiste{ padding-top:10vw; }
+
+@media (max-width:860px){
+  .cases-hero{ padding-top:6vw; }
+  .cases-page-title{ margin-bottom:5vw; font-size:var(--mobile-heading); letter-spacing:0; }
+  .cases-page-lead{ margin-bottom:8vw; max-width:none; font-size:3.8vw; }
+
+  .cases-list{ padding-top:12vw; }
+  .cases-grid{ gap:16vw; }
+  /* Stacked, so the mirroring has nothing to mirror — every row reads
+     headline, copy, link, image. */
+  .case-row,
+  .case-row:nth-child(even){ grid-template-columns:1fr; gap:6vw; }
+  .case-row:nth-child(even) .case-row-text{ order:1; }
+  .case-row:nth-child(even) .case-row-media{ order:2; }
+  .case-row-client{ margin-bottom:2vw; font-size:3.8vw; }
+  .case-row-title{ margin-bottom:4vw; font-size:6vw; }
+  .case-row-copy{ margin-bottom:5vw; font-size:3.8vw; }
+  .case-row-link{ gap:2.5vw; font-size:3.2vw; }
+  .case-row-link-icon{ width:3vw; height:3vw; }
+  .case-row-media{ border-radius:2.5vw; }
+  .cases-more-wrap{ padding-top:14vw; }
+  .cases-list + .kundenleiste{ padding-top:18vw; }
+}
+
+/* ---------- Leistungen overview ----------
+   No Figma frame: built from the site's own vocabulary. The service cards
+   borrow the outlined-card shape of the Über-uns facts row, the process list
+   the big numerals of the homepage Prozess module. */
+.leistung-ueber-hero{ padding-top:5.677vw; }
+.leistung-ueber-h1{
+  margin:0 0 1.25vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+}
+.leistung-ueber-lead{
+  margin:0; max-width:52.4219vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4; color:var(--white); opacity:.8;
+}
+
+.leistung-ueber-list{ padding-top:7vw; }
+/* auto-fit rather than a fixed count: five services do not divide evenly, and
+   the row should reflow if one is added or dropped. */
+.leistung-ueber-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(20vw, 1fr));
+  gap:1.5625vw;
+}
+.leistung-ueber-card{
+  display:flex; flex-direction:column; align-items:flex-start;
+  padding:1.875vw;
+  border:1px solid var(--white); border-radius:0.625vw;
+  transition:background-color .5s ease;
+}
+.leistung-ueber-card:hover{ background:rgba(255,255,255,.06); }
+.leistung-ueber-icon{ display:block; width:auto; height:5vw; margin-bottom:2vw; }
+.leistung-ueber-title{
+  margin:0 0 1vw;
+  font-family:var(--font-display); font-weight:400;
+  font-size:1.4462vw; line-height:1.15; color:var(--white);
+}
+.leistung-ueber-title a{ color:inherit; text-decoration:none; }
+/* The whole card is clickable via the title's stretched link; the arrow below
+   stays a visible affordance without being a second tab stop. */
+.leistung-ueber-title a::after{ content:''; position:absolute; inset:0; }
+.leistung-ueber-card{ position:relative; }
+.leistung-ueber-copy{
+  margin:0 0 2vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.9375vw; line-height:1.5; color:var(--white); opacity:.8;
+}
+.leistung-ueber-link{
+  display:inline-flex; align-items:center; gap:0.6853vw; margin-top:auto;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:0.7292vw; line-height:1.5; letter-spacing:0.08em; text-transform:uppercase;
+  color:var(--white); text-decoration:none;
+}
+.leistung-ueber-link-icon{
+  display:block; flex:none; width:0.75vw; height:0.75vw;
+  filter:invert(1);
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+}
+.leistung-ueber-card:hover .leistung-ueber-link-icon{ transform:rotate(45deg); }
+@media (prefers-reduced-motion:reduce){
+  .leistung-ueber-card, .leistung-ueber-link-icon{ transition:none; }
+}
+
+.leistung-ueber-prozess{ padding-top:10vw; padding-bottom:2vw; }
+.leistung-ueber-prozess-heading{
+  margin:0 0 4vw;
+  font-family:var(--font-display); font-weight:400;
+  font-size:3.3854vw; line-height:1.1; color:var(--white);
+}
+.leistung-ueber-steps{
+  list-style:none; margin:0; padding:0;
+  display:grid; grid-template-columns:repeat(4, 1fr); gap:2.5vw;
+}
+.leistung-ueber-step{ display:flex; flex-direction:column; }
+.leistung-ueber-step-num{
+  font-family:var(--font-display); font-weight:400;
+  font-size:3.3854vw; line-height:1; color:var(--white); opacity:.35;
+  margin-bottom:1vw;
+}
+.leistung-ueber-step h3{
+  margin:0 0 0.8vw;
+  font-family:var(--font-display); font-weight:400;
+  font-size:1.6146vw; line-height:1.2; color:var(--white);
+}
+.leistung-ueber-step p{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:0.9375vw; line-height:1.5; color:var(--white); opacity:.8;
+}
+
+/* Detail pages whose illustration is a plain asset rather than the inlined,
+   morphing Websites icon. */
+.leistung-detail-illustration-img{ display:block; width:100%; height:auto; }
+
+@media (max-width:860px){
+  .leistung-ueber-hero{ padding-top:6vw; }
+  .leistung-ueber-h1{ margin-bottom:5vw; font-size:var(--mobile-heading); letter-spacing:0; }
+  .leistung-ueber-lead{ max-width:none; font-size:3.8vw; }
+
+  .leistung-ueber-list{ padding-top:14vw; }
+  .leistung-ueber-grid{ grid-template-columns:1fr; gap:5vw; }
+  .leistung-ueber-card{ padding:6vw; border-radius:2.5vw; }
+  .leistung-ueber-card:hover{ background:transparent; }
+  .leistung-ueber-icon{ height:16vw; margin-bottom:5vw; }
+  .leistung-ueber-title{ margin-bottom:3vw; font-size:6vw; }
+  .leistung-ueber-copy{ margin-bottom:5vw; font-size:3.8vw; }
+  .leistung-ueber-link{ gap:2.5vw; font-size:3.2vw; }
+  .leistung-ueber-link-icon{ width:3vw; height:3vw; }
+
+  .leistung-ueber-prozess{ padding-top:18vw; padding-bottom:0; }
+  .leistung-ueber-prozess-heading{ margin-bottom:10vw; font-size:var(--mobile-heading); }
+  .leistung-ueber-steps{ grid-template-columns:1fr; gap:10vw; }
+  .leistung-ueber-step-num{ margin-bottom:2vw; font-size:12vw; }
+  .leistung-ueber-step h3{ margin-bottom:2.5vw; font-size:5.5vw; }
+  .leistung-ueber-step p{ font-size:3.8vw; }
+}
+
+/* ---------- Placeholder marking (review aid, remove before launch) ----------
+   Everything on the site that is not real content yet is marked up with
+   data-placeholder (text) or data-placeholder-media (an image or plate whose
+   asset is a stand-in). Both are drawn in red so a glance down a page shows
+   exactly what still has to be written or delivered. Red is the ONE colour in
+   an otherwise black-and-white design precisely because it cannot be mistaken
+   for a design decision.
+   To ship: delete this block, then strip the two attributes from the HTML —
+   nothing else depends on them. */
+:root{ --placeholder:#ff2323; }
+[data-placeholder],
+[data-placeholder] *{
+  color:var(--placeholder) !important;
+  opacity:1 !important;
+  -webkit-text-fill-color:var(--placeholder) !important;
+}
+[data-placeholder]::placeholder{ color:var(--placeholder) !important; }
+[data-placeholder-media]{
+  position:relative;
+  outline:2px solid var(--placeholder); outline-offset:-2px;
+}
+/* A small corner tag, so a stand-in image is obvious even when the picture
+   itself looks finished. */
+[data-placeholder-media]::after{
+  content:'Platzhalter';
+  position:absolute; z-index:5; left:0; top:0;
+  padding:0.25em 0.6em;
+  background:var(--placeholder); color:#fff;
+  font-family:var(--font-body); font-weight:700;
+  font-size:0.6vw; line-height:1.4; letter-spacing:0.06em; text-transform:uppercase;
+  pointer-events:none;
+}
+@media (max-width:860px){
+  [data-placeholder-media]::after{ font-size:2.6vw; }
 }
 
 /* ---------- Footer (Figma node 192:1023) ----------
@@ -1375,13 +3118,12 @@ body.nav-open .mobile-nav{ display:flex; }
    40px   -> 1.0417vw  (40/3840*100)
    256px  -> 6.6667vw  (column + gutter)
    3032px -> 78.9583vw (total content width)
-   Toggle with the "g" key.
-   Was briefly changed to default-hidden (suspecting it was the source of
-   an unwanted "vignette" look on Hero/Cases) — reverted per explicit
-   direction: the grid should stay visible by default as before, "g"
-   hides it. The actual vignette issue was the .site-header gradient
-   (removed separately), not this. ---------------------------------------- */
+   Hidden by default; press "g" to show it (js/main.js toggles
+   body.show-grid). It used to be the other way round — visible by default,
+   "g" to hide — which meant every screenshot and every client view carried
+   the overlay. ------------------------------------------------------------ */
 .debug-grid{
+  display:none;
   position:fixed;
   inset:0;
   left:50%;
@@ -1392,10 +3134,224 @@ body.nav-open .mobile-nav{ display:flex; }
   z-index:9999;
   background-image:repeating-linear-gradient(
     to right,
-    rgba(255,0,0,.1) 0,
-    rgba(255,0,0,.1) 5.625vw,
+    rgba(255,255,255,.06) 0,
+    rgba(255,255,255,.06) 5.625vw,
     transparent 5.625vw,
     transparent 6.6667vw
   );
 }
-body.hide-grid .debug-grid{ display:none; }
+body.show-grid .debug-grid{ display:block; }
+
+/* ============================================================================
+   Responsive: Mobile (≤860px)
+   ----------------------------------------------------------------------------
+   The whole site is authored in vw against a 3840px reference, which scales
+   down proportionally — and that is exactly the problem on a phone: at 390px
+   viewport width, 1vw = 3.9px, so a 0.99vw eyebrow lands at 3.9px and a
+   1.61vw body copy at 6.3px. Every section therefore needs its type and
+   layout re-pitched at this breakpoint, plus the three sections built on
+   absolute Figma coordinates (Prozess curve, Team scatter, Creativity
+   collage, Footer) need to fall back to normal flow.
+
+   This block sits at the end of the file on purpose: it must win over the
+   per-section rules above without a specificity arms race, and it keeps the
+   whole mobile picture readable in one place. A few sections (Leistungen,
+   Testimonial, Kundenleiste, Insights, the bottom bar) already carry their
+   own ≤860px block next to their base CSS — those are left where they are;
+   nothing here re-declares what they already handle.
+   ============================================================================ */
+@media (max-width:860px){
+
+  /* --- Grid: swap the 78.9583vw desktop content column for a simple
+     gutter-based one. --grid-margin derives from --grid-width, so this one
+     override also re-anchors .wrap, .cases-track, .leistungen-track and the
+     .case-active-title offset to the phone's own margins. --------------- */
+  :root{
+    --grid-width:calc(100vw - var(--gutter) * 2);
+    --active-col-offset:0vw; /* active case card starts at the content edge, not column 4 (must match activeColOffsetVw() in js/main.js) */
+    /* One value for the site's main section-heading grade — everything that
+       is 3.3854vw on desktop (Team, Creativity, Leistungen, Insights). Kept
+       as a variable so the grade stays one decision instead of four copies
+       that drift apart. */
+    --mobile-heading:8vw;
+  }
+  .wrap{ max-width:none; padding:0 var(--gutter); }
+  body.show-grid .debug-grid{ display:none; } /* the 12-column overlay describes the desktop grid only */
+
+  /* --- Header: stop it sticking. The bottom bar is the permanent nav
+     surface on mobile, so a sticky white logo has nothing to gain and was
+     colliding with headings and the white Insights cards it scrolled over. */
+  .site-header{ position:static; }
+  .header-inner{ padding-top:18px; padding-bottom:18px; }
+
+  /* --- Hero --------------------------------------------------------- */
+  .hero{ padding-top:4vw; padding-bottom:8vw; }
+  .eyebrow{ font-size:3.4vw; gap:2.5vw; margin-bottom:3.5vw; }
+  .eyebrow-dot{ width:1.6vw; height:1.6vw; }
+  /* 10.5vw, not 12: the longest word in the headline ("UNTERNEHMEN.")
+     measures 8.06x the font size, so anything above ~10.86vw pushes it past
+     the content column on a 320px screen — the narrowest case, since the
+     gutter is a fixed 20px there rather than 5vw. */
+  .hero-title{ font-size:10.5vw; letter-spacing:0; }
+  .hero-row{ white-space:normal; } /* "DIE BEGEISTERN." may break across two lines instead of overflowing */
+  .hero-outline{ -webkit-text-stroke-width:1.5px; } /* was 1px — matches the thicker desktop stroke */
+
+  /* --- Slider buttons (shared by Cases + Leistungen) ------------------ */
+  .slider-controls{ gap:3vw; }
+  .slider-btn{ width:11vw; height:11vw; min-width:0; min-height:0; }
+  .slider-section{ padding-top:2.5vw; padding-bottom:10vw; }
+
+  /* --- Cases carousel ------------------------------------------------- */
+  .cases-header{ min-height:11vw; margin-bottom:4vw; }
+  /* The title rides on --active-col-offset on desktop, which is 0 here (see
+     above) — that would park it underneath the prev/next buttons. It becomes
+     a plain flex item next to them instead; the active card is still flush
+     with the content edge, the two just no longer share an anchor. */
+  .case-active-title{ position:static; transform:none; font-size:4.6vw; margin-left:4vw; }
+  .case-item{ width:52vw; min-width:0; gap:3vw; }
+  .case-media{ height:46vw; min-height:0; border-radius:2vw; }
+  .case-item.is-large{ width:70vw; min-width:0; }
+  .case-item.is-large .case-media{ height:58vw; min-height:0; }
+  .case-tags{ font-size:3.2vw; }
+
+  /* --- Prozess: the scroll-driven circle needs a wide viewport to read as
+     a curve at all (its radius is 32vw = 125px on a phone), and the items'
+     translateX along it eats most of the screen width. Drop the circle and
+     the vignette here and let the steps be a plain stacked list; the JS
+     stops writing --item-x at this breakpoint too. ---------------------- */
+  .process-circle-wrap, .process-fade{ display:none; }
+  /* Without the curve the list has no left offset of its own any more (that
+     was --item-x's job on desktop), so it needs the page's own content
+     margins instead of sitting flush against the viewport edge. */
+  .process-list{ padding:2vw var(--gutter) 4vw; gap:12vw; }
+  .process-item{ transform:none; align-items:flex-start; gap:4vw; }
+  .process-number{ font-size:16vw; }
+  .process-text{ max-width:none; gap:2vw; }
+  .process-text h3{ font-size:5vw; }
+  .process-text p{ font-size:4vw; }
+
+  /* --- Team: the scattered absolute circles become a 2-up grid, and the
+     hover-only name/role is shown permanently (there is no hover on touch,
+     so it would otherwise be unreachable). ------------------------------ */
+  .team{ padding:5vw 0 20vw; }
+  .team-inner{
+    height:auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:5vw;
+  }
+  .team-heading{
+    position:static; width:auto; grid-column:1 / -1;
+    font-size:var(--mobile-heading); margin-bottom:2vw;
+  }
+  /* relative, NOT static: .team-circle is an inset:0 absolute box, so a
+     static member would hand its containing block up to .team (which is
+     position:relative) and every photo would stretch across the whole
+     section, stacked on top of each other. */
+  .team-member{
+    position:relative;
+    left:auto; top:auto; /* the per-member Figma scatter offsets would otherwise shift each one out of its grid cell */
+    width:100%; height:auto; aspect-ratio:1 / 1;
+  }
+  /* Square photos here, not circles — which is also the shape the design
+     itself uses whenever the name/role are on screen: the Figma hover
+     variant (539:1877) un-rounds the circle at the same moment the text
+     fades in. On touch there is no hover, so the text is permanent and the
+     square is permanent with it. That also frees the full cell width: the
+     circular clip had been slicing the first characters off the lines
+     sitting near the bottom edge ("CEO" -> "EO"), which is why the type
+     had been dropped to an off-scale 2.9vw and pushed to the middle.
+     Both of those workarounds go away here: the text sits back at the
+     design's own bottom-left inset, at 3.4vw — the mobile step that
+     .eyebrow uses, which is exactly the pairing the desktop scale has
+     (both are 0.9896vw there). Scrim kept a touch stronger than the base
+     one since this text is always on, over photos of any brightness. */
+  .team-overlay{ opacity:1; }
+  .team-overlay::before{ background:linear-gradient(180deg, transparent 45%, rgba(0,0,0,.8) 100%); }
+  .team-circle{ border-radius:0; }
+  .team-icon{ display:none; } /* 1.15vw/0.8vw icons are ~4px here — not legible, and they aren't real links */
+  .team-info{ gap:0.8vw; }
+  .team-info h3, .team-info p{ font-size:3.4vw; }
+  .team-arrow{ display:none; } /* points across the desktop scatter; meaningless in a grid */
+
+  /* --- Creativity: collage → stacked/2-up, CTA back into normal flow --- */
+  .creativity{ padding:8vw 0 20vw; }
+  .creativity-inner{ width:auto; height:auto; padding:0 var(--gutter); }
+  .creativity-heading{ position:static; width:auto; font-size:var(--mobile-heading); margin-bottom:6vw; }
+  .creativity-images{
+    position:static; width:auto; height:auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:3vw;
+  }
+  .creativity-img{ position:static; width:100%; height:100%; border-radius:2vw; }
+  .creativity-img--1{ grid-column:1 / -1; aspect-ratio:56.6 / 40; }
+  .creativity-img--2, .creativity-img--3{ aspect-ratio:1 / 1; }
+  .creativity-cta{ position:static; margin-top:7vw; }
+  .creativity-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
+  .creativity-cta-icon{ width:9vw; height:9vw; }
+
+  /* --- Leistungen: the block above sizes the cards/type; the header row is
+     restacked here. At the heading's mobile size there is no room left
+     beside the two buttons, so it takes its own line above them (via order,
+     so the DOM stays as authored). Cases deliberately keeps its buttons and
+     title on one line — that title is a small label naming the active
+     slide, not a section heading of this grade. --------------------------- */
+  .leistungen{ padding:8vw 0 18vw; }
+  .leistungen-header{
+    flex-direction:column; align-items:flex-start;
+    gap:4vw; margin-bottom:5vw;
+  }
+  .leistungen-heading{ order:-1; }
+
+  /* --- Insights / Kundenleiste / Testimonial: handled in their own blocks
+     above; only the section rhythm is unified here. --------------------- */
+  .testimonial{ padding:8vw 0 18vw; }
+  .kundenleiste{ padding:8vw 0 18vw; }
+  .insights{ padding:8vw 0 18vw; }
+
+  /* --- Footer: every child is absolutely placed from Figma coordinates on
+     desktop; here the two bands become padded flow containers, the nav
+     becomes a 2-column grid (DOM order fills it row-wise and reads fine),
+     and the seal straddles the black/white seam via negative margins
+     instead of an absolute top. ---------------------------------------- */
+  .footer-inner{ width:auto; margin:0 var(--gutter); display:flex; flex-direction:column; }
+  .footer-black{
+    height:auto; border-radius:2vw 2vw 0 0;
+    padding:8vw 6vw 12vw;
+    display:flex; flex-direction:column; gap:6vw;
+  }
+  .footer-lead{ position:static; font-size:3.6vw; white-space:normal; }
+  .footer-contact-link{ position:static; font-size:5vw; white-space:normal; }
+  .footer-mail, .footer-phone{ left:auto; top:auto; }
+  .footer-contact-link + .footer-contact-link{ margin-top:-3vw; } /* mail/phone read as one block, tighter than the section gap */
+  .footer-nav{ display:grid; grid-template-columns:1fr 1fr; gap:4vw 4vw; }
+  .footer-nav-link{ position:static; left:auto; top:auto; font-size:4vw; }
+  .footer-nav-link::before{ display:none; }
+  .footer-newsletter-heading{ position:static; width:auto; text-align:left; font-size:5vw; margin-bottom:-2vw; }
+  .footer-subscribe-form{ display:flex; align-items:center; }
+  .footer-subscribe-input{
+    position:static; left:auto; top:auto;
+    /* min-width:0 — a flex item's automatic minimum is its intrinsic input
+       width (~20 characters), which kept the row wider than the footer and
+       pushed the arrow off the right edge. */
+    flex:1 1 auto; width:auto; min-width:0; height:11vw;
+    border-radius:5.5vw 0 0 5.5vw; padding:0 4vw; font-size:3.4vw;
+  }
+  .footer-subscribe-btn{ position:static; left:auto; top:auto; height:11vw; flex:none; }
+  .footer-subscribe-label{ height:11vw; padding:0 4vw; font-size:3.2vw; }
+  .footer-subscribe-arrow{ width:11vw; height:11vw; }
+  .footer-seal{
+    position:static; order:1; z-index:2;
+    width:20vw; height:20vw; margin:-10vw auto; /* half sunk into each band, so it still straddles the seam */
+  }
+  .footer-white{
+    order:2;
+    height:auto; padding:14vw 6vw 8vw;
+    display:flex; flex-direction:column; align-items:center; gap:5vw;
+  }
+  .footer-legal{
+    position:static; transform:none;
+    flex-wrap:wrap; justify-content:center; gap:5vw;
+  }
+  .footer-legal a{ font-size:3.4vw; }
+  .footer-social-heading{ position:static; width:auto; font-size:3.4vw; }
+  .footer-social{ position:static; gap:5vw; }
+  .footer-social img{ width:7vw; height:7vw; }
+}

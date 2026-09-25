@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suchmaschinenoptimierung — noll media</title>
+<meta name="description" content="Suchmaschinenoptimierung bei noll media – Digitalagentur aus Montabaur.">
+<link rel="preconnect" href="fonts">
+<link rel="stylesheet" href="fonts/stylesheet.css">
+<link rel="stylesheet" href="css/style.css?v=139">
+<script>
+/* Page transition, arrival half. Inline and in the head on purpose: the white
+   panel has to be covering the screen before this page's first paint, which a
+   deferred external file could not manage. js/main.js handles the departure
+   half and writes the direction into sessionStorage just before navigating. */
+(function(){
+  try{
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var dir = sessionStorage.getItem('nollWipe');
+    if (dir !== 'ltr' && dir !== 'rtl') return;
+    sessionStorage.removeItem('nollWipe');
+    var html = document.documentElement;
+    html.classList.add('wipe-hold');
+    var done = false;
+    var reveal = function(){
+      if (done) return;
+      done = true;
+      html.classList.remove('wipe-hold');
+      html.classList.add('wipe-reveal-' + dir);
+      setTimeout(function(){ html.classList.remove('wipe-reveal-' + dir); }, 1400);
+    };
+    document.addEventListener('DOMContentLoaded', reveal);
+    /* never leave the screen white if anything above misfires */
+    setTimeout(reveal, 1200);
+  }catch(e){}
+})();
+</script>
+</head>
+<body>
+
+<div class="debug-grid" aria-hidden="true"></div>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a class="logo" href="index.html" aria-label="noll media Startseite">
+      <svg class="logo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42.5 42.5" aria-hidden="true">
+        <defs><style>.logo-mark .st0{fill:#fff;}</style></defs>
+        <path class="st0" d="M36.3,6.2C32.4,2.2,26.9,0,21.3,0c-5.6,0-11.1,2.2-15,6.2C2.2,10.1,0,15.6,0,21.3c0,5.7,2.2,11.1,6.2,15,3.9,4.1,9.3,6.3,15,6.2v-4.2c-4.5,0-8.9-1.7-12-5-3.3-3.1-5.1-7.5-5-12,0-4.5,1.7-8.9,5-12,3.1-3.3,7.5-5.1,12-5,4.5,0,8.9,1.7,12,5,3.3,3.1,5.1,7.5,5,12,.1,5.2-2.3,10.1-6.4,13.3v-13.7c0-2.8-1.1-5.5-3.1-7.5-2-2-4.7-3.2-7.5-3.1-2.3,0-4.5.7-6.4,2.1l-2.1-2.1h-2.1v21.2h4.2v-10.9c.1-3.4,3-6.1,6.4-6.1,3.5,0,6.4,2.9,6.4,6.4v20.7c4.3-1.3,8-4,10.7-7.6,2.8-3.6,4.3-8.1,4.2-12.7,0-5.7-2.1-11.1-6.2-15.1Z"/>
+      </svg>
+      <span class="logo-text-clip" aria-hidden="true">
+        <svg class="logo-wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="58.6 10.8 138.9 21.5">
+          <defs><style>.logo-wordmark .st0{fill:#fff;}</style></defs>
+          <path class="st0" d="M109.7,32v-4.1h-1.7c-.5,0-.9-.3-1-.7,0,0,0-.2,0-.3V10.9h-4.9v16.4c0,2.5,1.9,4.7,4.5,4.7.2,0,.4,0,.5,0h2.6ZM99.6,32v-4.1h-1.7c-.5,0-.9-.3-1-.7,0,0,0-.2,0-.3V10.9h-4.9v16.4c0,2.5,1.9,4.7,4.5,4.7.2,0,.4,0,.5,0h2.6ZM84.2,24c0,1.6,0,2.7-.7,3.3-.4.3-.8.5-1.3.5-.5,0-.9-.1-1.3-.5-.6-.6-.7-1.8-.7-3.3s0-2.7.7-3.3c.4-.3.8-.5,1.3-.4.5,0,1,.1,1.3.4.6.6.7,1.8.7,3.3M89.1,24c0-3.1-.4-4.7-1.8-6.1-2.9-2.7-7.4-2.7-10.3,0-1.3,1.5-1.8,3-1.8,6.1s.4,4.7,1.8,6.1c2.9,2.7,7.4,2.7,10.3,0,1.3-1.5,1.8-3,1.8-6.1M72.3,32v-10.2c.2-1.7-.4-3.4-1.6-4.6-1-.9-2.3-1.4-3.6-1.4-1.4,0-2.7.5-3.7,1.5v-1.3h-4.8v16h4.9v-9.6c-.2-1.1.5-2.1,1.6-2.4,1.1-.2,2.1.5,2.4,1.6,0,.3,0,.5,0,.8v9.6h4.9Z"/>
+          <rect class="st0" x="178.6" y="16.9" width="3" height="15.1"/>
+          <rect class="st0" x="178.5" y="10.8" width="3.2" height="3.2"/>
+          <path class="st0" d="M141.5,32v-9.6c0-1.6-.5-3.1-1.6-4.2-1-.9-2.4-1.4-3.8-1.4-1.8,0-3.6.8-4.7,2.2-.9-1.4-2.6-2.3-4.3-2.2-1.5,0-3,.6-4,1.7v-1.5h-3v15.1h3v-9.2c-.2-1.6,1-3.1,2.6-3.3.2,0,.3,0,.5,0,1.7,0,3,1,3,3.4v9.2h3v-9.3c-.1-1.7,1.1-3.1,2.8-3.2.1,0,.2,0,.3,0,1.7,0,3,1,3,3.4v9.2h3.2Z"/>
+          <path class="st0" d="M191.3,16.8c-2.5,0-4,.5-5.4,2.2l2,1.9c.7-1.1,2-1.6,3.3-1.5,2.4,0,3.3.9,3.3,2.8v1.1h-4c-3.4,0-5.2,1.8-5.2,4.3,0,1.2.4,2.4,1.2,3.2,1.1,1,2.5,1.5,4,1.4,1.5.1,3-.5,4-1.5v1.4h3v-10.1c0-3.4-2.1-5.2-6.2-5.2ZM193.8,28.8c-.8.7-1.8,1-2.8.9-1.9,0-2.8-.8-2.8-2.1s.9-2.2,2.7-2.2h3.5v1.2c0,.8-.1,1.6-.7,2.2Z"/>
+          <path class="st0" d="M170.7,10.9v7.6c-1-1.2-2.5-1.8-4-1.7-1.3,0-2.6.4-3.6,1.3-1.5,1.5-1.7,4.1-1.7,6.3s.2,4.9,1.7,6.4c1,.9,2.3,1.4,3.7,1.3,1.5.1,3-.6,4-1.8v1.6h2.9V10.9h-3ZM167.6,29.5c-2.7,0-3.2-2.3-3.2-5s.4-5,3.2-5,3.1,2.3,3.1,5-.4,5-3.1,5Z"/>
+          <path class="st0" d="M158.2,24c0-4.3-2.3-7.2-6.4-7.2s-6.4,2.8-6.4,7.7,3,7.7,6.8,7.7c2.1.1,4.2-.7,5.6-2.3l-1.9-1.8c-.9,1.1-2.3,1.6-3.6,1.5-2.5,0-3.8-1.6-3.8-4.2h9.8s0-1.3,0-1.3ZM155.1,23.2h-6.8c0-.7.1-1.4.4-2,.5-1.2,1.7-1.9,3-1.9,1.3,0,2.5.7,3,1.9.3.6.4,1.3.4,2h0Z"/>
+        </svg>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="Hauptnavigation">
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="ueber-uns.html">Über uns</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="cases.html">Cases</a></span>
+      <span class="nav-item nav-item--has-dropdown" id="navServices"><span class="nav-dot" aria-hidden="true"></span><a href="leistungen.html" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown">Services</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="insights.html">Insights</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="kontakt.html">Kontakt</a></span>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
+    <div class="nav-dropdown-inner">
+      <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
+      <a href="leistungen-social-media.html">Social Media</a>
+      <a href="leistungen-media-content.html">Media &amp; Content</a>
+      <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
+      <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
+    <a href="ueber-uns.html">Über uns</a>
+    <a href="cases.html">Cases</a>
+    <div class="mobile-nav-group">
+      <button class="mobile-nav-sub-toggle" id="mobileSubToggle" type="button" aria-expanded="false" aria-controls="mobileSubnav">
+        Services
+        <span class="mobile-nav-sub-icon" aria-hidden="true"></span>
+      </button>
+      <div class="mobile-subnav" id="mobileSubnav">
+        <div class="mobile-subnav-inner">
+          <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
+          <a href="leistungen-social-media.html">Social Media</a>
+          <a href="leistungen-media-content.html">Media &amp; Content</a>
+          <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
+          <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+        </div>
+      </div>
+    </div>
+    <a href="insights.html">Insights</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<aside class="social-rail" aria-label="Social Media">
+  <a href="#" class="social-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+  <a href="#" class="social-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+  <a href="#" class="social-x" aria-label="X"><img src="images/x.svg" alt=""></a>
+  <a href="#" class="social-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+</aside>
+
+<div class="mobile-bar" aria-label="Mobile Menüleiste">
+  <div class="mobile-bar-socials">
+    <a href="#" class="mobile-bar-social mobile-bar-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+    <a href="#" class="mobile-bar-social mobile-bar-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+    <a href="#" class="mobile-bar-social mobile-bar-x" aria-label="X"><img src="images/x.svg" alt=""></a>
+    <a href="#" class="mobile-bar-social mobile-bar-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+  </div>
+  <button class="mobile-bar-toggle" id="mobileBarToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+    <span class="mobile-bar-toggle-label">Menü</span>
+    <span class="mobile-bar-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</div>
+
+<main id="main">
+
+  <!-- Hero + feature list — Figma node 770:4159 ("Frame 354"), 3840px
+       reference. Content column matches --grid-margin/--grid-width exactly
+       (see the CSS comment above .leistung-detail-hero), so it lives inside
+       a plain .wrap. The illustration and the text/feature-list column are
+       now siblings in one two-column row (.leistung-detail-hero-row):
+       the illustration is position:sticky, pinned in the viewport while
+       the taller left column (hero copy + feature list) scrolls past, and
+       it scrolls away naturally once that row's bottom edge — right where
+       the Contact band below begins — reaches it. Illustration reuses
+       images/leistungen/websites-shops.svg — confirmed byte-for-byte the
+       same artwork as Figma's larger hero export, just scaled up here
+       instead of duplicating the asset. -->
+  <section class="leistung-detail-hero">
+    <div class="wrap leistung-detail-hero-row">
+      <div class="leistung-detail-scroll-col">
+        <div class="leistung-detail-content">
+          <div class="leistung-detail-intro">
+            <div class="leistung-detail-tags">
+              <span class="leistung-detail-tag">SEO</span>
+              <span class="leistung-detail-tag">Local</span>
+            </div>
+            <h1 class="leistung-detail-title">Suchmaschinen&shy;optimierung</h1>
+            <p class="leistung-detail-lead" data-placeholder>Platzhalter: Hier steht der Einleitungstext zu diesem Leistungsbereich — worum es geht, für wen er gedacht ist und was ihn bei noll media ausmacht. Drei bis fünf Sätze, so lang wie der Text auf der Websites-Seite.</p>
+          </div>
+          <a class="leistung-detail-cta" href="kontakt.html">
+            <span class="leistung-detail-cta-label">Mehr erfahren</span>
+            <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+          </a>
+        </div>
+
+        <!-- Feature accordion — Figma component 785:4372 ("job1"), variants
+             active=false / active=true: the open state drops a paragraph in
+             below the title inside the same column, and the plus turns into a
+             minus. The whole row is the control, as in the component, so it is
+             a <button> containing spans (a button may only hold phrasing
+             content — the spans are laid out as blocks in CSS).
+             COPY: the Figma has body text for one placeholder item only, so
+             these five paragraphs are drafts in the page's own voice — replace
+             them with the real service copy. -->
+        <ul class="leistung-detail-feature-list">
+          <li class="leistung-detail-feature">
+            <button class="leistung-detail-feature-row" type="button" aria-expanded="false" aria-controls="feature-panel-1">
+              <span class="leistung-detail-feature-text">
+                <span class="leistung-detail-feature-title">Analyse</span>
+                <span class="leistung-detail-feature-panel" id="feature-panel-1">
+                  <span class="leistung-detail-feature-panel-inner">
+                    <span class="leistung-detail-feature-copy" data-placeholder>Platzhalter: Was wir uns zuerst ansehen und welche Werkzeuge wir dafür nutzen.</span>
+                  </span>
+                </span>
+              </span>
+              <span class="leistung-detail-feature-icon" aria-hidden="true"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" focusable="false"><path fill="#fff" d="M33.9492 45.5488H64.0472L64.0472 50.5488H33.9492L33.9492 45.5488Z"/><path class="ldf-icon-bar" fill="#fff" d="M51.5 32.902L51.5 63L46.5 63L46.5 32.902L51.5 32.902Z"/></svg></span>
+            </button>
+            <div class="leistung-detail-feature-divider" aria-hidden="true"></div>
+          </li>
+          <li class="leistung-detail-feature">
+            <button class="leistung-detail-feature-row" type="button" aria-expanded="false" aria-controls="feature-panel-2">
+              <span class="leistung-detail-feature-text">
+                <span class="leistung-detail-feature-title">Technisches SEO</span>
+                <span class="leistung-detail-feature-panel" id="feature-panel-2">
+                  <span class="leistung-detail-feature-panel-inner">
+                    <span class="leistung-detail-feature-copy" data-placeholder>Platzhalter: Welche technischen Punkte wir angehen — Ladezeit, Struktur, Indexierung.</span>
+                  </span>
+                </span>
+              </span>
+              <span class="leistung-detail-feature-icon" aria-hidden="true"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" focusable="false"><path fill="#fff" d="M33.9492 45.5488H64.0472L64.0472 50.5488H33.9492L33.9492 45.5488Z"/><path class="ldf-icon-bar" fill="#fff" d="M51.5 32.902L51.5 63L46.5 63L46.5 32.902L51.5 32.902Z"/></svg></span>
+            </button>
+            <div class="leistung-detail-feature-divider" aria-hidden="true"></div>
+          </li>
+          <li class="leistung-detail-feature">
+            <button class="leistung-detail-feature-row" type="button" aria-expanded="false" aria-controls="feature-panel-3">
+              <span class="leistung-detail-feature-text">
+                <span class="leistung-detail-feature-title">Inhalte</span>
+                <span class="leistung-detail-feature-panel" id="feature-panel-3">
+                  <span class="leistung-detail-feature-panel-inner">
+                    <span class="leistung-detail-feature-copy" data-placeholder>Platzhalter: Wie wir Themen finden und Seiten dafür aufbauen.</span>
+                  </span>
+                </span>
+              </span>
+              <span class="leistung-detail-feature-icon" aria-hidden="true"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" focusable="false"><path fill="#fff" d="M33.9492 45.5488H64.0472L64.0472 50.5488H33.9492L33.9492 45.5488Z"/><path class="ldf-icon-bar" fill="#fff" d="M51.5 32.902L51.5 63L46.5 63L46.5 32.902L51.5 32.902Z"/></svg></span>
+            </button>
+            <div class="leistung-detail-feature-divider" aria-hidden="true"></div>
+          </li>
+          <li class="leistung-detail-feature">
+            <button class="leistung-detail-feature-row" type="button" aria-expanded="false" aria-controls="feature-panel-4">
+              <span class="leistung-detail-feature-text">
+                <span class="leistung-detail-feature-title">Lokale Sichtbarkeit</span>
+                <span class="leistung-detail-feature-panel" id="feature-panel-4">
+                  <span class="leistung-detail-feature-panel-inner">
+                    <span class="leistung-detail-feature-copy" data-placeholder>Platzhalter: Was für Unternehmen aus der Region zusätzlich zählt.</span>
+                  </span>
+                </span>
+              </span>
+              <span class="leistung-detail-feature-icon" aria-hidden="true"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" focusable="false"><path fill="#fff" d="M33.9492 45.5488H64.0472L64.0472 50.5488H33.9492L33.9492 45.5488Z"/><path class="ldf-icon-bar" fill="#fff" d="M51.5 32.902L51.5 63L46.5 63L46.5 32.902L51.5 32.902Z"/></svg></span>
+            </button>
+            <div class="leistung-detail-feature-divider" aria-hidden="true"></div>
+          </li>
+          <li class="leistung-detail-feature">
+            <button class="leistung-detail-feature-row" type="button" aria-expanded="false" aria-controls="feature-panel-5">
+              <span class="leistung-detail-feature-text">
+                <span class="leistung-detail-feature-title">Monitoring</span>
+                <span class="leistung-detail-feature-panel" id="feature-panel-5">
+                  <span class="leistung-detail-feature-panel-inner">
+                    <span class="leistung-detail-feature-copy" data-placeholder>Platzhalter: Woran Sie ablesen, dass sich etwas bewegt, und in welchem Rhythmus.</span>
+                  </span>
+                </span>
+              </span>
+              <span class="leistung-detail-feature-icon" aria-hidden="true"><svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg" focusable="false"><path fill="#fff" d="M33.9492 45.5488H64.0472L64.0472 50.5488H33.9492L33.9492 45.5488Z"/><path class="ldf-icon-bar" fill="#fff" d="M51.5 32.902L51.5 63L46.5 63L46.5 32.902L51.5 32.902Z"/></svg></span>
+            </button>
+            <div class="leistung-detail-feature-divider" aria-hidden="true"></div>
+          </li>
+        </ul>
+      </div>
+
+      <div class="leistung-detail-illustration">
+        <!-- Same inline icon as the Leistungen card on the homepage, so the drip
+           can morph to its hover shape here too — see the "Drip morph" block
+           in js/main.js. -->
+      <img class="leistung-detail-illustration-img" src="images/leistungen/seo.svg" alt="" aria-hidden="true">
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact band (Figma "contact", white section) — reuses the site's
+       plain circle-crop photo pattern (see .testimonial-photo) and the
+       real team photo/contact details already used on the homepage. -->
+  <section class="leistung-detail-contact" aria-label="Kontakt">
+    <div class="wrap leistung-detail-contact-inner">
+      <div class="leistung-detail-contact-text">
+        <h2>Lassen wir Sie finden, wenn gesucht wird.</h2>
+        <a class="leistung-detail-cta" href="ueber-uns.html">
+          <span class="leistung-detail-cta-label">Mehr über uns erfahren</span>
+          <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+        </a>
+      </div>
+      <div class="leistung-detail-person">
+        <div class="leistung-detail-person-photo">
+          <img src="images/team/christian-noll.jpg" alt="Christian Noll">
+        </div>
+        <div class="leistung-detail-person-info">
+          <div class="leistung-detail-person-name">
+            <strong>Christian Noll</strong>
+            <span>CEO</span>
+          </div>
+          <div class="leistung-detail-person-kontakt">
+            <div class="leistung-detail-person-row">
+              <span>TEL</span>
+              <a href="tel:+4926029191500">+49 02602 919 150 0</a>
+            </div>
+            <div class="leistung-detail-person-row">
+              <span>MAIL</span>
+              <a href="mailto:christian.noll@noll.media">christian.noll@noll.media</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cases teaser — 3 placeholder tiles (Figma's own red placeholder fill
+       + "Lorem Ipsum Cases dolor sit amet" copy). Same "keep the design's
+       own placeholder until real case content exists" approach already
+       used for the Leistungen cards on the homepage — swap in real case
+       images/copy/links here once available. -->
+  <section class="leistung-detail-cases" aria-label="Cases">
+    <div class="wrap">
+      <h2 class="leistung-detail-cases-heading">Ein Blick auf unsere innovativen</h2>
+      <div class="leistung-detail-cases-grid">
+        <article class="leistung-detail-case">
+          <div class="leistung-detail-case-media" data-placeholder-media aria-hidden="true"></div>
+          <div class="leistung-detail-case-body">
+            <div class="leistung-detail-case-text">
+              <p class="leistung-detail-case-subtitle" data-placeholder>Cases Subtitle</p>
+              <p class="leistung-detail-case-title" data-placeholder>Lorem Ipsum Cases dolor sit amet</p>
+            </div>
+            <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
+          </div>
+        </article>
+        <article class="leistung-detail-case">
+          <div class="leistung-detail-case-media" data-placeholder-media aria-hidden="true"></div>
+          <div class="leistung-detail-case-body">
+            <div class="leistung-detail-case-text">
+              <p class="leistung-detail-case-subtitle" data-placeholder>Cases Subtitle</p>
+              <p class="leistung-detail-case-title" data-placeholder>Lorem Ipsum Cases dolor sit amet</p>
+            </div>
+            <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
+          </div>
+        </article>
+        <article class="leistung-detail-case">
+          <div class="leistung-detail-case-media" data-placeholder-media aria-hidden="true"></div>
+          <div class="leistung-detail-case-body">
+            <div class="leistung-detail-case-text">
+              <p class="leistung-detail-case-subtitle" data-placeholder>Cases Subtitle</p>
+              <p class="leistung-detail-case-title" data-placeholder>Lorem Ipsum Cases dolor sit amet</p>
+            </div>
+            <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="kontakt" aria-label="Kontakt &amp; Footer">
+  <div class="footer-inner">
+    <div class="footer-black">
+      <p class="footer-lead">Wir freuen uns, von Ihnen zu hören.</p>
+      <a class="footer-contact-link footer-mail" href="mailto:hallo@noll.media.de">hallo@noll.media.de</a>
+      <a class="footer-contact-link footer-phone" href="tel:+4926029191500">+49 2602 9191 500</a>
+
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-1" href="ueber-uns.html">Über uns</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-1" href="insights.html">Insights</a>
+        <a class="footer-nav-link footer-nav-col-3 footer-nav-row-1" href="#">Presse</a>
+        <a class="footer-nav-link footer-nav-col-3 footer-nav-row-2" href="#">Ressourcen</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-2" href="cases.html">Cases</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-2" href="kontakt.html">Kontakt</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-3" href="leistungen.html">Services</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-3" href="#newsletter">Newsletter</a>
+      </nav>
+
+      <h2 class="footer-newsletter-heading" id="newsletter">Abonnieren Sie unseren Newsletter</h2>
+      <form class="footer-subscribe-form" action="#" method="post">
+        <label class="visually-hidden" for="footer-email">Ihre E-Mailadresse</label>
+        <input class="footer-subscribe-input" type="email" id="footer-email" name="email" placeholder="Ihre E-Mailadresse" autocomplete="email" required>
+        <button class="footer-subscribe-btn" type="submit">
+          <span class="footer-subscribe-label">Abonnieren</span>
+          <img class="footer-subscribe-arrow" src="images/footer/subscribe-arrow.svg" alt="">
+        </button>
+      </form>
+    </div>
+
+    <div class="footer-white">
+      <div class="footer-legal">
+        <a href="#">Impressum</a>
+        <a href="kontakt.html">Kontakt</a>
+        <a href="#">Datenschutz</a>
+      </div>
+      <p class="footer-social-heading">Folgen Sie uns!</p>
+      <div class="footer-social">
+        <a href="#" aria-label="Instagram"><img src="images/footer/social-instagram.svg" alt=""></a>
+        <a href="#" aria-label="Facebook"><img src="images/footer/social-facebook.svg" alt=""></a>
+        <a href="#" aria-label="Xing"><img src="images/footer/social-xing.svg" alt=""></a>
+        <a href="#" aria-label="LinkedIn"><img src="images/footer/social-linkedin.svg" alt=""></a>
+      </div>
+    </div>
+
+    <a class="footer-seal" href="#top" aria-label="Nach oben scrollen">
+      <img src="images/footer/logo-seal.svg" alt="">
+    </a>
+  </div>
+</footer>
+
+<script src="js/main.js?v=39"></script>
+</body>
+</html>
