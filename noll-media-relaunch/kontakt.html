@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kontakt — noll media</title>
+<meta name="description" content="Kontakt zu noll media – Rudolf-Diesel-Straße 6, 56410 Montabaur. Schreib uns oder ruf an.">
+<link rel="preconnect" href="fonts">
+<link rel="stylesheet" href="fonts/stylesheet.css">
+<link rel="stylesheet" href="css/style.css?v=139">
+<script>
+/* Page transition, arrival half. Inline and in the head on purpose: the white
+   panel has to be covering the screen before this page's first paint, which a
+   deferred external file could not manage. js/main.js handles the departure
+   half and writes the direction into sessionStorage just before navigating. */
+(function(){
+  try{
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var dir = sessionStorage.getItem('nollWipe');
+    if (dir !== 'ltr' && dir !== 'rtl') return;
+    sessionStorage.removeItem('nollWipe');
+    var html = document.documentElement;
+    html.classList.add('wipe-hold');
+    var done = false;
+    var reveal = function(){
+      if (done) return;
+      done = true;
+      html.classList.remove('wipe-hold');
+      html.classList.add('wipe-reveal-' + dir);
+      setTimeout(function(){ html.classList.remove('wipe-reveal-' + dir); }, 1400);
+    };
+    document.addEventListener('DOMContentLoaded', reveal);
+    /* never leave the screen white if anything above misfires */
+    setTimeout(reveal, 1200);
+  }catch(e){}
+})();
+</script>
+</head>
+<body>
+
+<div class="debug-grid" aria-hidden="true"></div>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a class="logo" href="index.html" aria-label="noll media Startseite">
+      <svg class="logo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42.5 42.5" aria-hidden="true">
+        <defs><style>.logo-mark .st0{fill:#fff;}</style></defs>
+        <path class="st0" d="M36.3,6.2C32.4,2.2,26.9,0,21.3,0c-5.6,0-11.1,2.2-15,6.2C2.2,10.1,0,15.6,0,21.3c0,5.7,2.2,11.1,6.2,15,3.9,4.1,9.3,6.3,15,6.2v-4.2c-4.5,0-8.9-1.7-12-5-3.3-3.1-5.1-7.5-5-12,0-4.5,1.7-8.9,5-12,3.1-3.3,7.5-5.1,12-5,4.5,0,8.9,1.7,12,5,3.3,3.1,5.1,7.5,5,12,.1,5.2-2.3,10.1-6.4,13.3v-13.7c0-2.8-1.1-5.5-3.1-7.5-2-2-4.7-3.2-7.5-3.1-2.3,0-4.5.7-6.4,2.1l-2.1-2.1h-2.1v21.2h4.2v-10.9c.1-3.4,3-6.1,6.4-6.1,3.5,0,6.4,2.9,6.4,6.4v20.7c4.3-1.3,8-4,10.7-7.6,2.8-3.6,4.3-8.1,4.2-12.7,0-5.7-2.1-11.1-6.2-15.1Z"/>
+      </svg>
+      <span class="logo-text-clip" aria-hidden="true">
+        <svg class="logo-wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="58.6 10.8 138.9 21.5">
+          <defs><style>.logo-wordmark .st0{fill:#fff;}</style></defs>
+          <path class="st0" d="M109.7,32v-4.1h-1.7c-.5,0-.9-.3-1-.7,0,0,0-.2,0-.3V10.9h-4.9v16.4c0,2.5,1.9,4.7,4.5,4.7.2,0,.4,0,.5,0h2.6ZM99.6,32v-4.1h-1.7c-.5,0-.9-.3-1-.7,0,0,0-.2,0-.3V10.9h-4.9v16.4c0,2.5,1.9,4.7,4.5,4.7.2,0,.4,0,.5,0h2.6ZM84.2,24c0,1.6,0,2.7-.7,3.3-.4.3-.8.5-1.3.5-.5,0-.9-.1-1.3-.5-.6-.6-.7-1.8-.7-3.3s0-2.7.7-3.3c.4-.3.8-.5,1.3-.4.5,0,1,.1,1.3.4.6.6.7,1.8.7,3.3M89.1,24c0-3.1-.4-4.7-1.8-6.1-2.9-2.7-7.4-2.7-10.3,0-1.3,1.5-1.8,3-1.8,6.1s.4,4.7,1.8,6.1c2.9,2.7,7.4,2.7,10.3,0,1.3-1.5,1.8-3,1.8-6.1M72.3,32v-10.2c.2-1.7-.4-3.4-1.6-4.6-1-.9-2.3-1.4-3.6-1.4-1.4,0-2.7.5-3.7,1.5v-1.3h-4.8v16h4.9v-9.6c-.2-1.1.5-2.1,1.6-2.4,1.1-.2,2.1.5,2.4,1.6,0,.3,0,.5,0,.8v9.6h4.9Z"/>
+          <rect class="st0" x="178.6" y="16.9" width="3" height="15.1"/>
+          <rect class="st0" x="178.5" y="10.8" width="3.2" height="3.2"/>
+          <path class="st0" d="M141.5,32v-9.6c0-1.6-.5-3.1-1.6-4.2-1-.9-2.4-1.4-3.8-1.4-1.8,0-3.6.8-4.7,2.2-.9-1.4-2.6-2.3-4.3-2.2-1.5,0-3,.6-4,1.7v-1.5h-3v15.1h3v-9.2c-.2-1.6,1-3.1,2.6-3.3.2,0,.3,0,.5,0,1.7,0,3,1,3,3.4v9.2h3v-9.3c-.1-1.7,1.1-3.1,2.8-3.2.1,0,.2,0,.3,0,1.7,0,3,1,3,3.4v9.2h3.2Z"/>
+          <path class="st0" d="M191.3,16.8c-2.5,0-4,.5-5.4,2.2l2,1.9c.7-1.1,2-1.6,3.3-1.5,2.4,0,3.3.9,3.3,2.8v1.1h-4c-3.4,0-5.2,1.8-5.2,4.3,0,1.2.4,2.4,1.2,3.2,1.1,1,2.5,1.5,4,1.4,1.5.1,3-.5,4-1.5v1.4h3v-10.1c0-3.4-2.1-5.2-6.2-5.2ZM193.8,28.8c-.8.7-1.8,1-2.8.9-1.9,0-2.8-.8-2.8-2.1s.9-2.2,2.7-2.2h3.5v1.2c0,.8-.1,1.6-.7,2.2Z"/>
+          <path class="st0" d="M170.7,10.9v7.6c-1-1.2-2.5-1.8-4-1.7-1.3,0-2.6.4-3.6,1.3-1.5,1.5-1.7,4.1-1.7,6.3s.2,4.9,1.7,6.4c1,.9,2.3,1.4,3.7,1.3,1.5.1,3-.6,4-1.8v1.6h2.9V10.9h-3ZM167.6,29.5c-2.7,0-3.2-2.3-3.2-5s.4-5,3.2-5,3.1,2.3,3.1,5-.4,5-3.1,5Z"/>
+          <path class="st0" d="M158.2,24c0-4.3-2.3-7.2-6.4-7.2s-6.4,2.8-6.4,7.7,3,7.7,6.8,7.7c2.1.1,4.2-.7,5.6-2.3l-1.9-1.8c-.9,1.1-2.3,1.6-3.6,1.5-2.5,0-3.8-1.6-3.8-4.2h9.8s0-1.3,0-1.3ZM155.1,23.2h-6.8c0-.7.1-1.4.4-2,.5-1.2,1.7-1.9,3-1.9,1.3,0,2.5.7,3,1.9.3.6.4,1.3.4,2h0Z"/>
+        </svg>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="Hauptnavigation">
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="ueber-uns.html">Über uns</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="cases.html">Cases</a></span>
+      <span class="nav-item nav-item--has-dropdown" id="navServices"><span class="nav-dot" aria-hidden="true"></span><a href="leistungen.html" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown">Services</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="insights.html">Insights</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="kontakt.html">Kontakt</a></span>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
+    <div class="nav-dropdown-inner">
+      <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
+      <a href="leistungen-social-media.html">Social Media</a>
+      <a href="leistungen-media-content.html">Media &amp; Content</a>
+      <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
+      <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
+    <a href="ueber-uns.html">Über uns</a>
+    <a href="cases.html">Cases</a>
+    <div class="mobile-nav-group">
+      <button class="mobile-nav-sub-toggle" id="mobileSubToggle" type="button" aria-expanded="false" aria-controls="mobileSubnav">
+        Services
+        <span class="mobile-nav-sub-icon" aria-hidden="true"></span>
+      </button>
+      <div class="mobile-subnav" id="mobileSubnav">
+        <div class="mobile-subnav-inner">
+          <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
+          <a href="leistungen-social-media.html">Social Media</a>
+          <a href="leistungen-media-content.html">Media &amp; Content</a>
+          <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
+          <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+        </div>
+      </div>
+    </div>
+    <a href="insights.html">Insights</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<aside class="social-rail" aria-label="Social Media">
+  <a href="https://www.instagram.com/noll.media/" target="_blank" rel="noopener" class="social-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+  <a href="https://www.facebook.com/noll.media/" target="_blank" rel="noopener" class="social-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+  <a href="https://www.xing.com/pages/noll-media-gmbh" target="_blank" rel="noopener" class="social-x" aria-label="Xing"><img src="images/x.svg" alt=""></a>
+  <a href="https://www.linkedin.com/company/nollmedia/home/" target="_blank" rel="noopener" class="social-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+</aside>
+
+<div class="mobile-bar" aria-label="Mobile Menüleiste">
+  <div class="mobile-bar-socials">
+    <a href="https://www.instagram.com/noll.media/" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+    <a href="https://www.facebook.com/noll.media/" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+    <a href="https://www.xing.com/pages/noll-media-gmbh" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-x" aria-label="Xing"><img src="images/x.svg" alt=""></a>
+    <a href="https://www.linkedin.com/company/nollmedia/home/" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+  </div>
+  <button class="mobile-bar-toggle" id="mobileBarToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+    <span class="mobile-bar-toggle-label">Menü</span>
+    <span class="mobile-bar-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</div>
+
+
+<main id="main">
+
+  <!-- Kontakt — Figma node 839:3519 ("Frame 358"), 3840px reference frame,
+       px / 3840 * 100 = vw like every other block. Content column is
+       left:404 / width:3032, i.e. --grid-margin / --grid-width, so everything
+       sits in a plain .wrap. -->
+  <section class="kontakt-hero" aria-label="Kontakt">
+    <div class="wrap">
+      <p class="kontakt-tag"><span>Kontakt</span></p>
+      <h1 class="kontakt-title">Wie können wir dir helfen? Erzähl es uns.</h1>
+      <div class="kontakt-facts">
+        <div class="kontakt-adresse">
+          <strong>noll media GmbH</strong>
+          <span>Rudolf-Diesel-Straße 6 | 56410 Montabaur</span>
+        </div>
+        <div class="kontakt-direkt">
+          <div class="kontakt-direkt-row"><span>TEL</span><a href="tel:+4926029191500">+49 2602 9191 500</a></div>
+          <div class="kontakt-direkt-row"><span>MAIL</span><a href="mailto:hallo@noll.media">hallo@noll.media</a></div>
+        </div>
+        <a class="leistung-detail-cta kontakt-anfahrt"
+           href="https://www.google.com/maps/search/?api=1&amp;query=Rudolf-Diesel-Stra%C3%9Fe+6%2C+56410+Montabaur"
+           target="_blank" rel="noopener">
+          <span class="leistung-detail-cta-label">Anfahrt planen</span>
+          <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="kontakt-main" aria-label="Kontaktformular">
+    <div class="wrap kontakt-main-row">
+      <!-- The form posts nowhere yet: there is no endpoint on this static site.
+           Wire action/method up to whatever handles mail, the markup and the
+           required fields are already in place. -->
+      <form class="kontakt-form" action="#" method="post">
+        <div class="kontakt-field">
+          <label for="kontakt-name">Name*</label>
+          <input id="kontakt-name" name="name" type="text" placeholder="Dein Name" autocomplete="name" required>
+        </div>
+        <div class="kontakt-field">
+          <label for="kontakt-firma">Unternehmen</label>
+          <input id="kontakt-firma" name="unternehmen" type="text" placeholder="Dein Unternehmen" autocomplete="organization">
+        </div>
+        <div class="kontakt-field">
+          <label for="kontakt-mail">E-Mailadresse*</label>
+          <input id="kontakt-mail" name="email" type="email" placeholder="Deine E-Mailadresse" autocomplete="email" required>
+        </div>
+        <div class="kontakt-field">
+          <label for="kontakt-nachricht">Nachricht*</label>
+          <textarea id="kontakt-nachricht" name="nachricht" placeholder="Nachricht schreiben ..." required></textarea>
+        </div>
+        <div class="kontakt-submit">
+          <button class="leistung-detail-cta kontakt-send" type="submit">
+            <span class="leistung-detail-cta-label">Nachricht senden</span>
+            <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+          </button>
+          <p class="kontakt-datenschutz">Es gelten unsere <a href="#">Datenschutzbestimmungen</a>.</p>
+        </div>
+      </form>
+
+      <div class="kontakt-aside">
+        <p class="kontakt-lead">Du benötigst Beratung, planst ein konkretes Projekt oder möchtest uns einfach mal kennenlernen? Wir freuen uns, von dir zu hören!</p>
+        <div class="kontakt-person">
+          <div class="kontakt-person-photo">
+            <img src="images/team/christian-noll.jpg" alt="Christian Noll">
+          </div>
+          <div class="kontakt-person-txt">
+            <div class="kontakt-person-name">
+              <strong>Christian Noll</strong>
+              <span>CEO</span>
+            </div>
+            <div class="kontakt-person-kontakt">
+              <div class="kontakt-person-row"><span>TEL</span><a href="tel:+4926029191500">+49 02602 919 150 0</a></div>
+              <div class="kontakt-person-row"><span>MAIL</span><a href="mailto:christian.noll@noll.media">christian.noll@noll.media</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="kontakt" aria-label="Kontakt &amp; Footer">
+  <div class="footer-inner">
+    <div class="footer-black">
+      <p class="footer-lead">Wir freuen uns, von dir zu hören.</p>
+      <a class="footer-contact-link footer-mail" href="mailto:hallo@noll.media">hallo@noll.media</a>
+      <a class="footer-contact-link footer-phone" href="tel:+4926029191500">+49 2602 9191 500</a>
+
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-1" href="ueber-uns.html">Über uns</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-1" href="insights.html">Insights</a>
+        <a class="footer-nav-link footer-nav-col-3 footer-nav-row-1" href="#">Presse</a>
+        <a class="footer-nav-link footer-nav-col-3 footer-nav-row-2" href="#">Ressourcen</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-2" href="cases.html">Cases</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-2" href="kontakt.html">Kontakt</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-3" href="leistungen.html">Services</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-3" href="#newsletter">Newsletter</a>
+      </nav>
+
+      <h2 class="footer-newsletter-heading" id="newsletter">Abonniere unseren Newsletter</h2>
+      <form class="footer-subscribe-form" action="#" method="post">
+        <label class="visually-hidden" for="footer-email">Deine E-Mailadresse</label>
+        <input class="footer-subscribe-input" type="email" id="footer-email" name="email" placeholder="Deine E-Mailadresse" autocomplete="email" required>
+        <button class="footer-subscribe-btn" type="submit">
+          <span class="footer-subscribe-label">Abonnieren</span>
+          <img class="footer-subscribe-arrow" src="images/footer/subscribe-arrow.svg" alt="">
+        </button>
+      </form>
+    </div>
+
+    <div class="footer-white">
+      <div class="footer-legal">
+        <a href="#">Impressum</a>
+        <a href="kontakt.html">Kontakt</a>
+        <a href="#">Datenschutz</a>
+      </div>
+      <p class="footer-social-heading">Folge uns!</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/noll.media/" target="_blank" rel="noopener" aria-label="Instagram"><img src="images/footer/social-instagram.svg" alt=""></a>
+        <a href="https://www.facebook.com/noll.media/" target="_blank" rel="noopener" aria-label="Facebook"><img src="images/footer/social-facebook.svg" alt=""></a>
+        <a href="https://www.xing.com/pages/noll-media-gmbh" target="_blank" rel="noopener" aria-label="Xing"><img src="images/footer/social-xing.svg" alt=""></a>
+        <a href="https://www.linkedin.com/company/nollmedia/home/" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="images/footer/social-linkedin.svg" alt=""></a>
+      </div>
+    </div>
+
+    <a class="footer-seal" href="#top" aria-label="Nach oben scrollen">
+      <img src="images/footer/logo-seal.svg" alt="">
+    </a>
+  </div>
+</footer>
+
+<script src="js/main.js?v=39"></script>
+</body>
+</html>

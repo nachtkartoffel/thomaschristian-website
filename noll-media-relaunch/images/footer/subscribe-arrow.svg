@@ -1,0 +1,12 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Ebene_1" clip-path="url(#clip0_0_7)">
+<path id="Vector" d="M40.0029 80.0059C62.0959 80.0059 80.0059 62.0959 80.0059 40.0029C80.0059 17.9099 62.0959 0 40.0029 0C17.9099 0 0 17.9099 0 40.0029C0 62.0959 17.9099 80.0059 40.0029 80.0059Z" fill="white"/>
+<path id="Vector_2" d="M31.1328 31.1328H48.8682V48.8682" stroke="black" stroke-width="6.75105" stroke-miterlimit="10"/>
+<path id="Vector_3" d="M48.8682 31.1328L31.1328 48.8682" stroke="black" stroke-width="6.66667" stroke-miterlimit="10"/>
+</g>
+<defs>
+<clipPath id="clip0_0_7">
+<rect width="80" height="80" fill="white"/>
+</clipPath>
+</defs>
+</svg>
