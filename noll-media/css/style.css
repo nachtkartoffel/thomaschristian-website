@@ -951,7 +951,7 @@ body.scroll-locked{
   position:relative;
   width:92.3438vw; /* 3546px */
   margin:0 auto;
-  height:72.2272vw; /* 2744.457px Figma height + 0.757vw extra so heading->images gap matches Team section */
+  height:75.9511vw; /* 2744.457px Figma height + 0.757vw (Team-gap) + 3.7239vw: the heading runs to 3 lines (constant, everything is vw-scaled), so images/CTA move down one line (3.3854vw x 1.1) */
 }
 .creativity-heading{
   position:absolute; left:13.2263vw; top:0; width:43.3823vw; margin:0;
@@ -962,7 +962,7 @@ body.scroll-locked{
   /* top nudged down from the raw Figma value (9.7634vw) by +0.757vw so the
      heading->images gap matches the Team section's heading->photos gap,
      per explicit direction ("Gleicher Abstand ... wie in der Team section"). */
-  position:absolute; left:0; top:10.5204vw; width:100%; height:61.7068vw;
+  position:absolute; left:0; top:14.2443vw; width:100%; height:61.7068vw; /* +3.7239vw: one heading line, the 3rd line was hidden behind img--1 */
 }
 .creativity-img{
   position:absolute;
@@ -975,7 +975,7 @@ body.scroll-locked{
 .creativity-img--2{ left:46.8933vw; top:20.0078vw; width:32.0317vw; height:29.1941vw; }
 .creativity-img--3{ left:18.9978vw; top:34.3403vw; width:20.8735vw; height:27.3665vw; }
 .creativity-cta{
-  position:absolute; left:46.9010vw; top:67.4236vw; /* shifted down with .creativity-images by the same +0.757vw */
+  position:absolute; left:46.9010vw; top:71.1475vw; /* shifted down with .creativity-images by the same +0.757vw */
   display:flex; align-items:center;
   text-decoration:none;
 }
@@ -1042,24 +1042,12 @@ body.scroll-locked{
   color:var(--white);
 }
 .leistungen-track{
-  display:flex; gap:1.0417vw;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  /* Left inset is a margin, not padding: padding lives inside the
-     scrollport and would scroll away on the very first tick, so the
-     "start at the content edge" boundary would move with it. A margin
-     sits outside the scrolling box entirely — the track's own left edge
-     stays pinned at the content grid's edge, and cards only disappear
-     once they scroll past that fixed boundary (i.e. slide out to the
-     left), instead of the whole inset sliding away immediately. */
-  margin-left:var(--grid-margin);
-  padding:0 var(--grid-margin) clamp(16px, 2vw, 40px) 0;
-  scrollbar-width:none; -ms-overflow-style:none;
+  /* Vier feste Kacheln im Raster statt Slider: 4 × Kachel + 3 × Gap
+     füllt --grid-width genau aus. */
+  display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:1.0417vw;
+  margin:0 var(--grid-margin);
 }
-.leistungen-track::-webkit-scrollbar{ display:none; }
 .leistung-card{
-  scroll-snap-align:start;
-  flex:0 0 18.9583vw; min-width:230px;
   min-height:23.9806vw;
   display:flex; flex-direction:column; align-items:flex-start; gap:1.5vw;
   padding:1.9vw 1.25vw 2.5vw;
@@ -1144,8 +1132,9 @@ body.scroll-locked{
 }
 @media (max-width:860px){
   .leistungen-heading{ font-size:var(--mobile-heading); }
+  .leistungen-track{ grid-template-columns:1fr; gap:4vw; }
   .leistung-card{
-    flex-basis:78vw; min-height:auto;
+    min-height:auto;
     /* the desktop padding (1.9vw/1.25vw/2.5vw) is only ~7px/5px/10px on a
        phone, so the copy sat almost on the card's border */
     padding:6vw 5vw; gap:4vw;
@@ -1156,6 +1145,13 @@ body.scroll-locked{
   .leistung-card p{ font-size:3.6vw; }
   .leistung-cta-label{ height:9vw; padding:0 5vw; font-size:3.4vw; }
   .leistung-cta-icon{ width:9vw; height:9vw; }
+}
+@media (max-width:1200px) and (min-width:861px){
+  .leistungen-track{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:2vw; }
+  .leistung-card{ min-height:auto; padding:3vw 2.5vw; gap:2.5vw; }
+  .leistung-icon{ height:10vw; }
+  .leistung-card h3{ font-size:2.6vw; }
+  .leistung-card p{ font-size:1.5vw; }
 }
 
 /* ---------- Kundenzitate / Testimonial (Figma node 191:974, "Group 2") ----------
@@ -1223,6 +1219,28 @@ body.scroll-locked{
 .testimonial-role{
   font-family:var(--font-body); font-weight:500; font-size:1.25vw; line-height:1.2; color:var(--white);
 }
+/* Google-Bewertungen (js/google-reviews.js) */
+.testimonial-quote > p, .testimonial-attribution{ transition:opacity .4s ease; }
+.testimonial-quote.is-fading > p, .testimonial-quote.is-fading .testimonial-attribution{ opacity:0; }
+.testimonial-attribution a{ color:inherit; text-decoration:none; }
+.testimonial-attribution a:hover, .testimonial-attribution a:focus-visible{ text-decoration:underline; }
+.testimonial-stars{ color:#fbbc04; letter-spacing:0.1em; margin-right:0.6em; }
+.testimonial-summary{
+  margin-top:0.8vw;
+  font-family:var(--font-body); font-weight:300; font-size:0.9375vw; line-height:1.2;
+  color:var(--white); opacity:.7;
+}
+.testimonial-dots{ display:flex; gap:0.625vw; margin-top:2vw; justify-content:flex-end; }
+.testimonial-dots[hidden]{ display:none; }
+.testimonial-dot{
+  width:0.625vw; height:0.625vw; min-width:10px; min-height:10px;
+  padding:0; border:1px solid var(--white); border-radius:50%;
+  background:transparent; cursor:pointer;
+}
+.testimonial-dot[aria-current="true"]{ background:var(--white); }
+@media (prefers-reduced-motion: reduce){
+  .testimonial-quote > p, .testimonial-attribution{ transition:none; }
+}
 @media (max-width:860px){
   .testimonial-inner{ flex-direction:column; align-items:stretch; gap:6vw; width:auto; margin:0 var(--grid-margin); }
   /* Photo spans the full content column. Kept round — that is this
@@ -1234,6 +1252,8 @@ body.scroll-locked{
   .testimonial-quote p{ font-size:5.5vw; }
   .testimonial-attribution{ margin-top:5vw; align-items:flex-start; text-align:left; }
   .testimonial-name, .testimonial-role{ font-size:3.2vw; }
+  .testimonial-summary{ font-size:3vw; margin-top:3vw; }
+  .testimonial-dots{ justify-content:flex-start; gap:3vw; margin-top:5vw; }
 }
 
 /* ---------- Kundenleiste / "Wir sprechen aus Erfahrung" (Figma node
@@ -3354,4 +3374,445 @@ body.show-grid .debug-grid{ display:block; }
   .footer-social-heading{ position:static; width:auto; font-size:3.4vw; }
   .footer-social{ position:static; gap:5vw; }
   .footer-social img{ width:7vw; height:7vw; }
+}
+
+/* ==========================================================================
+   Case detail (case-ursa-chemie.html)
+   Hero in the Leistungs-Detail vocabulary, then the pinned MacBook stage,
+   story blocks, numbers, image row. Units follow the rest of the site: vw on
+   the 3840px reference grid, separate mobile values under 860px.
+   ========================================================================== */
+.case-detail-hero{ padding-top:5.677vw; padding-bottom:4vw; }
+.case-detail-tags{ margin-bottom:2.5vw; }
+.case-detail-client{
+  margin:0 0 0.6vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4; color:var(--white); opacity:.45;
+}
+.case-detail-title{
+  margin:0 0 3.3vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:4.6997vw; line-height:1.1; letter-spacing:0.047vw;
+  color:var(--white);
+}
+.case-detail-hero-row{
+  display:grid; grid-template-columns:minmax(0,52.4219vw) auto;
+  justify-content:space-between; align-items:start; gap:4vw;
+}
+.case-detail-lead{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.4; color:var(--white); opacity:.8;
+}
+.case-detail-facts{ margin:0; display:flex; flex-direction:column; gap:1vw; min-width:16vw; }
+.case-detail-facts div{ display:flex; flex-direction:column; gap:0.15vw; padding-bottom:1vw; border-bottom:1px solid rgba(255,255,255,.25); }
+.case-detail-facts dt{
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:0.7292vw; letter-spacing:0.08em; text-transform:uppercase; opacity:.45;
+}
+.case-detail-facts dd{
+  margin:0; font-family:var(--font-display-bold); font-weight:400; font-size:0.9375vw; line-height:1.4;
+}
+
+/* ---------- Case detail — laptop stage ------------------------------------
+   The laptop is a real-time 3D model (models/laptop.glb, three.js, see
+   js/case-laptop.js); the HTML screen is laid over its display with a CSS
+   matrix3d onto the display's projected corners:
+     .case-mb          tall section; its height is the scroll distance
+     .case-mb-sticky   the 100vh stage that stays put while you scroll
+     .case-mb-canvas   WebGL render of the laptop, fills the stage
+     .mb-screen        HTML screen, 1440px wide, mapped onto the display
+   Until the model is ready (and if WebGL is missing) the section carries
+   .is-flat and shows the screen on its own, centred. */
+.case-mb{ position:relative; height:520vh; }
+.case-mb-sticky{
+  position:sticky; top:0; height:100vh; height:100svh;
+  overflow:hidden; background:#000;
+}
+/* Spline mode (js/case-spline.js): the scene renders into its own canvas and
+   draws the screen content itself, so the built-in canvas and the HTML
+   screen step aside. */
+.case-mb-spline{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.case-mb.is-spline .case-mb-canvas,
+.case-mb.is-spline .mb-screen{ display:none; }
+.case-mb.is-spline .case-mb-spline{ opacity:0; transition:opacity .6s cubic-bezier(.4,0,.2,1); }
+.case-mb.is-spline-ready .case-mb-spline{ opacity:1; }
+.case-mb-canvas{ position:absolute; inset:0; width:100%; height:100%; display:block; }
+.mb-screen{
+  position:absolute; left:0; top:0; z-index:1;
+  width:1440px; height:932px;
+  transform-origin:0 0;
+  overflow:hidden; background:#fff; color:#141414;
+  container-type:inline-size;
+  visibility:hidden;
+  backface-visibility:hidden;
+}
+/* glare that fades as the screen comes square-on */
+/* glass: a soft reflection band that slides with the camera
+   (--mb-glare-x, set by the script) plus a faint inner edge shadow */
+.mb-screen::after{
+  content:""; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(112deg,
+    rgba(255,255,255,0) calc(var(--mb-glare-x,30%) - 34%),
+    rgba(255,255,255,.13) var(--mb-glare-x,30%),
+    rgba(255,255,255,.02) calc(var(--mb-glare-x,30%) + 18%),
+    rgba(255,255,255,0) calc(var(--mb-glare-x,30%) + 40%));
+  box-shadow:inset 0 0 60px rgba(0,0,0,.18);
+  opacity:var(--mb-glare,1);
+}
+.mb-site{ position:absolute; left:0; top:0; width:100%; will-change:transform; }
+.mb-site-shot{ display:block; width:100%; height:auto; }
+/* flat fallback: the screen alone, centred, as a rounded panel */
+.case-mb.is-flat .mb-screen{
+  visibility:visible;
+  left:50%; top:50%;
+  width:min(84vw, 1200px) !important; height:auto !important; aspect-ratio:1440 / 932;
+  transform:translate(-50%,-50%) !important;
+  border-radius:0.625vw; box-shadow:0 0 0 1px rgba(255,255,255,.15);
+}
+.case-mb.is-flat .case-mb-canvas{ display:none; }
+
+/* chapter captions + progress line */
+.case-mb-captions{
+  position:absolute; z-index:3; left:var(--grid-margin); bottom:7vh;
+  margin:0; pointer-events:none;
+}
+.case-mb-caption{
+  position:absolute; left:0; bottom:0; margin:0; white-space:nowrap;
+  display:flex; align-items:baseline; gap:0.8vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:1.6146vw; line-height:1.2; color:var(--white);
+  opacity:0; transform:translateY(1vw);
+  transition:opacity .5s cubic-bezier(.4,0,.2,1), transform .5s cubic-bezier(.4,0,.2,1);
+}
+.case-mb-caption span{ font-weight:300; font-size:.55em; letter-spacing:.08em; opacity:.6; }
+.case-mb-caption.is-active{ opacity:1; transform:none; }
+/* while the screen fills the view the captions sit on the site itself —
+   give them a backing so they stay readable on a white page */
+.case-mb.is-zoomed .case-mb-caption{
+  background:var(--black); padding:0.6vw 1.1vw; border-radius:999px;
+}
+.case-mb-progress{
+  position:absolute; z-index:3; right:var(--grid-margin); bottom:calc(7vh + 0.8vw);
+  width:12vw; height:2px; background:rgba(255,255,255,.25); overflow:hidden; border-radius:2px;
+}
+.case-mb-progress-bar{
+  display:block; height:100%; width:100%; background:var(--white);
+  transform-origin:0 50%; transform:scaleX(var(--mb-p,0));
+}
+.case-mb.is-zoomed .case-mb-progress{ background:rgba(0,0,0,.2); }
+.case-mb.is-zoomed .case-mb-progress-bar{ background:var(--black); }
+
+/* ---------- drawn stand-in site on the screen (all in cqw = % of screen width) */
+.mb-site{ font-family:var(--font-body); background:#fff; }
+.mb-site img{ display:block; width:100%; height:100%; object-fit:cover; max-width:none; }
+.mb-site i{ font-style:normal; }
+.mbs-nav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:3.4cqw 5cqw 2cqw; font-size:1.1cqw;
+}
+.mbs-logo{ font-family:var(--font-display-bold); font-weight:700; font-size:1.8cqw; letter-spacing:.06em; color:#0b3a6e; }
+.mbs-logo b{ font-weight:300; margin-left:.3em; }
+.mbs-links{ display:flex; gap:2.6cqw; color:#333; }
+.mbs-hero{ position:relative; margin:0 2cqw; height:40cqw; border-radius:1.2cqw; overflow:hidden; }
+.mbs-hero::after{ content:""; position:absolute; inset:0; background:linear-gradient(90deg,rgba(8,30,60,.85) 0%,rgba(8,30,60,.2) 70%); }
+.mbs-hero-text{
+  position:absolute; z-index:1; left:5cqw; bottom:6cqw; max-width:48cqw;
+  display:flex; flex-direction:column; align-items:flex-start; gap:1.6cqw; color:#fff;
+}
+.mbs-kicker{ font-size:1.1cqw; letter-spacing:.12em; text-transform:uppercase; opacity:.8; }
+.mbs-h1{ font-family:var(--font-display-bold); font-weight:700; font-size:5.4cqw; line-height:1.05; }
+.mbs-btn{
+  display:inline-block; padding:1cqw 2cqw; border-radius:999px;
+  background:#fff; color:#0b3a6e; font-size:1.1cqw; font-weight:700;
+}
+.mbs-btn--dark{ background:#0b3a6e; color:#fff; }
+.mbs-band{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:2cqw;
+  padding:5cqw 5cqw 4cqw; font-size:1.2cqw; color:#555;
+}
+.mbs-band span{ display:flex; flex-direction:column; gap:.4cqw; border-top:1px solid #ddd; padding-top:1.6cqw; }
+.mbs-band b{ font-family:var(--font-display-bold); font-size:4cqw; line-height:1; color:#0b3a6e; }
+.mbs-section{ padding:4cqw 5cqw 6cqw; }
+.mbs-section--grey{ background:#f1f3f6; }
+.mbs-h2{ display:block; margin-bottom:2.6cqw; font-family:var(--font-display-bold); font-weight:700; font-size:3cqw; line-height:1.1; color:#141414; }
+.mbs-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:2cqw; }
+.mbs-card{ display:flex; flex-direction:column; gap:1.2cqw; font-size:1.4cqw; font-weight:700; }
+.mbs-card img{ height:24cqw; border-radius:1cqw; }
+.mbs-split{ display:grid; grid-template-columns:1.1fr 1fr; gap:5cqw; align-items:center; padding:2cqw 5cqw 7cqw; }
+.mbs-split img{ height:34cqw; border-radius:1cqw; }
+.mbs-lines{ display:flex; flex-direction:column; gap:1.1cqw; margin-bottom:2.6cqw; }
+.mbs-lines i{ display:block; height:.9cqw; border-radius:.5cqw; background:#e1e4e8; }
+.mbs-lines i:nth-child(2n){ width:86%; }
+.mbs-lines i:last-child{ width:60%; }
+.mbs-news{ display:flex; flex-direction:column; gap:1cqw; padding:2cqw; background:#fff; border-radius:1cqw; }
+.mbs-news i{ display:block; height:.9cqw; border-radius:.5cqw; background:#e1e4e8; }
+.mbs-news i:first-child{ height:14cqw; background:#d5dbe3; margin-bottom:1cqw; }
+.mbs-news i:last-child{ width:65%; }
+.mbs-footer{ display:flex; justify-content:space-between; align-items:flex-start; padding:5cqw 5cqw 8cqw; background:#0b2a50; }
+.mbs-footer .mbs-logo{ color:#fff; }
+.mbs-footer .mbs-lines{ width:30cqw; }
+.mbs-footer .mbs-lines i{ background:rgba(255,255,255,.2); }
+
+/* ---------- story / stats / gallery ---------- */
+.case-detail-story{ padding:8vw 0 4vw; }
+.case-detail-story .wrap{ display:flex; flex-direction:column; }
+.case-detail-block{
+  display:grid; grid-template-columns:31% 1fr; gap:3vw;
+  padding:2.6vw 0; border-top:2px solid var(--white);
+}
+.case-detail-block h2{
+  margin:0; font-family:var(--font-display-bold); font-weight:700;
+  font-size:2.2917vw; line-height:1.25;
+}
+.case-detail-block p{
+  margin:0; max-width:52.4219vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.0938vw; line-height:1.5; opacity:.8;
+}
+.case-detail-stats{ padding:4vw 0 8vw; }
+.case-detail-stats-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:1.0417vw; }
+.case-detail-stat{
+  display:flex; flex-direction:column; gap:0.8vw;
+  padding:2.6vw; border:1px solid var(--white); border-radius:0.625vw;
+}
+.case-detail-stat strong{ font-family:var(--font-display-bold); font-weight:700; font-size:4.6997vw; line-height:1; }
+.case-detail-stat span{ font-family:var(--font-display-bold); font-weight:300; font-size:0.9375vw; opacity:.8; }
+.case-detail-gallery-grid{ display:grid; grid-template-columns:1fr 1fr; gap:1.0417vw; }
+.case-detail-gallery-item{ margin:0; border-radius:0.625vw; overflow:hidden; aspect-ratio:3 / 2; }
+.case-detail-gallery-item--wide{ grid-column:1 / -1; aspect-ratio:21 / 9; }
+.case-detail-gallery-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+.case-detail-gallery + .leistung-detail-cases{ padding-top:9vw; }
+
+@media (prefers-reduced-motion:reduce){
+  /* no pinned scrub: one still of the open laptop, scrolled with the page */
+  .case-mb{ height:auto; }
+  .case-mb-captions, .case-mb-progress{ display:none; }
+  .case-mb-caption{ transition:none; }
+}
+
+@media (max-width:860px){
+  .case-detail-hero{ padding-top:6vw; padding-bottom:8vw; }
+  .case-detail-tags{ flex-wrap:wrap; margin-bottom:6vw; }
+  .case-detail-client{ font-size:3.8vw; margin-bottom:2vw; }
+  .case-detail-title{ font-size:var(--mobile-heading, 9vw); letter-spacing:0; margin-bottom:6vw; }
+  .case-detail-title br{ display:none; }
+  .case-detail-hero-row{ grid-template-columns:1fr; gap:8vw; }
+  .case-detail-lead{ font-size:4vw; }
+  .case-detail-facts{ gap:3vw; }
+  .case-detail-facts div{ padding-bottom:3vw; gap:1vw; }
+  .case-detail-facts dt{ font-size:2.8vw; }
+  .case-detail-facts dd{ font-size:3.8vw; }
+
+  .case-mb{ height:420vh; }
+  .case-mb-captions{ left:var(--gutter); bottom:12vh; }
+  .case-mb-caption{ font-size:5vw; gap:2vw; }
+  .case-mb.is-zoomed .case-mb-caption{ padding:1.6vw 3.4vw; }
+  .case-mb-progress{ right:var(--gutter); bottom:calc(12vh + 2.4vw); width:18vw; }
+
+  .case-detail-story{ padding:12vw 0 6vw; }
+  .case-detail-block{ grid-template-columns:1fr; gap:3vw; padding:6vw 0 8vw; }
+  .case-detail-block h2{ font-size:6.4vw; }
+  .case-detail-block p{ max-width:none; font-size:4vw; }
+  .case-detail-stats{ padding:6vw 0 12vw; }
+  .case-detail-stats-grid{ grid-template-columns:1fr; gap:4vw; }
+  .case-detail-stat{ padding:6vw; gap:2vw; border-radius:2vw; }
+  .case-detail-stat strong{ font-size:13vw; }
+  .case-detail-stat span{ font-size:3.8vw; }
+  .case-detail-gallery-grid{ grid-template-columns:1fr; gap:4vw; }
+  .case-detail-gallery-item{ border-radius:2vw; }
+  .case-detail-gallery-item--wide{ aspect-ratio:3 / 2; }
+}
+
+/* ==========================================================================
+   Social Wall (#insights auf der Startseite) — ersetzt die Blog-Teaser.
+   Isotope-Masonry im Seitenraster: 4 Spalten innerhalb --grid-width mit
+   dem Site-Gutter 1.0417vw (40px @ 3840px). YouTube und Querformat-
+   Beiträge belegen 2 Spalten. Vorderseite = Medium mit weißer Kontur,
+   Rückseite = weiße Karte mit schwarzem Text (3D-Flip per Klick).
+   Logik/Datenquelle: js/social-wall.js, Doku: SOCIAL-WALL.md.
+   ========================================================================== */
+.social-wall{
+  --sw-cols:4;
+  --sw-gap:1.0417vw;
+  --sw-border:1px; /* wie die Outline-Buttons der Seite */
+  --sw-radius:max(12px, 0.625vw); /* Site-Standard 24px @ 3840px */
+  --sw-text:clamp(13px, 0.9375vw, 36px);
+}
+.social-wall-header{
+  display:flex; align-items:flex-end; justify-content:space-between; gap:2vw;
+  margin:0 0 3vw;
+}
+.social-wall .insights-heading{ margin:0; }
+.social-wall-filters{ display:flex; flex-wrap:wrap; align-items:center; gap:0.3125vw 0; }
+/* Filter = die sekundären Pills der Seite (.blog-chip): schwarz, 1px weiße
+   Kontur, Hover/aktiv weiß gefüllt; horizontal bündig aneinander. */
+.sw-filter{
+  display:flex; align-items:center; justify-content:center;
+  height:2.0833vw; padding:0 1.25vw;
+  background:var(--black); border:1px solid var(--white); border-radius:999px;
+  font-family:var(--font-display-bold); font-weight:700; font-size:0.8247vw; line-height:1.2;
+  color:var(--white); white-space:nowrap; cursor:pointer;
+  transition:background .3s ease, color .3s ease;
+}
+.sw-filter:hover, .sw-filter:focus-visible, .sw-filter.is-active{ background:var(--white); color:#000; }
+@media (prefers-reduced-motion:reduce){ .sw-filter{ transition:none; } }
+.sw-filter[hidden]{ display:none; }
+.sw-filter:focus-visible{ outline:2px solid var(--white); outline-offset:3px; }
+
+.social-wall-grid{ position:relative; min-height:20vw; }
+.social-wall.is-ready .social-wall-grid{ min-height:0; }
+.sw-sizer,
+.sw-item{ width:calc((100% - (var(--sw-cols) - 1) * var(--sw-gap)) / var(--sw-cols)); }
+.sw-item.sw-wide{ width:calc((100% - (var(--sw-cols) - 1) * var(--sw-gap)) / var(--sw-cols) * 2 + var(--sw-gap)); }
+.sw-gutter{ width:var(--sw-gap); }
+.sw-item{
+  margin-bottom:var(--sw-gap);
+  perspective:2000px;
+}
+/* Ohne Isotope (Skript nicht geladen): einfacher Umbruch statt Masonry */
+.social-wall-grid.no-isotope{ display:flex; flex-wrap:wrap; gap:0 var(--sw-gap); }
+.social-wall-grid.no-isotope .sw-sizer, .social-wall-grid.no-isotope .sw-gutter{ display:none; }
+.social-wall-grid.no-isotope .sw-filtered-out{ display:none; }
+
+.sw-card{
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform .8s cubic-bezier(.2,.75,.2,1);
+  cursor:pointer;
+  outline:none;
+}
+.sw-item.is-flipped .sw-card{ transform:rotateY(180deg); }
+.sw-card:focus-visible .sw-media,
+.sw-card:focus-visible .sw-back{ box-shadow:0 0 0 3px var(--black), 0 0 0 6px var(--white); }
+
+.sw-face{
+  -webkit-backface-visibility:hidden; backface-visibility:hidden;
+}
+.sw-front{ position:relative; }
+
+/* Vorderseite: Medium mit weißer Kontur */
+.sw-media{
+  position:relative; overflow:hidden;
+  border-radius:var(--sw-radius);
+  background:#111;
+  isolation:isolate; /* clippt auch iframe/video sauber an den runden Ecken */
+}
+/* Kontur als Overlay statt border: das Thumbnail läuft bis an den Rand,
+   die Linie liegt obendrauf */
+.sw-media::after{
+  content:''; position:absolute; inset:0; z-index:3;
+  border:var(--sw-border) solid var(--white); border-radius:inherit;
+  pointer-events:none;
+}
+.sw-media img,
+.sw-media video,
+.sw-media iframe{
+  position:absolute; inset:0; width:100%; height:100%;
+  object-fit:cover; border:0;
+}
+.sw-media img{ transition:transform .6s cubic-bezier(.2,.75,.2,1); }
+.sw-card:hover .sw-media img{ transform:scale(1.04); }
+.sw-media video,
+.sw-media iframe{ opacity:0; transition:opacity .5s ease; pointer-events:none; }
+.sw-media.is-playing video,
+.sw-media.is-playing iframe{ opacity:1; }
+/* YouTube: 16:9-Player etwas überskalieren, damit kein Letterboxing/Titel-
+   Overlay am Rand sichtbar ist */
+.sw-media[data-youtube] iframe{ transform:scale(1.18); }
+.sw-media.is-missing{ background:var(--black); }
+.sw-media-text{
+  position:absolute; inset:0; margin:0; padding:1.5vw;
+  display:flex; align-items:flex-end;
+  font-family:var(--font-body); font-weight:700; font-size:clamp(15px, 1.25vw, 48px); line-height:1.2;
+  color:var(--white);
+}
+
+.sw-badge{
+  position:absolute; top:0.8vw; right:0.8vw; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  width:clamp(26px, 1.6667vw, 64px); height:clamp(26px, 1.6667vw, 64px);
+  border-radius:50%; background:var(--white); color:var(--black);
+}
+.sw-badge svg{ width:55%; height:55%; }
+.sw-play{
+  position:absolute; left:50%; top:50%; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  width:clamp(40px, 3.125vw, 120px); height:clamp(40px, 3.125vw, 120px);
+  margin:calc(clamp(40px, 3.125vw, 120px) / -2) 0 0 calc(clamp(40px, 3.125vw, 120px) / -2);
+  border:2px solid var(--white); border-radius:50%;
+  color:var(--white); background:rgba(0,0,0,.35);
+  transition:opacity .4s ease;
+  pointer-events:none;
+}
+.sw-play svg{ width:45%; height:45%; margin-left:8%; }
+.sw-media.is-playing .sw-play{ opacity:0; }
+
+/* Rückseite: weiße Karte, schwarzer Text */
+.sw-back{
+  position:absolute; inset:0;
+  transform:rotateY(180deg);
+  display:flex; flex-direction:column; gap:1vw;
+  padding:clamp(16px, 1.4583vw, 56px);
+  background:var(--white); color:var(--black);
+  border:var(--sw-border) solid var(--white);
+  border-radius:var(--sw-radius);
+  overflow:hidden;
+}
+.sw-back-meta{
+  display:flex; align-items:center; justify-content:space-between; gap:1em;
+  font-family:var(--font-body); font-weight:700; font-size:var(--sw-text); line-height:1;
+}
+.sw-back-network{ display:inline-flex; align-items:center; gap:.45em; }
+.sw-back-network svg{ width:1.2em; height:1.2em; }
+.sw-back-date{ font-weight:500; white-space:nowrap; }
+.sw-back-body{
+  flex:1 1 auto; min-height:0; overflow-y:auto;
+  padding-top:1vw; border-top:2px solid var(--black);
+  font-family:var(--font-body); font-weight:400; font-size:var(--sw-text); line-height:1.45;
+  scrollbar-width:thin; scrollbar-color:var(--black) transparent;
+  overscroll-behavior:contain;
+}
+.sw-back-body p{ margin:0 0 .8em; }
+.sw-back-title{
+  margin:0 0 .6em;
+  font-family:var(--font-body); font-weight:700; font-size:calc(var(--sw-text) * 1.35); line-height:1.15;
+}
+.sw-back-tags{ color:#6b6b6b; font-size:.88em; }
+/* Link auf der Rückseite = der sekundäre CTA der Seite (.leistung-cta: Pill +
+   Pfeil-Kreis, Cross-Slide-Hover). Auf der weißen Karte als Negativ: Pill und
+   Kreis schwarz mit schwarzer Kontur, Pfeil weiß. */
+.sw-back .leistung-cta{ align-self:flex-start; flex:0 0 auto; margin-top:0; }
+.sw-back .leistung-cta-label{ border-color:var(--black); }
+.sw-back .leistung-cta-icon{ border-color:var(--black); background:var(--black); }
+
+.social-wall-more-wrap{ display:flex; justify-content:center; padding-top:3vw; }
+.social-wall-more-wrap[hidden]{ display:none; }
+.social-wall-noscript a{ text-decoration:underline; }
+
+@media (prefers-reduced-motion:reduce){
+  .sw-card{ transition:none; transform-style:flat; }
+  .sw-item.is-flipped .sw-card{ transform:none; }
+  .sw-back{ transform:none; opacity:0; visibility:hidden; transition:opacity .2s ease, visibility .2s; }
+  .sw-item.is-flipped .sw-back{ opacity:1; visibility:visible; }
+  .sw-media img{ transition:none; }
+}
+@media (max-width:1200px){
+  .social-wall{ --sw-cols:3; }
+}
+@media (max-width:860px){
+  .social-wall{ --sw-cols:2; --sw-gap:3vw; --sw-text:3.4vw; --sw-radius:2vw; }
+  .social-wall-header{ flex-direction:column; align-items:flex-start; gap:4vw; margin-bottom:5vw; }
+  .social-wall-filters{ gap:2vw 0; }
+  .sw-filter{ height:9vw; padding:0 4vw; font-size:3.4vw; }
+  .sw-item.sw-wide{ width:100%; }
+  .sw-badge{ top:2vw; right:2vw; width:7vw; height:7vw; }
+  .sw-play{ width:11vw; height:11vw; margin:-5.5vw 0 0 -5.5vw; }
+  .sw-back{ gap:2.5vw; padding:4vw; }
+  .sw-back-body{ padding-top:2.5vw; }
+  .sw-back .leistung-cta-label{ height:8vw; padding:0 4vw; font-size:3vw; }
+  .sw-back .leistung-cta-icon{ width:8vw; height:8vw; }
+  .sw-back-meta{ font-size:3vw; flex-wrap:wrap; row-gap:.5em; }
+  .sw-media-text{ padding:4vw; font-size:4.4vw; }
+  .social-wall-more-wrap{ padding-top:8vw; }
 }
