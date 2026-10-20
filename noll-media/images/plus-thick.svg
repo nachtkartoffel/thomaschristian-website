@@ -1,8 +1,0 @@
-<svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- The plus from the blog overview's "Mehr Beiträge laden" button
-     (Figma node 815:2931). Only the glyph: the outlined circle around it is
-     drawn by the .leistung-cta-icon wrapper, which already carries the
-     secondary button's 1px ring. -->
-<path d="M52.5414 40.0005H27.4597" stroke="white" stroke-width="6.66667" stroke-miterlimit="10"/>
-<path d="M40 52.5417V27.46" stroke="white" stroke-width="6.66667" stroke-miterlimit="10"/>
-</svg>

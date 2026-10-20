@@ -1,7 +1,0 @@
-<svg viewBox="27.7 27.7 24.6 24.6" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- The arrow out of images/btn_pfeil.svg — the same two stroked paths the
-     CTA discs use, with the white circle behind them dropped and the viewBox
-     cropped to the arrow. Black, for use on the light card surfaces. -->
-<path d="M31.1328 31.1328H48.8682V48.8682" stroke="#000000" stroke-width="6.75105" stroke-miterlimit="10"/>
-<path d="M48.8682 31.1328L31.1328 48.8682" stroke="#000000" stroke-width="6.66667" stroke-miterlimit="10"/>
-</svg>
