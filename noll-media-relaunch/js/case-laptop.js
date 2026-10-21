@@ -1,11 +1,12 @@
 /* Case detail — laptop scroll stage, real-time 3D.
-   The laptop (models/laptop.glb) is our own, brand-free model, built in
-   Blender (tools/laptop-render/scene.py) and rendered live with three.js:
+   The laptop (models/laptop.glb: MacBook Pro 16" M3, Space Black — see
+   models/README.md for source and licence) is rendered live with three.js:
      - studio lighting for the reflections: a dark room with a big softbox
        overhead, strip lights left/right and a rim light behind (built from
        emissive panels, no HDR file)
      - ambient occlusion (GTAO) for the shading in seams and between keys
-     - a glossy black floor: a faded mirror image of the laptop plus a soft
+     - (no floor / reflection / shadow – removed on request; floorPlane() is unused)
+     - formerly: a glossy black floor: a faded mirror image of the laptop plus a soft
        contact shadow
    The screen content is NOT a texture: it is the HTML in .mb-screen, laid
    over the display with a CSS matrix3d onto the display's four projected
@@ -15,12 +16,15 @@
    Chapters (keep in sync with the data-mb-from/to captions in the markup):
      0    – .20  lid opens, laptop seen from above and slightly to the side
      .20  – .38  the camera swings square onto the display and moves in
-     .38  – .82  the site on the screen scrolls top to bottom
-     .82  – 1    pulls back out to the open laptop
+     .20  – .36  … only part of the way (ZOOM_MAX), keyboard stays in view
+     .38  – .78  the site on the screen scrolls top to bottom
+     .80  – 1    the lid closes, camera holds the frontal view
    Plain script (no modules, no fetch), so the page works from a server AND
    straight from disk. Needs, loaded before it:
      js/vendor/three.bundle.js   three.js as window.NollThree
      models/laptop.glb.js        the model as base64 (window.NOLL_LAPTOP_GLB)
+   The model-specific bits (node names, hinge, angles) live in MODEL below, so
+   another laptop model only needs a new MODEL block.
    Without WebGL the section keeps .is-flat: the screen alone, still scrolling.
    If the section has data-spline-scene, js/case-spline.js runs instead. */
 (function(){
@@ -29,7 +33,8 @@ const section = document.getElementById('caseMacbook');
 // a Spline scene takes over the stage when one is set (js/case-spline.js)
 if (!section || section.dataset.splineScene) return;
 
-const stage = section.querySelector('.case-mb-sticky');
+// the laptop's part of the stage (right of the benefits); falls back to the whole stage
+const stage = section.querySelector('.case-mb-view') || section.querySelector('.case-mb-sticky');
 const canvas = section.querySelector('.case-mb-canvas');
 const screenEl = section.querySelector('.mb-screen');
 const site = section.querySelector('.mb-site');
@@ -42,15 +47,30 @@ const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 const lerp = (a, b, t) => a + (b - a) * t;
 const rad = (d) => d * Math.PI / 180;
 
+// ---- model --------------------------------------------------------------------
+// Apple's AR export ships with obfuscated node names; these two are the lid
+// group and the display panel. The lid is modelled open (~20° past upright),
+// the hinge runs along x at y≈0, z≈-0.125 (model space, metres, front = +z).
+const MODEL = {
+  lid: 'ctmNimOYaZdxEUt',
+  display: 'eVdSUYIqmtLvNwc',
+  hinge: [0, 0, -.125],          // hinge axis position (model space)
+  shiftZ: .125,                  // move the model so the hinge sits at z = 0
+  closed: rad(110.2),            // lid on the deck
+  open: rad(0),                  // as modelled
+  notch: true,                   // draw the camera notch over the HTML screen
+};
+const S = 1.16;                  // size relative to the camera path's reference laptop
+
 // ---- tuning -----------------------------------------------------------------
-const HINGE_CLOSED = rad(90.6);   // lid on the deck
-const HINGE_OPEN = rad(-17);      // a little past upright
+const HINGE_CLOSED = MODEL.closed;
+const HINGE_OPEN = MODEL.open;
 const FOV = 28;                   // vertical, degrees
 const SCREEN_W_PX = 1440;         // layout width of the HTML screen
 
 let renderer, composer, scene, camera, ready = false;
-let pivots = [], displayMesh = null;
-const corners = [];               // display corners, display-local (tl, tr, bl, br)
+let pivots = [], displayFrame = null, floorY = 0;
+const corners = [];               // display corners in displayFrame space (tl, tr, bl, br)
 let dispW = .289, dispH = .182, screenH = 910, scrollMax = 0, vw = 0, vh = 0;
 
 function sizeScreen(){
@@ -69,14 +89,14 @@ function progress(){
 function chrome(p){
   section.style.setProperty('--mb-p', p.toFixed(4));
   // captions get a backing pill once the laptop is big enough to sit behind them
-  section.classList.toggle('is-zoomed', p > .24 && p < .9);
+  section.classList.toggle('is-zoomed', p > .3 && p < .8);   // display big: the live site is usable then (css)
   captions.forEach((c) => {
     const from = parseFloat(c.dataset.mbFrom), to = parseFloat(c.dataset.mbTo);
     c.classList.toggle('is-active', p >= from && p < to);
   });
 }
 function renderFlat(p){
-  const scroll = ease(seg(p, .4, .8));
+  const scroll = ease(seg(p, .38, .78));
   site.style.transform = `translate3d(0,${(-scroll * scrollMax).toFixed(1)}px,0)`;
   chrome(p);
 }
@@ -94,15 +114,15 @@ function orbit(target, dist, elev, az){
   return V(Math.sin(a) * Math.cos(e), Math.sin(e), Math.cos(a) * Math.cos(e)).multiplyScalar(dist).add(target);
 }
 function overview(open, back){
-  const target = V(0, lerp(.012, .072, open), lerp(.11, .085, open));
+  const target = V(0, lerp(.012, .072, open) * S, lerp(.11, .085, open) * S);
   // the half-open lid reaches highest: give the frame a little more room then
-  const d = fit(lerp(.42, .37, open), lerp(.27, .30, open) + .09 * Math.sin(Math.PI * open), .74, .70);
+  const d = fit(lerp(.42, .37, open) * S, (lerp(.27, .30, open) + .09 * Math.sin(Math.PI * open)) * S, .74, .70);
   const az = back ? lerp(0, 12, back) : lerp(-24, 0, open);
   return { pos: orbit(target, d, lerp(44, 15, open), az), target };
 }
 function displayWorld(){
-  displayMesh.updateWorldMatrix(true, false);
-  const m = displayMesh.matrixWorld;
+  displayFrame.updateWorldMatrix(true, false);
+  const m = displayFrame.matrixWorld;
   const pts = corners.map((c) => c.clone().applyMatrix4(m));
   const cen = pts.reduce((a, b) => a.add(b), V(0, 0, 0)).multiplyScalar(.25);
   const n = V(0, 0, 1).transformDirection(m);
@@ -142,27 +162,43 @@ let last = -1;
 function render3D(p, force){
   if (!force && Math.abs(p - last) < 0.00005) return;
   last = p;
+  // Timeline: the lid opens, the camera comes round to the front and moves
+  // in part of the way (display large, keyboard still in view), the site
+  // scrolls on the screen, then the lid closes while the camera holds that
+  // frontal view — after that the page simply scrolls on.
+  const ZOOM_MAX = .5;                  // how far towards "display fills the view" the camera goes
   const open = ease(seg(p, 0, .2));
-  const zoomIn = ease(seg(p, .2, .38));
-  const scroll = ease(seg(p, .4, .8));
-  const zoomOut = ease(seg(p, .82, 1));
-  const zoom = zoomIn * (1 - zoomOut);
+  const zoom = ease(seg(p, .2, .36)) * ZOOM_MAX;
+  const scroll = ease(seg(p, .38, .78));
+  const close = ease(seg(p, .8, 1));
+  const lidOpen = open * (1 - close);   // the lid opens at the start and closes again at the end
 
-  const hinge = lerp(HINGE_CLOSED, HINGE_OPEN, open);
-  pivots.forEach((pv) => { pv.rotation.x = hinge; });
+  // camera: framed on the open laptop (so it stays put while the lid closes)
+  pivots.forEach((pv) => { pv.rotation.x = lerp(HINGE_CLOSED, HINGE_OPEN, open); });
   scene.updateMatrixWorld(true);
-
-  const A = overview(open, zoomOut), B = zoomPose();
+  const A = overview(open, 0), B = zoomPose();
   camera.position.lerpVectors(A.pos, B.pos, zoom);
   const target = A.target.clone().lerp(B.target, zoom);
-  camera.lookAt(target);
+  // while the lid closes the camera keeps its angle (no turning) and only
+  // slides down and back, so the closed laptop ends up whole in the frame
+  const look = target.clone().sub(camera.position);
+  if (close > 0){
+    const down = V(0, .016 * S, .108 * S).sub(target).multiplyScalar(close);
+    camera.position.add(down).addScaledVector(look, -.35 * close);
+  }
+  camera.lookAt(camera.position.clone().add(look));
   camera.updateMatrixWorld();
+
+  // lid: where it actually is
+  const hinge = lerp(HINGE_CLOSED, HINGE_OPEN, lidOpen);
+  pivots.forEach((pv) => { pv.rotation.x = hinge; });
+  scene.updateMatrixWorld(true);
   composer.render();
 
   // lay the HTML screen onto the display
   const { pts, cen, n } = displayWorld();
   const facing = n.dot(tmp.copy(camera.position).sub(cen).normalize());
-  const on = seg(open, .7, 1) * seg(facing, .3, .7);   // "switches on" near the top of the travel
+  const on = seg(lidOpen, .3, .65) * seg(facing, .08, .35);   // on while rising, off while closing   // the screen comes on while the lid is still rising
   if (on > .001){
     const order = [0, 1, 2, 3];
     const q = order.map((i) => {
@@ -176,7 +212,7 @@ function render3D(p, force){
     screenEl.style.visibility = 'hidden';
   }
   site.style.transform = `translate3d(0,${(-scroll * scrollMax).toFixed(1)}px,0)`;
-  const right = V(1, 0, 0).transformDirection(displayMesh.matrixWorld);
+  const right = V(1, 0, 0).transformDirection(displayFrame.matrixWorld);
   const side = right.dot(tmp.copy(camera.position).sub(cen).normalize());
   screenEl.style.setProperty('--mb-glare', (.3 + .7 * (1 - zoom)).toFixed(3));
   screenEl.style.setProperty('--mb-glare-x', (50 - side * 160).toFixed(1) + '%');
@@ -232,7 +268,7 @@ function studio(){
   panel(1.4, 1.0, 3.2, [.15, 1.3, .35], t);    // softbox overhead
   panel(.14, 1.3, 9.0, [-.9, .45, .45], t);    // strip left (key)
   panel(.10, 1.1, 2.6, [.95, .35, .25], t);    // strip right (fill)
-  panel(1.3, .12, 6.0, [0, .55, -.85], t);     // rim, behind
+  panel(1.3, .12, 10.0, [0, .55, -.85], t);    // rim, behind
   panel(1.2, .25, .5, [0, .12, 1.3], t);       // low front bounce
   panel(2.4, 1.2, .35, [0, 1.2, -1.2], t);     // high back panel, for the closed lid
   return env;
@@ -247,24 +283,25 @@ function floorPlane(){
   g.fillStyle = '#000'; g.fillRect(0, 0, N, N);
   g.globalCompositeOperation = 'destination-out';
   const fade = g.createRadialGradient(N / 2, N / 2, 0, N / 2, N / 2, N * .3);
-  fade.addColorStop(0, 'rgba(0,0,0,.16)');
+  fade.addColorStop(0, 'rgba(0,0,0,.14)');
   fade.addColorStop(.4, 'rgba(0,0,0,.07)');
   fade.addColorStop(1, 'rgba(0,0,0,0)');
   g.fillStyle = fade; g.fillRect(0, 0, N, N);
   g.globalCompositeOperation = 'source-over';
   const size = 1.6, px = N / size;           // plane is 1.6 m square, centred under the base
-  const w = .304 * px, h = .215 * px;
+  const w = .354 * px, h = .248 * px;
   const rr = (x, y, ww, hh, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + ww, y, x + ww, y + hh, r); g.arcTo(x + ww, y + hh, x, y + hh, r); g.arcTo(x, y + hh, x, y, r); g.arcTo(x, y, x + ww, y, r); g.closePath(); };
-  [[28, .7], [8, 1]].forEach(([blur, a]) => {
-    g.save(); g.shadowColor = `rgba(0,0,0,${a})`; g.shadowBlur = blur; g.fillStyle = '#000';
-    rr(N / 2 - w / 2, N / 2 - h / 2, w, h, 8); g.fill(); g.restore();
+  // soft contact shadow: a wide, light penumbra and a gentle core
+  [[90, .45], [40, .5], [16, .45]].forEach(([blur, a]) => {
+    g.save(); g.shadowColor = `rgba(0,0,0,${a})`; g.shadowBlur = blur; g.fillStyle = `rgba(0,0,0,${a})`;
+    rr(N / 2 - w / 2, N / 2 - h / 2, w, h, 14); g.fill(); g.restore();
   });
   const tex = new THREE.CanvasTexture(c);
   tex.colorSpace = THREE.SRGBColorSpace;
   const mesh = new THREE.Mesh(new THREE.PlaneGeometry(size, size),
     new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, toneMapped: false }));
   mesh.rotation.x = -Math.PI / 2;
-  mesh.position.set(0, .0002, .1075);
+  mesh.position.set(0, floorY + .0002, .124);
   mesh.renderOrder = 1;
   return mesh;
 }
@@ -287,14 +324,14 @@ try {
 renderer.setClearColor(0x000000, 1);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.NeutralToneMapping || THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.0;
+renderer.toneMappingExposure = 1.2;
 
 scene = new THREE.Scene();
 scene.background = new THREE.Color(0x000000);
 const pmrem = new THREE.PMREMGenerator(renderer);
 scene.environment = pmrem.fromScene(studio(), 0.015).texture;
 // a key and a fill for the non-metal parts (keys, rubber, glass edges)
-const key = new THREE.DirectionalLight(0xfff8f0, .7); key.position.set(-.9, 1.2, .6); scene.add(key);
+const key = new THREE.DirectionalLight(0xfff8f0, 1.3); key.position.set(-.9, 1.2, .6); scene.add(key);
 const fill = new THREE.DirectionalLight(0xf0f4ff, .2); fill.position.set(.9, .5, .4); scene.add(fill);
 
 camera = new THREE.PerspectiveCamera(FOV, 1, .01, 20);
@@ -311,35 +348,73 @@ composer.addPass(ao);
 composer.addPass(new THREE.OutputPass());
 
 const bin = Uint8Array.from(atob(glb), (ch) => ch.charCodeAt(0)).buffer;
-new THREE.GLTFLoader().parse(bin, '', (gltf) => {
-  const root = gltf.scene;
-  root.traverse((o) => {
-    if (!o.isMesh) return;
-    const m = o.material;
-    m.envMapIntensity = 1;
-    if (m.name === 'aluminium'){ m.roughness = .3; }
-    if (m.name === 'keys'){ m.roughness = .58; m.color.setScalar(.008); }
-    if (m.name === 'display'){ m.color.setScalar(0); m.roughness = .05; }
-  });
-  displayMesh = root.getObjectByName('display');
-  const pivot = root.getObjectByName('lid_pivot');
-  if (!displayMesh || !pivot) return;      // unexpected model: stay flat
+const loader = new THREE.GLTFLoader();
+if (THREE.MeshoptDecoder) loader.setMeshoptDecoder(THREE.MeshoptDecoder);   // the model is meshopt-compressed
+loader.parse(bin, '', (gltf) => {
+  const model = gltf.scene;
+  const root = new THREE.Group();
+  root.add(model);
+  // Space Black on a black page: lift the reflections so edges and surfaces read
+  model.traverse((o) => { if (o.isMesh && o.material) o.material.envMapIntensity = 2.4; });
+  root.position.z = MODEL.shiftZ;
+  root.updateMatrixWorld(true);
 
-  // display corners from its quad (flat in local xy, facing +z)
-  const g = displayMesh.geometry; g.computeBoundingBox();
-  const bb = g.boundingBox, z = bb.max.z;
-  corners.push(V(bb.min.x, bb.max.y, z), V(bb.max.x, bb.max.y, z), V(bb.min.x, bb.min.y, z), V(bb.max.x, bb.min.y, z));
-  dispW = bb.max.x - bb.min.x; dispH = bb.max.y - bb.min.y;
+  const lid = model.getObjectByName(MODEL.lid);
+  const displayMesh = model.getObjectByName(MODEL.display);
+  if (!lid || !displayMesh) return;         // unexpected model: stay flat
 
-  // mirror image for the glossy floor, slightly dimmed
-  const mirror = root.clone(true);
-  mirror.scale.y = -1;
-  mirror.traverse((o) => {
-    if (o.isMesh){ o.material = o.material.clone(); o.material.envMapIntensity = .7; }
-  });
-  pivots = [pivot, mirror.getObjectByName('lid_pivot')];
+  // hinge: a pivot on the hinge axis that the lid group hangs from
+  const pivot = new THREE.Object3D();
+  pivot.name = 'lid_pivot';
+  pivot.position.set(MODEL.hinge[0], MODEL.hinge[1], MODEL.hinge[2]);
+  root.add(pivot);
+  root.updateMatrixWorld(true);
+  pivot.attach(lid);
 
-  scene.add(mirror, floorPlane(), root);
+  // the display: its own panel mesh, a flat (tilted) rectangle. Find its
+  // plane in hinge space and put a frame there: x right, y up the lid,
+  // z out of the glass. The HTML screen is mapped onto that frame.
+  const pts = [];
+  const pos = displayMesh.geometry.attributes.position;
+  displayMesh.updateWorldMatrix(true, false);
+  for (let i = 0; i < pos.count; i++){
+    const v = V(pos.getX(i), pos.getY(i), pos.getZ(i)).applyMatrix4(displayMesh.matrixWorld);
+    pts.push(pivot.worldToLocal(v));
+  }
+  const box = new THREE.Box3().setFromPoints(pts);
+  const up = V(0, box.max.y - box.min.y, -(box.max.z - box.min.z)).normalize();   // lid leans back
+  const xAxis = V(1, 0, 0), nrm = V().crossVectors(xAxis, up).normalize();        // points out of the glass
+  let uMin = Infinity, uMax = -Infinity, nMax = -Infinity;
+  pts.forEach((p) => { const u = p.dot(up); uMin = Math.min(uMin, u); uMax = Math.max(uMax, u); nMax = Math.max(nMax, p.dot(nrm)); });
+  const xMid = (box.min.x + box.max.x) / 2;
+  dispW = box.max.x - box.min.x; dispH = uMax - uMin;
+  displayFrame = new THREE.Object3D();
+  displayFrame.matrixAutoUpdate = true;
+  displayFrame.position.copy(xAxis.clone().multiplyScalar(xMid)).addScaledVector(up, (uMin + uMax) / 2).addScaledVector(nrm, nMax + .0002);
+  displayFrame.quaternion.setFromRotationMatrix(new THREE.Matrix4().makeBasis(xAxis, up, nrm));
+  pivot.add(displayFrame);
+  corners.push(V(-dispW / 2, dispH / 2, 0), V(dispW / 2, dispH / 2, 0), V(-dispW / 2, -dispH / 2, 0), V(dispW / 2, -dispH / 2, 0));
+
+  // screen off: the panel becomes black glass (the HTML screen sits on top)
+  const dm = displayMesh.material;
+  dm.emissive && dm.emissive.setScalar(0); dm.emissiveMap = null;
+  dm.map = null; dm.color && dm.color.setScalar(0); dm.metalness = 0; dm.roughness = .06;
+  dm.needsUpdate = true;
+
+  const bbox = new THREE.Box3().setFromObject(root);
+  floorY = bbox.min.y;
+
+  if (MODEL.notch && !screenEl.querySelector('.mb-notch')){
+    const notch = document.createElement('span');
+    notch.className = 'mb-notch'; notch.setAttribute('aria-hidden', 'true');
+    screenEl.appendChild(notch);
+  }
+
+  // no floor, no reflection, no shadow: the laptop stands on the black page
+  // (floorPlane() below is kept but no longer used)
+  pivots = [pivot];
+
+  scene.add(root);
   ready = true;
   section.classList.remove('is-flat');
   section.classList.add('is-3d');

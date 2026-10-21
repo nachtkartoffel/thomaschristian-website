@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="window" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 3840 2160">
+  <defs>
+    <style>
+      .cls-1 {
+        clip-path: url(#clippath);
+      }
+
+      .cls-2 {
+        fill: #f7e9d1;
+      }
+
+      .cls-3 {
+        fill: #afdad6;
+      }
+    </style>
+    <clipPath id="clippath">
+      <rect class="cls-3" width="3840" height="2160"/>
+    </clipPath>
+  </defs>
+  <rect class="cls-3" width="3840" height="2160"/>
+  <g class="cls-1">
+    <path class="cls-2" d="m1316.46,0c612.46,233.74,1712.13,1399.3,2528.81,1456.86,0,0,140.72-383.09,0-488.82-140.72-105.73-448.4-579.52-488.82-968.05,0,0-2652.45-233.74-2039.99,0Z"/>
+    <path class="cls-2" d="m0,440.97v787.11c1563.04,93.26,2168.52,500.32,2566.24,973.63h1298.46s0-533.45,0-533.45C2387.45,1205.7,537.18,1119.9,0,440.97Z"/>
+  </g>
+</svg>

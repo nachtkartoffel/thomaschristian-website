@@ -3424,7 +3424,7 @@ body.show-grid .debug-grid{ display:block; }
      .mb-screen        HTML screen, 1440px wide, mapped onto the display
    Until the model is ready (and if WebGL is missing) the section carries
    .is-flat and shows the screen on its own, centred. */
-.case-mb{ position:relative; height:520vh; }
+.case-mb{ position:relative; height:640vh; }
 .case-mb-sticky{
   position:sticky; top:0; height:100vh; height:100svh;
   overflow:hidden; background:#000;
@@ -3459,6 +3459,14 @@ body.show-grid .debug-grid{ display:block; }
     rgba(255,255,255,0) calc(var(--mb-glare-x,30%) + 40%));
   box-shadow:inset 0 0 60px rgba(0,0,0,.18);
   opacity:var(--mb-glare,1);
+}
+/* camera notch + rounded top corners of the display (js/case-laptop.js adds
+   .mb-notch when the model has one); sizes are shares of the 16" panel */
+.mb-screen{ border-radius:16px 16px 0 0; }
+.mb-notch{
+  position:absolute; z-index:3; left:50%; top:0; transform:translateX(-50%);
+  width:5.8%; height:3.4%; background:#000; border-radius:0 0 14px 14px;
+  pointer-events:none;
 }
 .mb-site{ position:absolute; left:0; top:0; width:100%; will-change:transform; }
 .mb-site-shot{ display:block; width:100%; height:auto; }
@@ -3816,3 +3824,271 @@ body.show-grid .debug-grid{ display:block; }
   .sw-media-text{ padding:4vw; font-size:4.4vw; }
   .social-wall-more-wrap{ padding-top:8vw; }
 }
+
+
+/* ---------- case benefits (Figma Frame 304) */
+/* Values from Figma (3840px frame -> vw): pill 2px outline, padding 32/42px,
+   48px type, 48px icon ring with a 16px plus, 42px between the pills.
+   Open, the pill becomes a frosted-glass card (blurred, translucent dark
+   fill over the laptop behind it) with the copy under the title and the
+   plus turned into a minus. */
+/* the laptop sits partly behind the benefits, so an open card frosts over it */
+.case-mb-view{ position:absolute; top:0; bottom:0; left:26vw; right:2vw; }
+.case-mb-layout{
+  position:relative; z-index:2; height:100%;
+  display:flex; flex-direction:column; justify-content:center; align-items:flex-start;
+  gap:2.6vw; pointer-events:none;
+}
+.case-benefits{
+  list-style:none; margin:0; padding:0; pointer-events:auto;
+  display:flex; flex-direction:column; align-items:flex-start; gap:1.0938vw;   /* 42px */
+}
+.case-benefit{
+  display:block; min-width:0; max-width:36.5vw;
+  border:2px solid var(--white); border-radius:2.6vw;
+  background:rgba(0,0,0,.35);
+  -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+  overflow:hidden;
+  transition:
+    min-width .55s cubic-bezier(.4,0,.2,1),
+    border-radius .55s cubic-bezier(.4,0,.2,1),
+    border-color .4s, background-color .4s,
+    -webkit-backdrop-filter .4s, backdrop-filter .4s;
+}
+.case-benefit-head{
+  display:flex; align-items:center; gap:.7292vw;                               /* 28px */
+  padding:.8333vw 1.0938vw;                                                    /* 32/42px */
+  width:100%; text-align:left; color:var(--white); background:none; border:0; cursor:pointer;
+  font:inherit;
+}
+.case-benefit-icon{
+  position:relative; flex:none; width:1.25vw; height:1.25vw;                  /* 48px */
+  border:2px solid var(--white); border-radius:50%;
+}
+.case-benefit-icon::before,
+.case-benefit-icon::after{                                                     /* 16px plus, 2px stroke */
+  content:""; position:absolute; left:50%; top:50%;
+  width:.4167vw; height:2px; margin-left:-.2083vw; margin-top:-1px;
+  background:var(--white);
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+}
+.case-benefit-icon::after{ transform:rotate(90deg); }
+.case-benefit-title{
+  font-family:var(--font-display); font-weight:400;
+  font-size:1.25vw; line-height:1.5; white-space:nowrap;                       /* 48px */
+  transition:opacity .3s;
+}
+.case-benefit-head:hover .case-benefit-title,
+.case-benefit-head:focus-visible .case-benefit-title{ opacity:1; }
+.case-benefit-panel{
+  /* the copy must not widen the closed pill: each pill is as wide as its label */
+  contain:inline-size;
+  display:grid; grid-template-rows:0fr;
+  transition:grid-template-rows .45s cubic-bezier(.4,0,.2,1);
+}
+.case-benefit-panel-inner{ min-height:0; overflow:hidden; }
+.case-benefit-copy{
+  margin:0; padding:0 1.0938vw 1.0938vw;                                       /* aligned with the icon */
+  margin-top:-.1vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.25vw; line-height:1.5; color:var(--white);                       /* 48px, like the title */
+}
+/* typing: the invisible full text reserves the final height, the typed text
+   is laid over it (js/case-benefits.js) */
+.cb-wrap{ position:relative; display:block; }
+.cb-ghost{ visibility:hidden; }
+.cb-typed{ position:absolute; left:0; top:0; right:0; }
+.case-benefit.is-typing .cb-typed::after{
+  content:""; display:inline-block; width:2px; height:1.1em; margin-left:2px;
+  vertical-align:-.15em; background:currentColor; animation:cb-caret .6s steps(1) infinite;
+}
+@keyframes cb-caret{ 50%{ opacity:0; } }
+/* step 1 (is-open): widen to the card; step 2 (is-tall): grow to the text height */
+.case-benefit.is-open{
+  min-width:36.5vw; border-radius:1.9vw;
+  border-color:var(--white);
+  background:rgba(0,0,0,.55);
+  -webkit-backdrop-filter:blur(24px) saturate(1.2); backdrop-filter:blur(24px) saturate(1.2);
+}
+.case-benefit.is-tall .case-benefit-panel{ grid-template-rows:1fr; }
+.case-benefit.is-open .case-benefit-icon::after{ transform:rotate(90deg) scaleX(0); }   /* plus -> minus */
+.case-benefit.is-open .case-benefit-title{ opacity:1; }
+@media (prefers-reduced-motion:reduce){
+  .case-benefit, .case-benefit-icon::before, .case-benefit-icon::after, .case-benefit-panel{ transition:none; }
+  .case-benefit.is-typing .cb-typed::after{ display:none; }
+}
+@media (max-width:860px){
+  .case-mb-view{ left:0; right:0; top:0; bottom:42%; }
+  .case-mb-layout{ align-items:flex-end; padding-bottom:16vh; }
+  .case-benefits{ gap:2.6vw; }
+  .case-benefit{ border-radius:8vw; max-width:none; }
+  .case-benefit.is-open{ border-radius:5vw; min-width:calc(100vw - 2 * var(--gutter)); }
+  .case-benefit-head{ gap:2.6vw; padding:2.4vw 3.6vw; }
+  .case-benefit-icon{ width:5.4vw; height:5.4vw; }
+  .case-benefit-icon::before, .case-benefit-icon::after{ width:2vw; margin-left:-1vw; }
+  .case-benefit-title{ font-size:4vw; }
+  .case-benefit-copy{ font-size:3.8vw; padding:0 3.6vw 3.6vw; }
+}
+
+/* ---------- case live site */
+/* The button under the benefits that swaps the captured screen for the live
+   site (js/case-live.js). It is the site's standard CTA; only the spacing and
+   the note are new. */
+.case-live{ pointer-events:auto; display:flex; flex-direction:column; align-items:flex-start; gap:.8vw; }
+.case-live-btn{ padding:0; background:none; border:0; cursor:pointer; font:inherit; }
+.case-live-note{
+  margin:0; max-width:21vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:.7292vw; line-height:1.4; color:var(--white);
+}
+/* the live iframe sits over the screen from the start; the captures below
+   only show until it has loaded */
+.mb-site-live{ position:absolute; left:0; top:0; width:100%; height:100%; border:0; background:#fff; opacity:0; transition:opacity .6s; pointer-events:none; }
+.case-mb.is-live .mb-site{ height:100%; transform:none !important; }
+.case-mb.is-live .mb-site-shot{ visibility:hidden; }
+.case-mb.is-live .mb-site-live{ opacity:1; }
+/* directly usable while the display is big (stage zoomed in); outside that
+   the mouse wheel keeps scrolling the page instead of getting caught in it */
+.case-mb.is-live.is-zoomed .mb-site-live{ pointer-events:auto; }
+@media (max-width:860px){
+  .case-mb-layout{ justify-content:flex-end; align-items:flex-start; gap:5vw; }
+  .case-live{ gap:2vw; }
+  .case-live-note{ max-width:none; font-size:2.8vw; }
+}
+
+/* ---------- case hero (Figma Frame 292, top) */
+/* Measured on the 3840px Figma frame and converted to vw (px / 38.4).
+   The key visual bleeds off the right edge; the title runs over it. */
+/* Figma measures from the top of the page, the menu included: pull the
+   section up under the (transparent, sticky) header by its height (96px =
+   28px padding + 40px logo + 28px), so image, tags and title land exactly on
+   the Figma positions: image 317px, tags 545px, title 663px (/38.4 -> vw). */
+.case-hero{ position:relative; min-height:47.97vw; margin-top:-96px; padding-top:14.19vw; padding-bottom:4vw; }
+.case-hero-media{
+  position:absolute; z-index:0; margin:0;
+  top:8.255vw; right:0; width:49.32vw; height:39.72vw;               /* y 317, 1894 x 1525 */
+  border-radius:.8333vw; overflow:hidden;                            /* 32px */
+}
+.case-hero-media img{ display:block; width:100%; height:100%; object-fit:cover; }
+.case-hero-text{ position:relative; z-index:1; }
+.case-hero-tags{
+  list-style:none; margin:0; padding:0;
+  display:flex; align-items:center; gap:2.8125vw;                    /* 108px */
+}
+.case-hero-tags li{
+  display:flex; align-items:center; gap:.599vw;                      /* 23px */
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:.9896vw; line-height:1; color:var(--white);              /* 38px */
+}
+.case-hero-tags img{ width:.4688vw; height:.4688vw; display:block; }  /* 18px */
+.case-hero-title{
+  margin:2.08vw 0 0;                                                 /* 80px */
+  display:flex; flex-direction:column;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:7.6042vw; line-height:1.1; letter-spacing:.076vw;        /* 292px, 2.92px */
+}
+.case-hero-title-outline{
+  text-transform:uppercase; color:transparent;
+  -webkit-text-stroke:max(1px, .07vw) var(--white);
+}
+.case-hero-title-fill{ color:var(--white); text-transform:uppercase; }
+.case-hero-lead{
+  margin:.94vw 0 0; max-width:38.96vw;                               /* 1496px */
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.25vw; line-height:1.5; color:var(--white);                   /* 48px */
+}
+@media (max-width:860px){
+  .case-hero{ min-height:0; margin-top:0; padding-top:8vw; padding-bottom:8vw; display:flex; flex-direction:column; }
+  .case-hero-text{ order:1; }
+  .case-hero-media{ order:2; position:relative; top:auto; width:auto; height:auto; aspect-ratio:1894 / 1525; margin:8vw var(--gutter) 0; border-radius:2vw; }
+  .case-hero-tags{ gap:5vw; flex-wrap:wrap; }
+  .case-hero-tags li{ gap:1.6vw; font-size:3.4vw; }
+  .case-hero-tags img{ width:1.8vw; height:1.8vw; }
+  .case-hero-title{ margin-top:5vw; font-size:12vw; letter-spacing:0; }
+  .case-hero-title-outline{ -webkit-text-stroke:1px var(--white); }
+  .case-hero-lead{ max-width:none; margin-top:4vw; font-size:4vw; }
+}
+
+/* ---------- case slider (Figma Frame 324 / 283) */
+/* Slides 984 / 2004 x 1490px, 32px radius, 44px apart; controls right-aligned
+   on the grid, 104px below: 109px arrow buttons, 16px dots (active 48px),
+   48px apart. 3840px frame -> vw (px / 38.4). */
+.case-slider{ padding:6.5vw 0 2vw; outline:none; }
+.case-slider-viewport{ overflow:hidden; }
+.case-slider-track{
+  display:flex; gap:1.1458vw; align-items:center;                       /* 44px */
+  transition:transform .7s cubic-bezier(.22,1,.36,1);
+  cursor:grab; touch-action:pan-y; user-select:none;
+}
+.case-slider-track.is-dragging{ cursor:grabbing; }
+.case-slide{
+  flex:none; margin:0; height:38.8vw;                                   /* 1490px */
+  border-radius:.8333vw; overflow:hidden; background:#000;              /* 32px */
+}
+.case-slide--mobile{ width:25.625vw; }                                  /* 984px */
+.case-slide--desktop{ width:52.1875vw; }                                /* 2004px */
+.case-slide img{ display:block; width:100%; height:100%; object-fit:cover; pointer-events:none; }
+.case-slider-controls{
+  display:flex; justify-content:flex-end; align-items:center; gap:1.25vw;   /* 48px */
+  margin-top:2.7vw;                                                         /* 104px */
+}
+.case-slider-btn{ flex:none; width:2.8443vw; height:2.8443vw; padding:0; border:0; background:none; cursor:pointer; transition:opacity .3s, transform .3s; }
+.case-slider-btn img{ display:block; width:100%; height:100%; }
+.case-slider-prev img{ transform:rotate(180deg); }
+.case-slider-btn:disabled{ cursor:default; }                           /* black & white only: no greyed-out state */
+.case-slider-btn:not(:disabled):hover{ transform:scale(1.06); }
+.case-slider-dots{ display:flex; align-items:center; gap:1.25vw; }
+.case-slider-dot{
+  width:.4167vw; height:.4167vw; padding:0; border:0; border-radius:50%;  /* 16px */
+  background:var(--white); cursor:pointer;
+  transition:width .4s cubic-bezier(.4,0,.2,1), height .4s cubic-bezier(.4,0,.2,1);
+}
+.case-slider-dot.is-active{ width:1.25vw; height:1.25vw; }              /* 48px */
+@media (prefers-reduced-motion:reduce){
+  .case-slider-track, .case-slider-dot{ transition:none; }
+}
+@media (max-width:860px){
+  .case-slider{ padding:12vw 0 4vw; }
+  .case-slider-track{ gap:3vw; }
+  .case-slide{ height:110vw; border-radius:2vw; }
+  .case-slide--mobile{ width:72vw; }
+  .case-slide--desktop{ width:86vw; }
+  .case-slider-controls{ gap:4vw; margin-top:6vw; }
+  .case-slider-btn{ width:11vw; height:11vw; }
+  .case-slider-dot{ width:1.8vw; height:1.8vw; }
+  .case-slider-dot.is-active{ width:4.5vw; height:4.5vw; }
+}
+
+/* ---------- case facts (client / scope / tags, before the contact band) */
+.case-facts{ padding:7vw 0 0; }
+.case-facts-grid{
+  margin:0 auto;
+  display:grid; grid-template-columns:1fr 1.4fr 1.4fr; gap:3vw;
+  border-top:2px solid var(--white); padding-top:2.6vw;
+}
+.case-fact{ display:flex; flex-direction:column; gap:1vw; }
+.case-fact dt{
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:.9896vw; line-height:1.2; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--white);
+}
+.case-fact dd{
+  margin:0;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:1.25vw; line-height:1.5; color:var(--white);                  /* 48px, like the intro */
+}
+.case-facts-tags{ flex-wrap:wrap; gap:.6vw 1.8vw; }
+.case-facts-tags li{ font-size:1.25vw; font-weight:300; line-height:1.5; }
+@media (max-width:860px){
+  .case-facts{ padding-top:14vw; }
+  .case-facts-grid{ grid-template-columns:1fr; gap:7vw; padding-top:6vw; }
+  .case-fact{ gap:2vw; }
+  .case-fact dt{ font-size:3vw; }
+  .case-fact dd{ font-size:4.2vw; }
+  .case-facts-tags{ gap:2vw 5vw; }
+  .case-facts-tags li{ font-size:4.2vw; }
+}
+
+/* header: link to the client's live site, the site's standard CTA */
+.case-hero-cta{ margin-top:2.1vw; }
+@media (max-width:860px){ .case-hero-cta{ margin-top:6vw; } }

@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="109.22" height="109.22" viewBox="0 0 109.22 109.22" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="btn-slider" clip-path="url(#clip0_0_11)">
+<path id="bg" d="M54.62 109.24C84.7858 109.24 109.24 84.7858 109.24 54.62C109.24 24.4542 84.7858 0 54.62 0C24.4542 0 0 24.4542 0 54.62C0 84.7858 24.4542 109.24 54.62 109.24Z" fill="white"/>
+<path id="pfeil" d="M48.62 42.62L60.6 54.62L48.62 66.6" stroke-width="4" stroke-miterlimit="10" stroke="#1B1B1A"/>
+<g id="kreis">
+</g>
+</g>
+<defs>
+<clipPath id="clip0_0_11">
+<rect width="109.22" height="109.22" fill="white"/>
+</clipPath>
+</defs>
+</svg>

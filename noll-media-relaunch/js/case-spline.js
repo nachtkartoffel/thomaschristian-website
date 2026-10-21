@@ -26,7 +26,7 @@
   ];
   const STEP_MS = 1000;   // each step is one 1s transition, scrubbed with seek()
 
-  const stage = section.querySelector('.case-mb-sticky');
+  const stage = section.querySelector('.case-mb-view') || section.querySelector('.case-mb-sticky');
   const captions = Array.from(section.querySelectorAll('.case-mb-caption'));
   const reduced = window.matchMedia('(prefers-reduced-motion:reduce)');
   let timeline = DEFAULT_TIMELINE;

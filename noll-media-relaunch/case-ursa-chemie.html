@@ -7,7 +7,7 @@
 <meta name="description" content="Case: Neuer Webauftritt für die Ursa Chemie GmbH – Konzept, Webdesign, Entwicklung und Content von noll media.">
 <link rel="preconnect" href="fonts">
 <link rel="stylesheet" href="fonts/stylesheet.css">
-<link rel="stylesheet" href="css/style.css?v=145">
+<link rel="stylesheet" href="css/style.css?v=158">
 <script>
 /* Page transition, arrival half. Inline and in the head on purpose: the white
    panel has to be covering the screen before this page's first paint, which a
@@ -133,23 +133,29 @@
        lead), then the pinned Laptop stage (css: "Case detail — MacBook",
        js/case-macbook.js), then the story in three blocks, the numbers, an
        image row, further cases and the standard contact band.
-       CONTENT: everything marked data-placeholder is stand-in copy. -->
-  <section class="case-detail-hero" aria-label="Projekt">
-    <div class="wrap">
-      <div class="leistung-detail-tags case-detail-tags">
-        <span class="leistung-detail-tag">Websites &amp; Online-Shops</span>
-        <span class="leistung-detail-tag">Content &amp; Media</span>
-      </div>
-      <p class="case-detail-client">Ursa Chemie GmbH:</p>
-      <h1 class="case-detail-title">Ein digitaler Auftritt, <br>so präzise wie die Chemie dahinter.</h1>
-      <div class="case-detail-hero-row">
-        <p class="case-detail-lead" data-placeholder>Platzhaltertext: Für URSA Chemie haben wir die Website von Grund auf neu gedacht – mit klarer Produktstruktur, eigenem Bildkonzept und einem System, das das Team selbst pflegen kann.</p>
-        <dl class="case-detail-facts">
-          <div><dt>Kunde</dt><dd>Ursa Chemie GmbH</dd></div>
-          <div><dt>Leistungen</dt><dd>Konzept, Webdesign, Entwicklung, Content</dd></div>
-          <div><dt>Jahr</dt><dd data-placeholder>2026</dd></div>
-        </dl>
-      </div>
+       Copy approved; only the project tiles under "Weitere Projekte" are still placeholders. -->
+  <!-- Header (Figma "noll-media" › Frame 292, top): dot tags, two-line
+       title – client name outlined, project type filled – overlapping the
+       key visual on the right, intro text below. -->
+  <section class="case-hero" aria-label="Projekt">
+    <figure class="case-hero-media">
+      <img src="images/cases/ursa-hero.jpg" alt="Labor der URSA Chemie">
+    </figure>
+    <div class="wrap case-hero-text">
+      <ul class="case-hero-tags">
+        <li><img src="images/case-tag-dot.svg" alt="" aria-hidden="true">Industrie</li>
+        <li><img src="images/case-tag-dot.svg" alt="" aria-hidden="true">Website</li>
+        <li><img src="images/case-tag-dot.svg" alt="" aria-hidden="true">Content</li>
+      </ul>
+      <h1 class="case-hero-title">
+        <span class="case-hero-title-outline">URSA Chemie</span>
+        <span class="case-hero-title-fill">Website</span>
+      </h1>
+      <p class="case-hero-lead">Für die URSA Chemie haben wir die Website von Grund auf neu gedacht – mit klarer Leistungsstruktur, eigenem Bildkonzept und einem System, das das Team selbst pflegen kann.</p>
+      <a class="leistung-detail-cta case-hero-cta" href="https://www.ursa-chemie.de/" target="_blank" rel="noopener">
+        <span class="leistung-detail-cta-label">Zur Live-Website</span>
+        <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+      </a>
     </div>
   </section>
 
@@ -157,7 +163,7 @@
        the stage inside it sticks to the viewport while the laptop opens, turns
        to face you, zooms in until the screen fills the view, scrolls through
        the site and pulls back out. The laptop is a real-time 3D model
-       (models/laptop.glb, built with tools/laptop-render) rendered into the
+       (models/laptop.glb, MacBook Pro M3 – see models/README.md) rendered into the
        canvas by js/case-laptop.js; .mb-screen is plain HTML laid over the
        model's display.
        SCREEN CONTENT: .mb-site is a drawn stand-in. Swap it for a full-page
@@ -169,100 +175,138 @@
        built-in three.js laptop. Setup + naming: SPLINE-SETUP.md -->
   <section class="case-mb is-flat" id="caseMacbook" data-spline-scene="" aria-label="Website im Überblick">
     <div class="case-mb-sticky">
-      <div class="case-mb-captions" aria-hidden="true">
-        <p class="case-mb-caption" data-mb-from="0" data-mb-to=".2"><span>01</span>Auftakt</p>
-        <p class="case-mb-caption" data-mb-from=".2" data-mb-to=".4"><span>02</span>Ein klarer erster Eindruck</p>
-        <p class="case-mb-caption" data-mb-from=".4" data-mb-to=".8"><span>03</span>Struktur, die trägt</p>
-        <p class="case-mb-caption" data-mb-from=".8" data-mb-to="1.01"><span>04</span>Live seit 2026</p>
-      </div>
+      <!-- Layout (Figma "noll-media" › Frame 304): benefits left, laptop right.
+           Each benefit is a pill that opens into a card on click
+           (js/case-benefits.js). CONTENT: the copy is placeholder. -->
+      <div class="wrap case-mb-layout">
+        <ul class="case-benefits" id="caseBenefits">
+          <li class="case-benefit">
+            <button class="case-benefit-head" type="button" aria-expanded="false" aria-controls="benefit-1">
+              <span class="case-benefit-icon" aria-hidden="true"></span>
+              <span class="case-benefit-title">Modernes Design</span>
+            </button>
+            <div class="case-benefit-panel" id="benefit-1" role="region"><div class="case-benefit-panel-inner">
+              <p class="case-benefit-copy">Ein ruhiges, technisches Designsystem, das die Präzision der URSA Chemie sichtbar macht – vom großen Statement bis zum Produktdetail.</p>
+            </div></div>
+          </li>
+          <li class="case-benefit">
+            <button class="case-benefit-head" type="button" aria-expanded="false" aria-controls="benefit-2">
+              <span class="case-benefit-icon" aria-hidden="true"></span>
+              <span class="case-benefit-title">Website-Ökosystem</span>
+            </button>
+            <div class="case-benefit-panel" id="benefit-2" role="region"><div class="case-benefit-panel-inner">
+              <p class="case-benefit-copy">Leistungen, Kompetenzen und Karriere greifen ineinander – ein System, das das Team selbst pflegen kann.</p>
+            </div></div>
+          </li>
+          <li class="case-benefit">
+            <button class="case-benefit-head" type="button" aria-expanded="false" aria-controls="benefit-3">
+              <span class="case-benefit-icon" aria-hidden="true"></span>
+              <span class="case-benefit-title">Erstklassiges SEO</span>
+            </button>
+            <div class="case-benefit-panel" id="benefit-3" role="region"><div class="case-benefit-panel-inner">
+              <p class="case-benefit-copy">Saubere Struktur, schnelle Ladezeiten und Inhalte, die bei Google für die relevanten Suchbegriffe gefunden werden.</p>
+            </div></div>
+          </li>
+          <li class="case-benefit">
+            <button class="case-benefit-head" type="button" aria-expanded="false" aria-controls="benefit-4">
+              <span class="case-benefit-icon" aria-hidden="true"></span>
+              <span class="case-benefit-title">Starke Arbeitgebermarke</span>
+            </button>
+            <div class="case-benefit-panel" id="benefit-4" role="region"><div class="case-benefit-panel-inner">
+              <p class="case-benefit-copy">„Ohne Chemie geht’s nicht!“ – ein Karrierebereich, der das Team zeigt und Bewerbungen direkt anstößt.</p>
+            </div></div>
+          </li>
+        </ul>
+        <div class="case-live" data-live-url="https://www.ursa-chemie.de/" hidden>
 
-      <canvas class="case-mb-canvas" aria-hidden="true"></canvas>
-      <div class="mb-screen">
-        <div class="mb-site" data-placeholder-media>
-          <div class="mbs-nav">
-            <span class="mbs-logo">URSA<b>CHEMIE</b></span>
-            <span class="mbs-links"><i>Produkte</i><i>Branchen</i><i>Unternehmen</i><i>Karriere</i><i>Kontakt</i></span>
-          </div>
-          <div class="mbs-hero">
-            <img src="images/img1.jpg" alt="">
-            <div class="mbs-hero-text">
-              <span class="mbs-kicker">Industriechemie seit 1949</span>
-              <span class="mbs-h1">Lösungen, die verbinden.</span>
-              <span class="mbs-btn">Produkte entdecken</span>
-            </div>
-          </div>
-          <div class="mbs-band">
-            <span><b>70+</b>Jahre Erfahrung</span>
-            <span><b>400</b>Produkte</span>
-            <span><b>30</b>Länder</span>
-          </div>
-          <div class="mbs-section">
-            <span class="mbs-h2">Unsere Produktwelten</span>
-            <div class="mbs-cards">
-              <span class="mbs-card"><img src="images/img2.jpg" alt=""><i>Klebstoffe</i></span>
-              <span class="mbs-card"><img src="images/img3.jpg" alt=""><i>Dichtstoffe</i></span>
-              <span class="mbs-card"><img src="images/ueber-uns/kombi.jpg" alt=""><i>Reinigung</i></span>
-            </div>
-          </div>
-          <div class="mbs-split">
-            <img src="images/ueber-uns/hero.jpg" alt="">
-            <div>
-              <span class="mbs-h2">Made in Montabaur</span>
-              <span class="mbs-lines"><i></i><i></i><i></i><i></i></span>
-              <span class="mbs-btn mbs-btn--dark">Mehr erfahren</span>
-            </div>
-          </div>
-          <div class="mbs-section mbs-section--grey">
-            <span class="mbs-h2">Aktuelles</span>
-            <div class="mbs-cards mbs-cards--news">
-              <span class="mbs-news"><i></i><i></i><i></i></span>
-              <span class="mbs-news"><i></i><i></i><i></i></span>
-              <span class="mbs-news"><i></i><i></i><i></i></span>
-            </div>
-          </div>
-          <div class="mbs-footer">
-            <span class="mbs-logo">URSA<b>CHEMIE</b></span>
-            <span class="mbs-lines"><i></i><i></i><i></i></span>
-          </div>
         </div>
       </div>
 
-      <div class="case-mb-progress" aria-hidden="true">
-        <span class="case-mb-progress-bar"></span>
+      <div class="case-mb-view">
+        <canvas class="case-mb-canvas" aria-hidden="true"></canvas>
+        <div class="mb-screen">
+          <!-- The live site: viewport captures of ursa-chemie.de, stacked
+               (images/cases/ursa-chemie-screens.jpg). -->
+          <div class="mb-site"><img class="mb-site-shot" src="images/cases/ursa-chemie-screens.jpg" alt="Website der URSA Chemie"></div>
+        </div>
       </div>
     </div>
   </section>
 
-  <section class="case-detail-story" aria-label="Projektverlauf">
-    <div class="wrap">
-      <div class="case-detail-block">
-        <h2>Ausgangslage</h2>
-        <p data-placeholder>Platzhaltertext: Die alte Website war über Jahre gewachsen. Über 400 Produkte, aber kein Weg, sie schnell zu finden – und ein Auftritt, der der Qualität des Unternehmens nicht mehr gerecht wurde.</p>
+  <!-- Screenshot slider (Figma "noll-media" › Frame 324 / 283): views of the
+       live site, mobile and desktop, the active one on the grid's left edge.
+       js/case-slider.js. Images: images/cases/slider/ -->
+  <section class="case-slider" aria-label="Ansichten der Website" aria-roledescription="carousel" data-start="1" tabindex="0">
+    <div class="case-slider-viewport">
+      <div class="case-slider-track">
+        <figure class="case-slide case-slide--mobile"><img src="images/cases/slider/ursa-mobile-1.jpg" alt="URSA Chemie – Startseite mobil" draggable="false"></figure>
+        <figure class="case-slide case-slide--desktop"><img src="images/cases/slider/ursa-desktop-1.jpg" alt="URSA Chemie – Startseite Desktop" draggable="false"></figure>
+        <figure class="case-slide case-slide--mobile"><img src="images/cases/slider/ursa-mobile-2.jpg" alt="URSA Chemie – Karriere mobil" draggable="false"></figure>
+        <figure class="case-slide case-slide--mobile"><img src="images/cases/slider/ursa-mobile-3.jpg" alt="URSA Chemie – Kennzahlen mobil" draggable="false"></figure>
+        <figure class="case-slide case-slide--desktop"><img src="images/cases/slider/ursa-desktop-2.jpg" alt="URSA Chemie – Effizienz von A bis Z, Desktop" draggable="false"></figure>
       </div>
-      <div class="case-detail-block">
-        <h2>Unser Ansatz</h2>
-        <p data-placeholder>Platzhaltertext: Gemeinsam mit dem Team haben wir die Produktwelt neu sortiert, ein ruhiges, technisches Designsystem entwickelt und jede Seite für Suchmaschinen und mobile Nutzung aufgebaut.</p>
-      </div>
-      <div class="case-detail-block">
-        <h2>Ergebnis</h2>
-        <p data-placeholder>Platzhaltertext: Ein Auftritt, der Vertrauen schafft, Anfragen bündelt und vom Marketing selbst gepflegt wird – schnell, barrierearm und messbar.</p>
-      </div>
+    </div>
+    <div class="wrap case-slider-controls">
+      <button class="case-slider-btn case-slider-prev" type="button" aria-label="Vorheriges Bild"><img src="images/slider-prev.svg" alt=""></button>
+      <div class="case-slider-dots"></div>
+      <button class="case-slider-btn case-slider-next" type="button" aria-label="Nächstes Bild"><img src="images/slider-next.svg" alt=""></button>
     </div>
   </section>
 
-  <section class="case-detail-stats" aria-label="Zahlen">
-    <div class="wrap case-detail-stats-grid">
-      <div class="case-detail-stat"><strong data-placeholder>+68&nbsp;%</strong><span>Anfragen über die Website</span></div>
-      <div class="case-detail-stat"><strong data-placeholder>1,2&nbsp;s</strong><span>Ladezeit (LCP)</span></div>
-      <div class="case-detail-stat"><strong data-placeholder>Top&nbsp;3</strong><span>bei Google für 40 Kernbegriffe</span></div>
-    </div>
+  <!-- Project facts: client, scope, tags -->
+  <section class="case-facts" aria-label="Projektdaten">
+    <dl class="wrap case-facts-grid">
+      <div class="case-fact">
+        <dt>Kunde</dt>
+        <dd>Ursa-Chemie GmbH</dd>
+      </div>
+      <div class="case-fact">
+        <dt>Website</dt>
+        <dd>Design, Hosting, Karriereportal, SEO, Content</dd>
+      </div>
+      <div class="case-fact">
+        <dt>Tags</dt>
+        <dd>
+          <ul class="case-hero-tags case-facts-tags">
+            <li><img src="images/case-tag-dot.svg" alt="" aria-hidden="true">Karriereportal</li>
+            <li><img src="images/case-tag-dot.svg" alt="" aria-hidden="true">Mitarbeiter-Recruiting</li>
+            <li><img src="images/case-tag-dot.svg" alt="" aria-hidden="true">Website</li>
+          </ul>
+        </dd>
+      </div>
+    </dl>
   </section>
 
-  <section class="case-detail-gallery" aria-label="Eindrücke">
-    <div class="wrap case-detail-gallery-grid">
-      <figure class="case-detail-gallery-item case-detail-gallery-item--wide" data-placeholder-media><img src="images/img1.jpg" alt=""></figure>
-      <figure class="case-detail-gallery-item" data-placeholder-media><img src="images/img2.jpg" alt=""></figure>
-      <figure class="case-detail-gallery-item" data-placeholder-media><img src="images/img3.jpg" alt=""></figure>
+  <section class="leistung-detail-contact" aria-label="Kontakt">
+    <div class="wrap leistung-detail-contact-inner">
+      <div class="leistung-detail-contact-text">
+        <h2>Dein Projekt gehört auf diese Seite. Lass uns sprechen.</h2>
+        <a class="leistung-detail-cta" href="kontakt.html">
+          <span class="leistung-detail-cta-label">Jetzt austauschen</span>
+          <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+        </a>
+      </div>
+      <div class="leistung-detail-person">
+        <div class="leistung-detail-person-photo">
+          <img src="images/team/christian-noll.jpg" alt="Christian Noll">
+        </div>
+        <div class="leistung-detail-person-info">
+          <div class="leistung-detail-person-name">
+            <strong>Christian Noll</strong>
+            <span>CEO</span>
+          </div>
+          <div class="leistung-detail-person-kontakt">
+            <div class="leistung-detail-person-row">
+              <span>TEL</span>
+              <a href="tel:+4926029191500">+49 02602 919 150 0</a>
+            </div>
+            <div class="leistung-detail-person-row">
+              <span>MAIL</span>
+              <a href="mailto:christian.noll@noll.media">christian.noll@noll.media</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -300,39 +344,6 @@
             <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
           </div>
         </article>
-      </div>
-    </div>
-  </section>
-
-  <section class="leistung-detail-contact" aria-label="Kontakt">
-    <div class="wrap leistung-detail-contact-inner">
-      <div class="leistung-detail-contact-text">
-        <h2>Dein Projekt gehört auf diese Seite. Lass uns sprechen.</h2>
-        <a class="leistung-detail-cta" href="kontakt.html">
-          <span class="leistung-detail-cta-label">Jetzt austauschen</span>
-          <span class="leistung-detail-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
-        </a>
-      </div>
-      <div class="leistung-detail-person">
-        <div class="leistung-detail-person-photo">
-          <img src="images/team/christian-noll.jpg" alt="Christian Noll">
-        </div>
-        <div class="leistung-detail-person-info">
-          <div class="leistung-detail-person-name">
-            <strong>Christian Noll</strong>
-            <span>CEO</span>
-          </div>
-          <div class="leistung-detail-person-kontakt">
-            <div class="leistung-detail-person-row">
-              <span>TEL</span>
-              <a href="tel:+4926029191500">+49 02602 919 150 0</a>
-            </div>
-            <div class="leistung-detail-person-row">
-              <span>MAIL</span>
-              <a href="mailto:christian.noll@noll.media">christian.noll@noll.media</a>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -390,9 +401,12 @@
 </footer>
 
 <script src="js/main.js?v=39"></script>
-<script src="js/vendor/three.bundle.js?v=169"></script>
-<script src="models/laptop.glb.js?v=1"></script>
-<script src="js/case-laptop.js?v=3"></script>
-<script src="js/case-spline.js?v=1"></script>
+<script src="js/vendor/three.bundle.js?v=170"></script>
+<script src="models/laptop.glb.js?v=2"></script>
+<script src="js/case-laptop.js?v=10"></script>
+<script src="js/case-spline.js?v=2"></script>
+<script src="js/case-benefits.js?v=2"></script>
+<script src="js/case-live.js?v=3"></script>
+<script src="js/case-slider.js?v=1"></script>
 </body>
 </html>
