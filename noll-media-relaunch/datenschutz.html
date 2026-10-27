@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Datenschutz — noll media</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#000000">
+<meta name="description" content="Datenschutzerklärung der noll media GmbH: welche Daten diese Website verarbeitet und welche Rechte du hast.">
+<meta name="robots" content="noindex, follow">
+<link rel="preconnect" href="fonts">
+<link rel="stylesheet" href="fonts/stylesheet.css">
+<link rel="stylesheet" href="css/style.css?v=168">
+<script>
+/* Page transition, arrival half. Inline and in the head on purpose: the white
+   panel has to be covering the screen before this page's first paint, which a
+   deferred external file could not manage. js/main.js handles the departure
+   half and writes the direction into sessionStorage just before navigating. */
+(function(){
+  try{
+    if (window.matchMedia('(prefers-reduced-motion:reduce)').matches) return;
+    var dir = sessionStorage.getItem('nollWipe');
+    if (dir !== 'ltr' && dir !== 'rtl') return;
+    sessionStorage.removeItem('nollWipe');
+    var html = document.documentElement;
+    html.classList.add('wipe-hold');
+    var done = false;
+    var reveal = function(){
+      if (done) return;
+      done = true;
+      html.classList.remove('wipe-hold');
+      html.classList.add('wipe-reveal-' + dir);
+      setTimeout(function(){ html.classList.remove('wipe-reveal-' + dir); }, 1400);
+    };
+    document.addEventListener('DOMContentLoaded', reveal);
+    /* never leave the screen white if anything above misfires */
+    setTimeout(reveal, 1200);
+  }catch(e){}
+})();
+</script>
+</head>
+<body>
+
+<div class="debug-grid" aria-hidden="true"></div>
+
+<a class="skip-link" href="#main">Zum Inhalt springen</a>
+
+<header class="site-header" id="top">
+  <div class="wrap header-inner">
+    <a class="logo" href="index.html" aria-label="noll media Startseite">
+      <svg class="logo-mark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42.5 42.5" aria-hidden="true">
+        <defs><style>.logo-mark .st0{fill:#fff;}</style></defs>
+        <path class="st0" d="M36.3,6.2C32.4,2.2,26.9,0,21.3,0c-5.6,0-11.1,2.2-15,6.2C2.2,10.1,0,15.6,0,21.3c0,5.7,2.2,11.1,6.2,15,3.9,4.1,9.3,6.3,15,6.2v-4.2c-4.5,0-8.9-1.7-12-5-3.3-3.1-5.1-7.5-5-12,0-4.5,1.7-8.9,5-12,3.1-3.3,7.5-5.1,12-5,4.5,0,8.9,1.7,12,5,3.3,3.1,5.1,7.5,5,12,.1,5.2-2.3,10.1-6.4,13.3v-13.7c0-2.8-1.1-5.5-3.1-7.5-2-2-4.7-3.2-7.5-3.1-2.3,0-4.5.7-6.4,2.1l-2.1-2.1h-2.1v21.2h4.2v-10.9c.1-3.4,3-6.1,6.4-6.1,3.5,0,6.4,2.9,6.4,6.4v20.7c4.3-1.3,8-4,10.7-7.6,2.8-3.6,4.3-8.1,4.2-12.7,0-5.7-2.1-11.1-6.2-15.1Z"/>
+      </svg>
+      <span class="logo-text-clip" aria-hidden="true">
+        <svg class="logo-wordmark" xmlns="http://www.w3.org/2000/svg" viewBox="58.6 10.8 138.9 21.5">
+          <defs><style>.logo-wordmark .st0{fill:#fff;}</style></defs>
+          <path class="st0" d="M109.7,32v-4.1h-1.7c-.5,0-.9-.3-1-.7,0,0,0-.2,0-.3V10.9h-4.9v16.4c0,2.5,1.9,4.7,4.5,4.7.2,0,.4,0,.5,0h2.6ZM99.6,32v-4.1h-1.7c-.5,0-.9-.3-1-.7,0,0,0-.2,0-.3V10.9h-4.9v16.4c0,2.5,1.9,4.7,4.5,4.7.2,0,.4,0,.5,0h2.6ZM84.2,24c0,1.6,0,2.7-.7,3.3-.4.3-.8.5-1.3.5-.5,0-.9-.1-1.3-.5-.6-.6-.7-1.8-.7-3.3s0-2.7.7-3.3c.4-.3.8-.5,1.3-.4.5,0,1,.1,1.3.4.6.6.7,1.8.7,3.3M89.1,24c0-3.1-.4-4.7-1.8-6.1-2.9-2.7-7.4-2.7-10.3,0-1.3,1.5-1.8,3-1.8,6.1s.4,4.7,1.8,6.1c2.9,2.7,7.4,2.7,10.3,0,1.3-1.5,1.8-3,1.8-6.1M72.3,32v-10.2c.2-1.7-.4-3.4-1.6-4.6-1-.9-2.3-1.4-3.6-1.4-1.4,0-2.7.5-3.7,1.5v-1.3h-4.8v16h4.9v-9.6c-.2-1.1.5-2.1,1.6-2.4,1.1-.2,2.1.5,2.4,1.6,0,.3,0,.5,0,.8v9.6h4.9Z"/>
+          <rect class="st0" x="178.6" y="16.9" width="3" height="15.1"/>
+          <rect class="st0" x="178.5" y="10.8" width="3.2" height="3.2"/>
+          <path class="st0" d="M141.5,32v-9.6c0-1.6-.5-3.1-1.6-4.2-1-.9-2.4-1.4-3.8-1.4-1.8,0-3.6.8-4.7,2.2-.9-1.4-2.6-2.3-4.3-2.2-1.5,0-3,.6-4,1.7v-1.5h-3v15.1h3v-9.2c-.2-1.6,1-3.1,2.6-3.3.2,0,.3,0,.5,0,1.7,0,3,1,3,3.4v9.2h3v-9.3c-.1-1.7,1.1-3.1,2.8-3.2.1,0,.2,0,.3,0,1.7,0,3,1,3,3.4v9.2h3.2Z"/>
+          <path class="st0" d="M191.3,16.8c-2.5,0-4,.5-5.4,2.2l2,1.9c.7-1.1,2-1.6,3.3-1.5,2.4,0,3.3.9,3.3,2.8v1.1h-4c-3.4,0-5.2,1.8-5.2,4.3,0,1.2.4,2.4,1.2,3.2,1.1,1,2.5,1.5,4,1.4,1.5.1,3-.5,4-1.5v1.4h3v-10.1c0-3.4-2.1-5.2-6.2-5.2ZM193.8,28.8c-.8.7-1.8,1-2.8.9-1.9,0-2.8-.8-2.8-2.1s.9-2.2,2.7-2.2h3.5v1.2c0,.8-.1,1.6-.7,2.2Z"/>
+          <path class="st0" d="M170.7,10.9v7.6c-1-1.2-2.5-1.8-4-1.7-1.3,0-2.6.4-3.6,1.3-1.5,1.5-1.7,4.1-1.7,6.3s.2,4.9,1.7,6.4c1,.9,2.3,1.4,3.7,1.3,1.5.1,3-.6,4-1.8v1.6h2.9V10.9h-3ZM167.6,29.5c-2.7,0-3.2-2.3-3.2-5s.4-5,3.2-5,3.1,2.3,3.1,5-.4,5-3.1,5Z"/>
+          <path class="st0" d="M158.2,24c0-4.3-2.3-7.2-6.4-7.2s-6.4,2.8-6.4,7.7,3,7.7,6.8,7.7c2.1.1,4.2-.7,5.6-2.3l-1.9-1.8c-.9,1.1-2.3,1.6-3.6,1.5-2.5,0-3.8-1.6-3.8-4.2h9.8s0-1.3,0-1.3ZM155.1,23.2h-6.8c0-.7.1-1.4.4-2,.5-1.2,1.7-1.9,3-1.9,1.3,0,2.5.7,3,1.9.3.6.4,1.3.4,2h0Z"/>
+        </svg>
+      </span>
+    </a>
+    <nav class="main-nav" aria-label="Hauptnavigation">
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="ueber-uns.html">Über uns</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="cases.html">Cases</a></span>
+      <span class="nav-item nav-item--has-dropdown" id="navServices"><span class="nav-dot" aria-hidden="true"></span><a href="leistungen.html" aria-haspopup="true" aria-expanded="false" aria-controls="navDropdown">Services</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="insights.html">Insights</a></span>
+      <span class="nav-item"><span class="nav-dot" aria-hidden="true"></span><a href="kontakt.html">Kontakt</a></span>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
+    <div class="nav-dropdown-inner">
+      <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+      <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+      <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+      <a href="leistungen-ki-automation.html">KI-Automation</a>
+    </div>
+  </div>
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
+    <a href="ueber-uns.html">Über uns</a>
+    <a href="cases.html">Cases</a>
+    <div class="mobile-nav-group">
+      <button class="mobile-nav-sub-toggle" id="mobileSubToggle" type="button" aria-expanded="false" aria-controls="mobileSubnav">
+        Services
+        <span class="mobile-nav-sub-icon" aria-hidden="true"></span>
+      </button>
+      <div class="mobile-subnav" id="mobileSubnav">
+        <div class="mobile-subnav-inner">
+          <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+          <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+          <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+          <a href="leistungen-ki-automation.html">KI-Automation</a>
+        </div>
+      </div>
+    </div>
+    <a href="insights.html">Insights</a>
+    <a href="kontakt.html">Kontakt</a>
+  </nav>
+</header>
+
+<aside class="social-rail" aria-label="Social Media">
+  <a href="https://www.instagram.com/noll.media/" target="_blank" rel="noopener" class="social-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+  <a href="https://www.facebook.com/noll.media/" target="_blank" rel="noopener" class="social-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+  <a href="https://www.xing.com/pages/noll-media-gmbh" target="_blank" rel="noopener" class="social-x" aria-label="Xing"><img src="images/x.svg" alt=""></a>
+  <a href="https://www.linkedin.com/company/nollmedia/home/" target="_blank" rel="noopener" class="social-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+</aside>
+
+<div class="mobile-bar" aria-label="Mobile Menüleiste">
+  <div class="mobile-bar-socials">
+    <a href="https://www.instagram.com/noll.media/" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-instagram" aria-label="Instagram"><img src="images/instagram.svg" alt=""></a>
+    <a href="https://www.facebook.com/noll.media/" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-facebook" aria-label="Facebook"><img src="images/facebook.svg" alt=""></a>
+    <a href="https://www.xing.com/pages/noll-media-gmbh" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-x" aria-label="Xing"><img src="images/x.svg" alt=""></a>
+    <a href="https://www.linkedin.com/company/nollmedia/home/" target="_blank" rel="noopener" class="mobile-bar-social mobile-bar-linkedin" aria-label="LinkedIn"><img src="images/linkedin.svg" alt=""></a>
+  </div>
+  <button class="mobile-bar-toggle" id="mobileBarToggle" aria-expanded="false" aria-controls="mobileNav" aria-label="Menü öffnen">
+    <span class="mobile-bar-toggle-label">Menü</span>
+    <span class="mobile-bar-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+  </button>
+</div>
+
+
+<main id="main">
+
+  <!-- Rechtstext. Aufbau wie die Kontaktseite (Tag-Pill + große Headline),
+       darunter eine schmale Lesespalte (.legal). Rot markierte Stellen
+       ([data-placeholder]) sind vor dem Livegang zu prüfen/ergänzen. -->
+  <section class="kontakt-hero legal-hero" aria-label="Datenschutz">
+    <div class="wrap">
+      <p class="kontakt-tag"><span>Datenschutz</span></p>
+      <h1 class="kontakt-title">Datenschutz&shy;erklärung</h1>
+    </div>
+  </section>
+
+  <section class="legal" aria-label="Datenschutz">
+    <div class="wrap">
+      <div class="legal-body">
+        <p class="legal-stand">Stand: Oktober 2026</p>
+
+        <h2>1. Verantwortlicher</h2>
+        <p>Verantwortlich für die Datenverarbeitung auf dieser Website ist:</p>
+        <p>noll media GmbH<br>Rudolf-Diesel-Straße 6<br>56410 Montabaur<br>Vertreten durch den Geschäftsführer Christian Noll<br>Telefon: <a href="tel:+4926029191500">+49 2602 9191 500</a><br>E-Mail: <a href="mailto:info@noll.media">info@noll.media</a></p>
+        <p data-placeholder>Datenschutzbeauftragter: Ein Datenschutzbeauftragter ist nicht benannt. Bitte prüfen, ob eine Benennungspflicht besteht (§ 38 BDSG).</p>
+
+        <h2>2. Allgemeines</h2>
+        <p>Personenbezogene Daten sind alle Daten, mit denen du persönlich identifiziert werden kannst. Wir verarbeiten sie nur, soweit das für den Betrieb dieser Website, die Beantwortung deiner Anfragen oder die Erfüllung eines Vertrags nötig ist oder du eingewilligt hast. Rechtsgrundlagen sind insbesondere Art. 6 Abs. 1 lit. a DSGVO (Einwilligung), lit. b (Vertrag und vorvertragliche Maßnahmen), lit. c (rechtliche Verpflichtung) und lit. f (berechtigtes Interesse). Soweit Informationen auf deinem Endgerät gespeichert oder dort ausgelesen werden, gilt zusätzlich § 25 TDDDG.</p>
+        <p>Wir speichern personenbezogene Daten nur so lange, wie es für den jeweiligen Zweck erforderlich ist oder gesetzliche Aufbewahrungsfristen (z. B. steuer- und handelsrechtlich bis zu zehn Jahre) es verlangen.</p>
+
+        <h2>3. Hosting und Server-Logfiles</h2>
+        <p data-placeholder>Diese Website wird bei [Hosting-Anbieter, Anschrift] gehostet. Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung nach Art. 28 DSGVO.</p>
+        <p>Beim Aufruf der Website erfasst der Server automatisch Informationen, die dein Browser übermittelt: IP-Adresse, Datum und Uhrzeit des Zugriffs, aufgerufene Seite, Referrer-URL, Browsertyp und -version sowie Betriebssystem. Diese Daten benötigen wir, um die Website technisch fehlerfrei und sicher auszuliefern (Art. 6 Abs. 1 lit. f DSGVO). Sie werden nicht mit anderen Datenquellen zusammengeführt und nach spätestens <span data-placeholder>[14] Tagen</span> gelöscht, sofern sie nicht zur Aufklärung eines Sicherheitsvorfalls benötigt werden.</p>
+
+        <h2>4. SSL-/TLS-Verschlüsselung</h2>
+        <p>Diese Seite nutzt aus Sicherheitsgründen eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennst du am „https://“ in der Adresszeile deines Browsers.</p>
+
+        <h2>5. Cookies und lokale Speicherung</h2>
+        <p>Diese Website setzt keine Tracking- oder Marketing-Cookies und verwendet keine Analyse-Tools. Für den Seitenübergang beim Wechsel zwischen unseren Seiten speichern wir kurzzeitig einen technischen Wert (die Richtung der Übergangsanimation) im Sitzungsspeicher deines Browsers (sessionStorage). Er enthält keine personenbezogenen Daten und wird gelöscht, sobald die Folgeseite geladen oder der Tab geschlossen ist. Rechtsgrundlage ist § 25 Abs. 2 Nr. 2 TDDDG in Verbindung mit Art. 6 Abs. 1 lit. f DSGVO.</p>
+
+        <h2>6. Kontaktformular, E-Mail und Telefon</h2>
+        <p>Wenn du uns über das Kontaktformular, per E-Mail oder telefonisch kontaktierst, verarbeiten wir deine Angaben (z. B. Name, Unternehmen, E-Mail-Adresse, Telefonnummer, Inhalt der Nachricht), um deine Anfrage zu bearbeiten. Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO, sofern die Anfrage mit einem Vertrag oder vorvertraglichen Maßnahmen zusammenhängt, ansonsten unser berechtigtes Interesse an der Beantwortung (Art. 6 Abs. 1 lit. f DSGVO). Die Daten bleiben bei uns, bis der Zweck entfällt oder du die Löschung verlangst; gesetzliche Aufbewahrungsfristen bleiben unberührt.</p>
+
+        <h2>7. Newsletter</h2>
+        <p>Wenn du unseren Newsletter abonnierst, verwenden wir deine E-Mail-Adresse ausschließlich für dessen Versand. Die Anmeldung erfolgt im Double-Opt-in-Verfahren: Erst nach Bestätigung über den Link in der Bestätigungsmail wirst du eingetragen. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO), die du jederzeit über den Abmeldelink in jedem Newsletter oder per E-Mail an uns widerrufen kannst.</p>
+        <p data-placeholder>Für den Versand nutzen wir [Newsletter-Anbieter, Anschrift; bisher: rapidmail GmbH, Augustinerplatz 2, 79098 Freiburg]. Mit dem Anbieter besteht ein Vertrag zur Auftragsverarbeitung. Angaben zu Öffnungs- und Klickmessung bitte ergänzen, falls genutzt.</p>
+
+        <h2>8. Social Wall (Instagram, LinkedIn, YouTube)</h2>
+        <p>Auf der Startseite und der Seite „Insights“ zeigen wir aktuelle Beiträge unserer Kanäle auf Instagram, LinkedIn und YouTube. Beitragstexte und Vorschaubilder laden wir über unseren eigenen Server; dein Browser baut dafür keine Verbindung zu diesen Plattformen auf. Erst wenn du einen Beitrag anklickst, gelangst du über einen normalen Link zur jeweiligen Plattform; dort gelten deren Datenschutzbestimmungen.</p>
+        <p><strong>Instagram-Medien:</strong> Bilder und Videos von Instagram können direkt vom Server der Meta Platforms Ireland Ltd., Merrion Road, Dublin 4, Irland, geladen werden. Dabei wird deine IP-Adresse an Meta übertragen.</p>
+        <p><strong>YouTube-Videos:</strong> YouTube-Videos binden wir im erweiterten Datenschutzmodus (youtube-nocookie.com) ein. Anbieter ist die Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland. Auch in diesem Modus wird beim Abspielen eine Verbindung zu Servern von Google hergestellt; dabei werden u. a. deine IP-Adresse und technische Informationen übertragen, eine Übermittlung in die USA ist möglich. Google ist unter dem EU-US Data Privacy Framework zertifiziert. Die Videos starten stumm, sobald sie im sichtbaren Bereich sind.</p>
+        <p data-placeholder>Rechtsgrundlage für Instagram-Medien und YouTube: deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG). Hinweis: Damit das stimmt, dürfen diese Inhalte erst nach Einwilligung (Consent-Banner) geladen werden – vor dem Livegang umsetzen oder Text anpassen.</p>
+
+        <h2>9. Google-Bewertungen</h2>
+        <p>Auf unserer Website zeigen wir Bewertungen, die Kundinnen und Kunden über unser Google-Unternehmensprofil abgegeben haben. Die Bewertungen ruft unser Server über die Schnittstelle von Google (Google Ireland Limited) ab und speichert sie zwischen; dein Browser lädt dabei nichts von Google. Angezeigt werden die öffentlich sichtbaren Angaben der Bewertung (Name bzw. Kürzel, Sterne, Text, Datum). Rechtsgrundlage ist unser berechtigtes Interesse, echte Kundenstimmen zu zeigen (Art. 6 Abs. 1 lit. f DSGVO).</p>
+
+        <h2>10. Live-Ansicht von Kundenwebsites in Cases</h2>
+        <p>In einzelnen Case-Studies binden wir die Website des jeweiligen Kunden live in die Bildschirmdarstellung ein (z. B. www.ursa-chemie.de). Dabei baut dein Browser eine Verbindung zum Server dieser Website auf und überträgt deine IP-Adresse sowie technische Informationen. Verantwortlich für die Datenverarbeitung auf der eingebundenen Website ist deren Betreiber; es gelten dessen Datenschutzhinweise.</p>
+        <p data-placeholder>Rechtsgrundlage: Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 25 Abs. 1 TDDDG) – die Einbindung lädt derzeit ohne Einwilligung. Vor dem Livegang hinter das Consent-Banner legen oder durch Screenshots ersetzen.</p>
+
+        <h2>11. Links zu sozialen Netzwerken</h2>
+        <p>Auf unserer Website verlinken wir unsere Profile bei Instagram, Facebook, XING und LinkedIn. Es handelt sich um einfache Links, keine Social-Plugins: Erst wenn du einen Link anklickst, wirst du zur jeweiligen Plattform weitergeleitet. Dort gelten die Datenschutzbestimmungen des jeweiligen Anbieters.</p>
+
+        <h2>12. Schriftarten und Skripte</h2>
+        <p>Schriftarten, Skripte und 3D-Modelle dieser Website liegen auf unserem eigenen Server. Beim Laden der Seite werden dafür keine Verbindungen zu Drittanbietern (z. B. Google Fonts oder Content-Delivery-Netzwerken) aufgebaut.</p>
+
+        <h2>13. Deine Rechte</h2>
+        <p>Du hast im Rahmen der gesetzlichen Bestimmungen jederzeit das Recht auf</p>
+        <ul>
+          <li>Auskunft über deine bei uns gespeicherten Daten (Art. 15 DSGVO),</li>
+          <li>Berichtigung unrichtiger Daten (Art. 16 DSGVO),</li>
+          <li>Löschung (Art. 17 DSGVO) und Einschränkung der Verarbeitung (Art. 18 DSGVO),</li>
+          <li>Datenübertragbarkeit (Art. 20 DSGVO),</li>
+          <li>Widerruf einer erteilten Einwilligung mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO).</li>
+        </ul>
+        <p><strong>Widerspruchsrecht (Art. 21 DSGVO):</strong> Verarbeiten wir deine Daten auf Grundlage eines berechtigten Interesses (Art. 6 Abs. 1 lit. f DSGVO), kannst du aus Gründen, die sich aus deiner besonderen Situation ergeben, jederzeit widersprechen. Wir verarbeiten die Daten dann nicht mehr, es sei denn, wir können zwingende schutzwürdige Gründe nachweisen oder die Verarbeitung dient der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen. Der Verarbeitung zu Zwecken der Direktwerbung kannst du jederzeit ohne Angabe von Gründen widersprechen.</p>
+        <p>Für alle Anliegen genügt eine formlose Nachricht an <a href="mailto:info@noll.media">info@noll.media</a>.</p>
+
+        <h2>14. Beschwerderecht</h2>
+        <p>Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Für uns zuständig ist der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Rheinland-Pfalz, Hintere Bleiche 34, 55116 Mainz, <a href="https://www.datenschutz.rlp.de" target="_blank" rel="noopener">www.datenschutz.rlp.de</a>.</p>
+
+        <h2>15. Änderungen</h2>
+        <p>Wir passen diese Datenschutzerklärung an, wenn sich die Website oder die Rechtslage ändert. Es gilt die jeweils hier veröffentlichte Fassung.</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="kontakt" aria-label="Kontakt &amp; Footer">
+  <div class="footer-inner">
+    <div class="footer-black">
+      <p class="footer-lead">Wir freuen uns, von dir zu hören.</p>
+      <a class="footer-contact-link footer-mail" href="mailto:hallo@noll.media">hallo@noll.media</a>
+      <a class="footer-contact-link footer-phone" href="tel:+4926029191500">+49 2602 9191 500</a>
+
+      <nav class="footer-nav" aria-label="Footer Navigation">
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-1" href="ueber-uns.html">Über uns</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-1" href="insights.html">Insights</a>
+        <a class="footer-nav-link footer-nav-col-3 footer-nav-row-1" href="#">Presse</a>
+        <a class="footer-nav-link footer-nav-col-3 footer-nav-row-2" href="#">Ressourcen</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-2" href="cases.html">Cases</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-2" href="kontakt.html">Kontakt</a>
+        <a class="footer-nav-link footer-nav-col-1 footer-nav-row-3" href="leistungen.html">Services</a>
+        <a class="footer-nav-link footer-nav-col-2 footer-nav-row-3" href="#newsletter">Newsletter</a>
+      </nav>
+
+      <h2 class="footer-newsletter-heading" id="newsletter">Abonniere unseren Newsletter</h2>
+      <form class="footer-subscribe-form" action="#" method="post">
+        <label class="visually-hidden" for="footer-email">Deine E-Mailadresse</label>
+        <input class="footer-subscribe-input" type="email" id="footer-email" name="email" placeholder="Deine E-Mailadresse" autocomplete="email" required>
+        <button class="footer-subscribe-btn" type="submit">
+          <span class="footer-subscribe-label">Abonnieren</span>
+          <img class="footer-subscribe-arrow" src="images/footer/subscribe-arrow.svg" alt="">
+        </button>
+      </form>
+    </div>
+
+    <div class="footer-white">
+      <div class="footer-legal">
+        <a href="impressum.html">Impressum</a>
+        <a href="kontakt.html">Kontakt</a>
+        <a href="datenschutz.html">Datenschutz</a>
+      </div>
+      <p class="footer-social-heading">Folge uns!</p>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/noll.media/" target="_blank" rel="noopener" aria-label="Instagram"><img src="images/footer/social-instagram.svg" alt=""></a>
+        <a href="https://www.facebook.com/noll.media/" target="_blank" rel="noopener" aria-label="Facebook"><img src="images/footer/social-facebook.svg" alt=""></a>
+        <a href="https://www.xing.com/pages/noll-media-gmbh" target="_blank" rel="noopener" aria-label="Xing"><img src="images/footer/social-xing.svg" alt=""></a>
+        <a href="https://www.linkedin.com/company/nollmedia/home/" target="_blank" rel="noopener" aria-label="LinkedIn"><img src="images/footer/social-linkedin.svg" alt=""></a>
+      </div>
+    </div>
+
+    <a class="footer-seal" href="#top" aria-label="Nach oben scrollen">
+      <img src="images/footer/logo-seal.svg" alt="">
+    </a>
+  </div>
+</footer>
+
+<script src="js/main.js?v=43"></script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+/* Statischer Stand der Google-Bewertungen (Fallback, z. B. lokal per file://).
+   Neu erzeugen: python3 tools/google-reviews/export_json.py */
+window.NOLL_GOOGLE_REVIEWS = {
+  "rating": 5,
+  "ratingCount": 10,
+  "placeUrl": "https://maps.google.com/maps?cid=5847870641444731828",
+  "reviews": [
+    {
+      "text": "Eine einfache und gute Zusammenarbeit, kreatives Denken gepaart mit tollen Designvorschlägen und der entsprechenden Produktkommunikation hat unsere Werbekampagne zum Erfolg gemacht. Ich bin mit den ausgeführten Arbeiten sehr zufrieden!",
+      "rating": 5,
+      "author": "Sascha Groß",
+      "authorUrl": "",
+      "time": "vor einem Jahr",
+      "url": "https://maps.google.com/maps?cid=5847870641444731828"
+    },
+    {
+      "text": "Super qualifizierte Online Marketing Agentur, die mit Kreativität, Einfallsreichtum, professioneller Beratung und Schnelligkeit 100% überzeugt!",
+      "rating": 5,
+      "author": "Lisa Baur",
+      "authorUrl": "",
+      "time": "vor 6 Jahren",
+      "url": "https://maps.google.com/maps?cid=5847870641444731828"
+    },
+    {
+      "text": "tolle & professionelle Arbeit. Jederzeit wieder!",
+      "rating": 5,
+      "author": "Stefan",
+      "authorUrl": "",
+      "time": "vor 6 Jahren",
+      "url": "https://maps.google.com/maps?cid=5847870641444731828"
+    },
+    {
+      "text": "kreativ, zuverlässig & kompetent. Die Zusammenarbeit war sehr konstruktiv und hat dabei noch Spaß gemacht. Ich freue mich auch weiterhin mit dem Team von noll new media einen zuverlässigen Partner an der Seite zu haben.",
+      "rating": 5,
+      "author": "CSS Draht Schmidt",
+      "authorUrl": "",
+      "time": "vor 6 Jahren",
+      "url": "https://maps.google.com/maps?cid=5847870641444731828"
+    }
+  ],
+  "updated": "2026-10-26T13:01:30+00:00",
+  "source": "static"
+};

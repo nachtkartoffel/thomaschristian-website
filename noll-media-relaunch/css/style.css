@@ -604,6 +604,7 @@ body.scroll-locked{
   transition:height .5s cubic-bezier(.4,0,.2,1);
 }
 .case-media img{ width:100%; height:100%; object-fit:cover; display:block; }
+a.case-media{ display:block; color:inherit; }
 .case-tags{
   /* One step down from the title's 1.6146vw by the golden ratio (÷1.618),
      and switched off the SmBd family (which only has a single, always-
@@ -1224,7 +1225,14 @@ body.scroll-locked{
 .testimonial-quote.is-fading > p, .testimonial-quote.is-fading .testimonial-attribution{ opacity:0; }
 .testimonial-attribution a{ color:inherit; text-decoration:none; }
 .testimonial-attribution a:hover, .testimonial-attribution a:focus-visible{ text-decoration:underline; }
-.testimonial-stars{ color:#fbbc04; letter-spacing:0.1em; margin-right:0.6em; }
+.testimonial-stars{ color:var(--white); letter-spacing:0.1em; margin-right:0.6em; }
+/* Kreis immer vertikal mittig zum Zitattext: Name/Sterne/Punkte hängen
+   absolut unter dem Zitat und zählen nicht zur Höhe, an der sich der
+   Kreis ausrichtet (Platz darunter liefert das padding-bottom der Sektion). */
+.testimonial-quote{ position:relative; }
+.testimonial-meta{ position:absolute; top:100%; left:0; right:0; }
+/* Lange Bewertungen: nächstkleinerer Grad im Schriftsystem (60 → 44 px @1920) */
+.testimonial-quote.is-long p{ font-size:2.2917vw; line-height:1.25; }
 .testimonial-summary{
   margin-top:0.8vw;
   font-family:var(--font-body); font-weight:300; font-size:0.9375vw; line-height:1.2;
@@ -1254,6 +1262,8 @@ body.scroll-locked{
   .testimonial-name, .testimonial-role{ font-size:3.2vw; }
   .testimonial-summary{ font-size:3vw; margin-top:3vw; }
   .testimonial-dots{ justify-content:flex-start; gap:3vw; margin-top:5vw; }
+  .testimonial-meta{ position:static; }
+  .testimonial-quote.is-long p{ font-size:5vw; line-height:1.2; }
 }
 
 /* ---------- Kundenleiste / "Wir sprechen aus Erfahrung" (Figma node
@@ -1832,6 +1842,13 @@ body.scroll-locked{
   height:12.5vw; border-radius:0.3125vw;
   background:var(--black); border:1px solid var(--white);
 }
+/* a real case: its key visual instead of the outline plate */
+.leistung-detail-case-media.has-image{ display:block; overflow:hidden; border:0; }
+.leistung-detail-case-media.has-image img{
+  display:block; width:100%; height:100%; object-fit:cover;
+  transition:transform .8s cubic-bezier(.16,1,.3,1);
+}
+.leistung-detail-case:hover .leistung-detail-case-media.has-image img{ transform:scale(1.04); }
 .leistung-detail-case-body{ display:flex; flex-direction:column; align-items:flex-start; gap:1.25vw; }
 .leistung-detail-case-text{ display:flex; flex-direction:column; gap:0.3125vw; }
 .leistung-detail-case-subtitle{
@@ -2755,9 +2772,9 @@ html.wipe-cover-rtl::before{
    the reordered text would land in the wide track and the image in the narrow
    one. Source order stays text-then-image, so the stacked mobile layout still
    reads headline first. */
-.case-row:nth-child(even){ grid-template-columns:1fr 31%; }
-.case-row:nth-child(even) .case-row-text{ order:2; }
-.case-row:nth-child(even) .case-row-media{ order:1; }
+:is(.cases-grid:not(.is-js) .case-row:nth-child(even), .case-row.is-alt){ grid-template-columns:1fr 31%; }
+:is(.cases-grid:not(.is-js) .case-row:nth-child(even), .case-row.is-alt) .case-row-text{ order:2; }
+:is(.cases-grid:not(.is-js) .case-row:nth-child(even), .case-row.is-alt) .case-row-media{ order:1; }
 .case-row-text{ display:flex; flex-direction:column; align-items:flex-start; }
 /* Two grades below the project title now (2.2917vw -> 1.0938vw, i.e. 88px ->
    42px on the 3840px reference). 1.6146vw sits between them but reads as a
@@ -2802,9 +2819,25 @@ html.wipe-cover-rtl::before{
   transition:transform .8s cubic-bezier(.22,1,.36,1);
 }
 .case-row:hover .case-row-media img{ transform:scale(1.04); }
-/* Filtered out: removed from the flow rather than faded, so the alternating
-   rhythm re-flows onto whatever is left. */
+/* Filtered out: removed from the flow, so the alternating rhythm re-flows
+   onto whatever is left (js/main.js sets .is-alt on every second visible row).
+   The filter animates (js/main.js): rows that drop out fade and sink away
+   (.is-leaving), rows that stay glide to their new place (FLIP), rows that
+   come in — or switch sides — rise in one after another (.is-entering). */
 .case-row[hidden]{ display:none; }
+.case-row{
+  transition:opacity .6s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1);
+}
+.case-row.is-leaving{
+  opacity:0; transform:translateY(2.5vw) scale(.97);
+  transition-duration:.32s, .32s; transition-timing-function:cubic-bezier(.4,0,1,1);
+  pointer-events:none;
+}
+.case-row.is-entering{ opacity:0; transform:translateY(4vw); transition:none; }
+.case-row.is-flip{ transition:none; }
+@media (prefers-reduced-motion:reduce){
+  .case-row, .case-row.is-leaving{ transition:none; }
+}
 @media (prefers-reduced-motion:reduce){
   .case-row-media img, .case-row-link-icon{ transition:none; }
 }
@@ -2825,9 +2858,9 @@ html.wipe-cover-rtl::before{
   /* Stacked, so the mirroring has nothing to mirror — every row reads
      headline, copy, link, image. */
   .case-row,
-  .case-row:nth-child(even){ grid-template-columns:1fr; gap:6vw; }
-  .case-row:nth-child(even) .case-row-text{ order:1; }
-  .case-row:nth-child(even) .case-row-media{ order:2; }
+  :is(.cases-grid:not(.is-js) .case-row:nth-child(even), .case-row.is-alt){ grid-template-columns:1fr; gap:6vw; }
+  :is(.cases-grid:not(.is-js) .case-row:nth-child(even), .case-row.is-alt) .case-row-text{ order:1; }
+  :is(.cases-grid:not(.is-js) .case-row:nth-child(even), .case-row.is-alt) .case-row-media{ order:2; }
   .case-row-client{ margin-bottom:2vw; font-size:3.8vw; }
   .case-row-title{ margin-bottom:4vw; font-size:6vw; }
   .case-row-copy{ margin-bottom:5vw; font-size:3.8vw; }
@@ -2855,11 +2888,10 @@ html.wipe-cover-rtl::before{
   font-size:1.0938vw; line-height:1.4; color:var(--white); opacity:.8;
 }
 
-.leistung-ueber-list{ padding-top:7vw; }
-/* auto-fit rather than a fixed count: five services do not divide evenly, and
-   the row should reflow if one is added or dropped. */
+.leistung-ueber-list{ padding-top:7vw; padding-bottom:10vw; }
+/* Four services in a 2 x 2 grid (2 columns on tablet too, 1 on phones). */
 .leistung-ueber-grid{
-  display:grid; grid-template-columns:repeat(auto-fit, minmax(20vw, 1fr));
+  display:grid; grid-template-columns:repeat(2, minmax(0, 1fr));
   gap:1.5625vw;
 }
 .leistung-ueber-card{
@@ -2897,6 +2929,23 @@ html.wipe-cover-rtl::before{
   transition:transform .4s cubic-bezier(.4,0,.2,1);
 }
 .leistung-ueber-card:hover .leistung-ueber-link-icon{ transform:rotate(45deg); }
+/* Secondary CTA in the cards. The title's stretched link already covers the
+   whole card (and is the one tab stop), so the button is a visual affordance
+   that plays its cross-slide whenever the card is hovered. */
+.leistung-ueber-cta{ margin-top:auto; pointer-events:none; }
+.leistung-ueber-card:hover .leistung-cta-label,
+.leistung-ueber-card:focus-within .leistung-cta-label{
+  transform:translateX(var(--leistung-cta-icon-w, 2.0833vw));
+}
+.leistung-ueber-card:hover .leistung-cta-icon,
+.leistung-ueber-card:focus-within .leistung-cta-icon{
+  transform:translateX(calc(-1 * var(--leistung-cta-label-w, 6vw))) rotate(45deg);
+}
+@media (max-width:1200px) and (min-width:861px){
+  .leistung-ueber-grid{ grid-template-columns:repeat(2, minmax(0, 1fr)); gap:2vw; }
+  .leistung-ueber-title{ font-size:2.6vw; }
+  .leistung-ueber-copy{ font-size:1.5vw; }
+}
 @media (prefers-reduced-motion:reduce){
   .leistung-ueber-card, .leistung-ueber-link-icon{ transition:none; }
 }
@@ -2937,7 +2986,7 @@ html.wipe-cover-rtl::before{
   .leistung-ueber-h1{ margin-bottom:5vw; font-size:var(--mobile-heading); letter-spacing:0; }
   .leistung-ueber-lead{ max-width:none; font-size:3.8vw; }
 
-  .leistung-ueber-list{ padding-top:14vw; }
+  .leistung-ueber-list{ padding-top:14vw; padding-bottom:20vw; }
   .leistung-ueber-grid{ grid-template-columns:1fr; gap:5vw; }
   .leistung-ueber-card{ padding:6vw; border-radius:2.5vw; }
   .leistung-ueber-card:hover{ background:transparent; }
@@ -4092,3 +4141,82 @@ body.show-grid .debug-grid{ display:block; }
 /* header: link to the client's live site, the site's standard CTA */
 .case-hero-cta{ margin-top:2.1vw; }
 @media (max-width:860px){ .case-hero-cta{ margin-top:6vw; } }
+
+/* Insights-Seite: Social Wall statt Blog-Liste. Kopf = .blog-hero, darunter
+   das Grid. Filter sitzen im Kopf an der Stelle der früheren Themen-Chips. */
+.social-wall-page .blog-hero{ padding-bottom:3vw; }
+.social-wall-page-body{ padding-bottom:8vw; }
+@media (max-width:860px){
+  .social-wall-page .blog-hero{ padding-bottom:6vw; }
+}
+
+/* ---------- case detail — smartphone stage (js/case-phone.js)
+   Same stage as the laptop; only the screen differs: a 390px-wide mobile
+   screen with the iPhone's rounded display corners and the Dynamic Island.
+   Radii/island are shares of the 440pt-wide iPhone 16 Pro Max display. */
+.case-mb--phone .mb-screen{ width:390px; height:844px; border-radius:48px; }
+.mb-island{
+  position:absolute; z-index:3; left:50%; top:11px; transform:translateX(-50%);
+  width:110px; height:32px; background:#000; border-radius:16px;
+  pointer-events:none;
+}
+.case-mb--phone .mb-screen::after{ border-radius:inherit; }
+/* flat fallback: the mobile screen alone, centred in the device's place */
+.case-mb--phone.is-flat .mb-screen{
+  left:50%; top:50%;
+  width:auto !important; height:min(78vh, 760px) !important; aspect-ratio:390 / 844;
+  border-radius:clamp(20px, 4vh, 44px);
+  box-shadow:0 0 0 8px #1a1a1a, 0 0 0 9px rgba(255,255,255,.18);
+}
+
+/* ---------- case detail — iPad stage (js/case-ipad.js)
+   Same stage as the laptop; the screen is the 12.9" iPad Pro display in
+   landscape (2732 x 2048 → 1440 x 1067 CSS px here) with its rounded display
+   corners, plus the ring where the Pencil touches the glass. */
+.case-mb--ipad .mb-screen{ width:1440px; height:1067px; border-radius:26px; }
+.case-mb--ipad .mb-screen::after{ border-radius:inherit; }
+/* the Pencil's own canvas, above the HTML screen */
+.case-mb-canvas--top{ z-index:2; pointer-events:none; }
+.mb-touch{
+  position:absolute; z-index:4; left:0; top:0;
+  width:46px; height:46px; margin:-23px 0 0 -23px; border-radius:50%;
+  background:radial-gradient(circle, rgba(20,20,20,.22) 0 30%, rgba(20,20,20,.08) 31% 100%);
+  box-shadow:0 0 0 1.5px rgba(20,20,20,.22);
+  opacity:0; pointer-events:none; will-change:transform, opacity;
+}
+/* flat fallback: the screen alone, centred, in a thin bezel */
+.case-mb--ipad.is-flat .mb-screen{
+  aspect-ratio:1440 / 1067; width:min(74vw, 1100px) !important;
+  border-radius:clamp(10px, 1.6vw, 24px);
+  box-shadow:0 0 0 clamp(8px, 1.2vw, 18px) #1a1a1a, 0 0 0 calc(clamp(8px, 1.2vw, 18px) + 1px) rgba(255,255,255,.18);
+}
+
+/* ---------- Rechtstexte (impressum.html, datenschutz.html)
+   Kopf wie die Kontaktseite; darunter eine schmale Lesespalte in der
+   Fließtext-Schrift der Seite. */
+.legal{ padding:2vw 0 8vw; }
+.legal-body{ max-width:52vw; color:var(--white); }
+.legal-body h2{
+  margin:3.2vw 0 .9vw;
+  font-family:var(--font-display-bold); font-weight:700;
+  font-size:1.25vw; line-height:1.3;
+}
+.legal-body h2:first-child, .legal-stand + h2{ margin-top:0; }
+.legal-body p, .legal-body li{
+  margin:0 0 1vw;
+  font-family:var(--font-display-bold); font-weight:300;
+  font-size:.9375vw; line-height:1.6; opacity:.85;
+}
+.legal-body ul{ margin:0 0 1vw; padding-left:1.2em; }
+.legal-body li{ margin-bottom:.4vw; }
+.legal-body a{ color:inherit; text-decoration:underline; text-underline-offset:.15em; word-break:break-word; }
+.legal-body strong{ font-weight:700; }
+.legal-stand{ font-size:.8vw !important; opacity:.55 !important; margin-bottom:2.4vw !important; }
+@media (max-width:860px){
+  .legal{ padding:4vw 0 16vw; }
+  .legal-body{ max-width:none; }
+  .legal-body h2{ margin:9vw 0 3vw; font-size:5vw; }
+  .legal-body p, .legal-body li{ margin-bottom:3.5vw; font-size:3.8vw; }
+  .legal-body li{ margin-bottom:2vw; }
+  .legal-stand{ font-size:3.2vw !important; margin-bottom:7vw !important; }
+}

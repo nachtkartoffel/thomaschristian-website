@@ -4,10 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Leistungen — noll media</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#000000">
 <meta name="description" content="Die Leistungen von noll media: Websites &amp; Online-Shops, Digitale Werbung, Content &amp; Media, Social Media und Suchmaschinenoptimierung.">
 <link rel="preconnect" href="fonts">
 <link rel="stylesheet" href="fonts/stylesheet.css">
-<link rel="stylesheet" href="css/style.css?v=139">
+<link rel="stylesheet" href="css/style.css?v=168">
 <script>
 /* Page transition, arrival half. Inline and in the head on purpose: the white
    panel has to be covering the screen before this page's first paint, which a
@@ -75,11 +80,10 @@
   </div>
   <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
     <div class="nav-dropdown-inner">
-      <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
-      <a href="leistungen-social-media.html">Social Media</a>
-      <a href="leistungen-media-content.html">Media &amp; Content</a>
-      <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
-      <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+      <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+      <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+      <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+      <a href="leistungen-ki-automation.html">KI-Automation</a>
     </div>
   </div>
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
@@ -92,11 +96,10 @@
       </button>
       <div class="mobile-subnav" id="mobileSubnav">
         <div class="mobile-subnav-inner">
-          <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
-          <a href="leistungen-social-media.html">Social Media</a>
-          <a href="leistungen-media-content.html">Media &amp; Content</a>
-          <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
-          <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+          <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+          <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+          <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+          <a href="leistungen-ki-automation.html">KI-Automation</a>
         </div>
       </div>
     </div>
@@ -128,93 +131,58 @@
 
 <main id="main">
 
-  <!-- Leistungen overview. The five service areas and the four-step method are
-       noll.media's own; the descriptions under them are drafts and marked with
-       data-placeholder until the real copy exists. -->
+  <!-- Leistungen overview. The four service areas match the homepage tiles. -->
   <section class="leistung-ueber-hero" aria-label="Leistungen">
     <div class="wrap">
       <h1 class="leistung-ueber-h1">Alles, was dein Unternehmen online sichtbar macht.</h1>
-      <p class="leistung-ueber-lead">Fünf Disziplinen, ein Team, ein Ansprechpartner — von der Website über Kampagnen und Content bis zur Suchmaschine. Messbar, transparent und erfolgsorientiert.</p>
+      <p class="leistung-ueber-lead">Ein Team, ein Ansprechpartner — von der Website über Google &amp; KI und Performance-Marketing bis zur KI-Automation. Messbar, transparent und erfolgsorientiert.</p>
     </div>
   </section>
 
   <section class="leistung-ueber-list" aria-label="Unsere Leistungen">
+    <!-- Same four services and copy as the Leistungen tiles on the homepage
+         (index.html) – keep both in sync. CTA = the site's secondary button
+         (.leistung-cta, outline pill + ring icon, cross-slide hover). -->
     <div class="wrap leistung-ueber-grid">
         <article class="leistung-ueber-card">
           <img class="leistung-ueber-icon" src="images/leistungen/websites-shops.svg" alt="" aria-hidden="true">
-          <h2 class="leistung-ueber-title"><a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a></h2>
-          <p class="leistung-ueber-copy">Die Website ist meist der erste Kontakt zwischen Kunde und Unternehmen. Wir entwickeln sie samt Shopsystem auf WordPress- und WooCommerce-Basis — sichtbar, messbar und erweiterbar.</p>
-          <a class="leistung-ueber-link" href="leistungen-website-online-shops.html">
-            <span>Mehr erfahren</span>
-            <img class="leistung-ueber-link-icon" src="images/arrow-ne.svg" alt="" aria-hidden="true">
-          </a>
-        </article>
-        <article class="leistung-ueber-card">
-          <img class="leistung-ueber-icon" src="images/leistungen/kampagne.svg" alt="" aria-hidden="true">
-          <h2 class="leistung-ueber-title"><a href="leistungen-digitale-werbung.html">Digitale Werbung</a></h2>
-          <p class="leistung-ueber-copy" data-placeholder>Platzhalter: Hier stehen zwei bis drei Sätze dazu, wie wir Werbebudget auf die Kanäle verteilen, die bei deiner Zielgruppe wirklich ankommen — und woran wir den Erfolg messen.</p>
-          <a class="leistung-ueber-link" href="leistungen-digitale-werbung.html">
-            <span>Mehr erfahren</span>
-            <img class="leistung-ueber-link-icon" src="images/arrow-ne.svg" alt="" aria-hidden="true">
-          </a>
-        </article>
-        <article class="leistung-ueber-card">
-          <img class="leistung-ueber-icon" src="images/leistungen/media.svg" alt="" aria-hidden="true">
-          <h2 class="leistung-ueber-title"><a href="leistungen-media-content.html">Content &amp; Media</a></h2>
-          <p class="leistung-ueber-copy" data-placeholder>Platzhalter: Hier stehen zwei bis drei Sätze zu Foto, Video und Text — was wir produzieren, für welche Kanäle, und wie daraus ein durchgängiger Auftritt wird.</p>
-          <a class="leistung-ueber-link" href="leistungen-media-content.html">
-            <span>Mehr erfahren</span>
-            <img class="leistung-ueber-link-icon" src="images/arrow-ne.svg" alt="" aria-hidden="true">
-          </a>
-        </article>
-        <article class="leistung-ueber-card">
-          <img class="leistung-ueber-icon" src="images/leistungen/kampagne.svg" alt="" aria-hidden="true">
-          <h2 class="leistung-ueber-title"><a href="leistungen-social-media.html">Social Media</a></h2>
-          <p class="leistung-ueber-copy" data-placeholder>Platzhalter: Hier stehen zwei bis drei Sätze zu Redaktionsplanung, Community und bezahlter Reichweite — und dazu, welche Plattformen für welches Ziel sinnvoll sind.</p>
-          <a class="leistung-ueber-link" href="leistungen-social-media.html">
-            <span>Mehr erfahren</span>
-            <img class="leistung-ueber-link-icon" src="images/arrow-ne.svg" alt="" aria-hidden="true">
+          <h2 class="leistung-ueber-title"><a href="leistungen-website-online-shops.html">Leistungsstarke<br>Websites &amp; Shops</a></h2>
+          <p class="leistung-ueber-copy">Websites und Online-Shops, die Kunden gewinnen, Mitarbeitende überzeugen und Abläufe vereinfachen – inklusive Foto und Video mit unserem Produktionspartner.</p>
+          <a class="leistung-cta leistung-ueber-cta" href="leistungen-website-online-shops.html" tabindex="-1" aria-hidden="true">
+            <span class="leistung-cta-label">Mehr erfahren</span>
+            <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
           </a>
         </article>
         <article class="leistung-ueber-card">
           <img class="leistung-ueber-icon" src="images/leistungen/seo.svg" alt="" aria-hidden="true">
-          <h2 class="leistung-ueber-title"><a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a></h2>
-          <p class="leistung-ueber-copy" data-placeholder>Platzhalter: Hier stehen zwei bis drei Sätze zu technischer Optimierung, Inhalten und lokaler Sichtbarkeit — und dazu, wie lange SEO üblicherweise braucht, bis es wirkt.</p>
-          <a class="leistung-ueber-link" href="leistungen-suchmaschinenoptimierung.html">
-            <span>Mehr erfahren</span>
-            <img class="leistung-ueber-link-icon" src="images/arrow-ne.svg" alt="" aria-hidden="true">
+          <h2 class="leistung-ueber-title"><a href="leistungen-suchmaschinenoptimierung.html">Gefunden werden<br>bei Google &amp; KI</a></h2>
+          <p class="leistung-ueber-copy">Wir sorgen dafür, dass du gefunden wirst: in der Google-Suche und in den Antworten von KI-Assistenten wie ChatGPT.</p>
+          <a class="leistung-cta leistung-ueber-cta" href="leistungen-suchmaschinenoptimierung.html" tabindex="-1" aria-hidden="true">
+            <span class="leistung-cta-label">Mehr erfahren</span>
+            <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+          </a>
+        </article>
+        <article class="leistung-ueber-card">
+          <img class="leistung-ueber-icon" src="images/leistungen/kampagne.svg" alt="" aria-hidden="true">
+          <h2 class="leistung-ueber-title"><a href="leistungen-digitale-werbung.html">Messbares<br>Performance-Marketing</a></h2>
+          <p class="leistung-ueber-copy">Anzeigen auf Google, Meta und LinkedIn, die gezielt Anfragen und Bewerbungen bringen – messbar bis zum Ergebnis.</p>
+          <a class="leistung-cta leistung-ueber-cta" href="leistungen-digitale-werbung.html" tabindex="-1" aria-hidden="true">
+            <span class="leistung-cta-label">Mehr erfahren</span>
+            <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
+          </a>
+        </article>
+        <article class="leistung-ueber-card">
+          <img class="leistung-ueber-icon" src="images/leistungen/ki.svg" alt="" aria-hidden="true">
+          <h2 class="leistung-ueber-title"><a href="leistungen-ki-automation.html">Intelligente<br>KI-Automation</a></h2>
+          <p class="leistung-ueber-copy">Wir automatisieren wiederkehrende Aufgaben mit KI – von der Kundenanfrage bis zur Bewerberkommunikation.</p>
+          <a class="leistung-cta leistung-ueber-cta" href="leistungen-ki-automation.html" tabindex="-1" aria-hidden="true">
+            <span class="leistung-cta-label">Mehr erfahren</span>
+            <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
           </a>
         </article>
     </div>
   </section>
 
-  <section class="leistung-ueber-prozess" aria-label="So arbeiten wir">
-    <div class="wrap">
-      <h2 class="leistung-ueber-prozess-heading">So arbeiten wir</h2>
-      <ol class="leistung-ueber-steps">
-        <li class="leistung-ueber-step">
-          <span class="leistung-ueber-step-num">01</span>
-          <h3>Analyse</h3>
-          <p data-placeholder>Wir sehen uns an, wo du stehst: Markt, Wettbewerb, Zahlen und das, was bisher läuft.</p>
-        </li>
-        <li class="leistung-ueber-step">
-          <span class="leistung-ueber-step-num">02</span>
-          <h3>Strategie</h3>
-          <p data-placeholder>Daraus entsteht ein Plan mit klaren Zielen und den Kanälen, die dafür den größten Hebel haben.</p>
-        </li>
-        <li class="leistung-ueber-step">
-          <span class="leistung-ueber-step-num">03</span>
-          <h3>Umsetzung</h3>
-          <p data-placeholder>Wir setzen um — Website, Kampagne, Content, Social — aus einer Hand und mit einem Ansprechpartner.</p>
-        </li>
-        <li class="leistung-ueber-step">
-          <span class="leistung-ueber-step-num">04</span>
-          <h3>Controlling</h3>
-          <p data-placeholder>Wir messen, was die Maßnahmen bringen, und justieren nach. Transparent und nachvollziehbar.</p>
-        </li>
-      </ol>
-    </div>
-  </section>
 
 
 </main>
@@ -250,9 +218,9 @@
 
     <div class="footer-white">
       <div class="footer-legal">
-        <a href="#">Impressum</a>
+        <a href="impressum.html">Impressum</a>
         <a href="kontakt.html">Kontakt</a>
-        <a href="#">Datenschutz</a>
+        <a href="datenschutz.html">Datenschutz</a>
       </div>
       <p class="footer-social-heading">Folge uns!</p>
       <div class="footer-social">
@@ -269,6 +237,6 @@
   </div>
 </footer>
 
-<script src="js/main.js?v=39"></script>
+<script src="js/main.js?v=43"></script>
 </body>
 </html>

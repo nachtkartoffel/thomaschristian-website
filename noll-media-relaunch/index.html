@@ -4,10 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>noll media — Dein Partner für Web, Branding &amp; Marketing</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#000000">
 <meta name="description" content="noll media – dein Partner für Web, Branding &amp; Marketing.">
 <link rel="preconnect" href="fonts">
 <link rel="stylesheet" href="fonts/stylesheet.css">
-<link rel="stylesheet" href="css/style.css?v=143">
+<link rel="stylesheet" href="css/style.css?v=168">
 <script>
 /* Page transition, arrival half. Inline and in the head on purpose: the white
    panel has to be covering the screen before this page's first paint, which a
@@ -82,11 +87,10 @@
        js/main.js measures from the Services item. -->
   <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
     <div class="nav-dropdown-inner">
-      <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
-      <a href="leistungen-social-media.html">Social Media</a>
-      <a href="leistungen-media-content.html">Media &amp; Content</a>
-      <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
-      <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+      <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+      <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+      <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+      <a href="leistungen-ki-automation.html">KI-Automation</a>
     </div>
   </div>
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
@@ -100,11 +104,10 @@
       </button>
       <div class="mobile-subnav" id="mobileSubnav">
         <div class="mobile-subnav-inner">
-          <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
-          <a href="leistungen-social-media.html">Social Media</a>
-          <a href="leistungen-media-content.html">Media &amp; Content</a>
-          <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
-          <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+          <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+          <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+          <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+          <a href="leistungen-ki-automation.html">KI-Automation</a>
         </div>
       </div>
     </div>
@@ -397,7 +400,7 @@
         <img class="leistung-icon" src="images/leistungen/ki.svg" alt="" aria-hidden="true">
         <h3>Intelligente<br>KI-Automation</h3>
         <p>Wir automatisieren wiederkehrende Aufgaben mit KI – von der Kundenanfrage bis zur Bewerberkommunikation.</p>
-        <a class="leistung-cta" href="#">
+        <a class="leistung-cta" href="leistungen-ki-automation.html">
           <span class="leistung-cta-label">Mehr erfahren</span>
           <span class="leistung-cta-icon"><img src="images/btn_pfeil.svg" alt=""></span>
         </a>
@@ -423,18 +426,20 @@
        über api/google-reviews.php und ersetzt Zitat, Name und Zeile darunter.
        Kommt nichts zurück (kein PHP, keine config.php, API-Fehler), bleibt
        das statische Zitat unten unverändert stehen. Das Foto bleibt fest. -->
-  <section class="testimonial" id="kundenzitate" aria-label="Kundenzitate" data-google-reviews="api/google-reviews.php">
+  <section class="testimonial" id="kundenzitate" aria-label="Kundenzitate" data-google-reviews="api/google-reviews.php" data-google-reviews-fallback="data/google-reviews.json">
     <div class="testimonial-inner">
-      <div class="testimonial-photo" data-placeholder-media>
+      <div class="testimonial-photo">
         <img src="images/testimonial/photo.jpg" alt="Jordan Doe">
       </div>
       <blockquote class="testimonial-quote">
         <p data-placeholder>Lorem ipsum dolor sit duo dolores et eamet. At vero eos et accusam et jus tet clita kasd gubergren”</p>
-        <footer class="testimonial-attribution">
-          <span class="testimonial-name" data-placeholder>Jordan Doe</span>
-          <span class="testimonial-role" data-placeholder>CEO Ursa Chemie</span>
-        </footer>
-        <nav class="testimonial-dots" aria-label="Bewertungen" hidden></nav>
+        <div class="testimonial-meta">
+          <footer class="testimonial-attribution">
+            <span class="testimonial-name" data-placeholder>Jordan Doe</span>
+            <span class="testimonial-role" data-placeholder>CEO Ursa Chemie</span>
+          </footer>
+          <nav class="testimonial-dots" aria-label="Bewertungen" hidden></nav>
+        </div>
       </blockquote>
     </div>
   </section>
@@ -594,9 +599,9 @@
 
     <div class="footer-white">
       <div class="footer-legal">
-        <a href="#">Impressum</a>
+        <a href="impressum.html">Impressum</a>
         <a href="kontakt.html">Kontakt</a>
-        <a href="#">Datenschutz</a>
+        <a href="datenschutz.html">Datenschutz</a>
       </div>
       <p class="footer-social-heading">Folge uns!</p>
       <div class="footer-social">
@@ -613,10 +618,13 @@
   </div>
 </footer>
 
-<script src="js/main.js?v=39"></script>
-<script src="js/google-reviews.js?v=1" defer></script>
+<script src="js/cases-data.js?v=2"></script>
+<script src="js/cases.js?v=2"></script>
+<script src="js/main.js?v=43"></script>
+<script src="js/google-reviews-data.js?v=1" defer></script>
+<script src="js/google-reviews.js?v=4" defer></script>
 <script src="js/vendor/isotope.pkgd.min.js?v=3.0.6" defer></script>
 <script src="js/social-wall-data.js?v=2" defer></script>
-<script src="js/social-wall.js?v=3" defer></script>
+<script src="js/social-wall.js?v=4" defer></script>
 </body>
 </html>

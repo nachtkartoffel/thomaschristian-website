@@ -11,10 +11,22 @@
   const roleEl  = quote.querySelector('.testimonial-role');
   const dotsEl  = quote.querySelector('.testimonial-dots');
   const INTERVAL = 9000;
+  // Ab so vielen Zeichen nächstkleinerer Schriftgrad (siehe .testimonial-quote.is-long)
+  const LONG = 160;
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  fetch(section.dataset.googleReviews, { headers: { Accept: 'application/json' } })
+  // Erst der PHP-Endpunkt (live), sonst die statische JSON-Datei (Hosting ohne PHP)
+  const load = (url) => fetch(url, { headers: { Accept: 'application/json' } })
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+    .then((d) => (d && d.reviews && d.reviews.length ? d : Promise.reject('leer')));
+  const fallback = section.dataset.googleReviewsFallback;
+  load(section.dataset.googleReviews)
+    .catch(() => (fallback ? load(fallback) : Promise.reject()))
+    .catch(() => {
+      // Letzter Fallback: eingebetteter Stand (funktioniert auch per file://)
+      const d = window.NOLL_GOOGLE_REVIEWS;
+      return d && d.reviews && d.reviews.length ? d : Promise.reject();
+    })
     .then((data) => {
       const reviews = (data && data.reviews) || [];
       if (!reviews.length) return;
@@ -38,6 +50,7 @@
 
     // Schließendes Anführungszeichen wie im Design, öffnendes kommt per CSS
     textEl.textContent = review.text.replace(/["“”„]+$/, '') + '”';
+    quote.classList.toggle('is-long', review.text.length > LONG);
 
     nameEl.textContent = '';
     if (review.authorUrl) {

@@ -4,10 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>URSA Chemie — Cases — noll media</title>
+<link rel="icon" href="favicon.ico" sizes="48x48">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<meta name="theme-color" content="#000000">
 <meta name="description" content="Case: Neuer Webauftritt für die Ursa Chemie GmbH – Konzept, Webdesign, Entwicklung und Content von noll media.">
 <link rel="preconnect" href="fonts">
 <link rel="stylesheet" href="fonts/stylesheet.css">
-<link rel="stylesheet" href="css/style.css?v=158">
+<link rel="stylesheet" href="css/style.css?v=168">
 <script>
 /* Page transition, arrival half. Inline and in the head on purpose: the white
    panel has to be covering the screen before this page's first paint, which a
@@ -75,11 +80,10 @@
   </div>
   <div class="nav-dropdown" id="navDropdown" aria-label="Leistungen">
     <div class="nav-dropdown-inner">
-      <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
-      <a href="leistungen-social-media.html">Social Media</a>
-      <a href="leistungen-media-content.html">Media &amp; Content</a>
-      <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
-      <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+      <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+      <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+      <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+      <a href="leistungen-ki-automation.html">KI-Automation</a>
     </div>
   </div>
   <nav class="mobile-nav" id="mobileNav" aria-label="Mobile Navigation">
@@ -92,11 +96,10 @@
       </button>
       <div class="mobile-subnav" id="mobileSubnav">
         <div class="mobile-subnav-inner">
-          <a href="leistungen-suchmaschinenoptimierung.html">Suchmaschinenoptimierung</a>
-          <a href="leistungen-social-media.html">Social Media</a>
-          <a href="leistungen-media-content.html">Media &amp; Content</a>
-          <a href="leistungen-digitale-werbung.html">Digitale Werbung</a>
-          <a href="leistungen-website-online-shops.html">Websites &amp; Online-Shops</a>
+          <a href="leistungen-website-online-shops.html">Websites &amp; Shops</a>
+          <a href="leistungen-suchmaschinenoptimierung.html">Google &amp; KI</a>
+          <a href="leistungen-digitale-werbung.html">Performance-Marketing</a>
+          <a href="leistungen-ki-automation.html">KI-Automation</a>
         </div>
       </div>
     </div>
@@ -313,38 +316,8 @@
   <section class="leistung-detail-cases" aria-label="Weitere Cases">
     <div class="wrap">
       <h2 class="leistung-detail-cases-heading">Weitere Projekte</h2>
-      <div class="leistung-detail-cases-grid">
-        <article class="leistung-detail-case">
-          <div class="leistung-detail-case-media" data-placeholder-media aria-hidden="true"></div>
-          <div class="leistung-detail-case-body">
-            <div class="leistung-detail-case-text">
-              <p class="leistung-detail-case-subtitle">Westerwald Bank eG</p>
-              <p class="leistung-detail-case-title"><a href="cases.html">Westerwald Bank</a></p>
-            </div>
-            <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
-          </div>
-        </article>
-        <article class="leistung-detail-case">
-          <div class="leistung-detail-case-media" data-placeholder-media aria-hidden="true"></div>
-          <div class="leistung-detail-case-body">
-            <div class="leistung-detail-case-text">
-              <p class="leistung-detail-case-subtitle">AWO Bezirksverband Rheinland e.V.</p>
-              <p class="leistung-detail-case-title"><a href="cases.html">AWO Rheinland</a></p>
-            </div>
-            <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
-          </div>
-        </article>
-        <article class="leistung-detail-case">
-          <div class="leistung-detail-case-media" data-placeholder-media aria-hidden="true"></div>
-          <div class="leistung-detail-case-body">
-            <div class="leistung-detail-case-text">
-              <p class="leistung-detail-case-subtitle">Versus Performance</p>
-              <p class="leistung-detail-case-title"><a href="cases.html">Versus Performance</a></p>
-            </div>
-            <img class="leistung-detail-case-icon" src="images/btn_pfeil.svg" alt="">
-          </div>
-        </article>
-      </div>
+      <!-- Built by js/cases.js from js/cases-data.js: the next cases after this one. -->
+      <div class="leistung-detail-cases-grid" data-cases="related" data-cases-current="ursa-chemie"></div>
     </div>
   </section>
 
@@ -381,9 +354,9 @@
 
     <div class="footer-white">
       <div class="footer-legal">
-        <a href="#">Impressum</a>
+        <a href="impressum.html">Impressum</a>
         <a href="kontakt.html">Kontakt</a>
-        <a href="#">Datenschutz</a>
+        <a href="datenschutz.html">Datenschutz</a>
       </div>
       <p class="footer-social-heading">Folge uns!</p>
       <div class="footer-social">
@@ -400,7 +373,9 @@
   </div>
 </footer>
 
-<script src="js/main.js?v=39"></script>
+<script src="js/cases-data.js?v=2"></script>
+<script src="js/cases.js?v=2"></script>
+<script src="js/main.js?v=43"></script>
 <script src="js/vendor/three.bundle.js?v=170"></script>
 <script src="models/laptop.glb.js?v=2"></script>
 <script src="js/case-laptop.js?v=10"></script>

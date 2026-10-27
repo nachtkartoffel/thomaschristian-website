@@ -1,4 +1,4 @@
-# Social Wall (Startseite, Sektion #insights)
+# Social Wall (Startseite, Sektion #insights + Seite insights.html)
 
 Ersetzt die drei statischen Blog-Teaser durch eine Sammlung echter Beiträge
 von Instagram (@noll.media), LinkedIn (noll media GmbH) und YouTube
@@ -61,3 +61,8 @@ Ohne Token liefert der Endpunkt YouTube live + Instagram aus dem statischen Stan
   Meta-CDN; wer das vermeiden will, kann sie serverseitig spiegeln.
 - **Lokale Vorschau:** YouTube-Videos spielen nur auf http(s) (unter `file://`
   bleibt das Vorschaubild stehen – YouTube verlangt einen Referrer).
+
+## Insights-Seite
+`insights.html` nutzt dieselbe Social Wall statt der Blog-Platzhalter: Titel + Lead der
+Blog-Übersicht bleiben, die Kanal-Filter sitzen an Stelle der Themen-Chips, die Suche entfällt.
+`data-page-first="16"` am Section-Element setzt die Startanzahl (Standard 12).

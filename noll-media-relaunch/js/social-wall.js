@@ -26,7 +26,7 @@
   const moreWrap  = section.querySelector('.social-wall-more-wrap');
   const endpoint  = section.dataset.socialWall;
 
-  const PAGE_FIRST = 12;   // Kacheln beim ersten Laden
+  const PAGE_FIRST = parseInt(section.dataset.pageFirst, 10) || 12;   // Kacheln beim ersten Laden (data-page-first überschreibt)
   const PAGE_STEP  = 8;    // pro Klick auf "Mehr anzeigen"
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 

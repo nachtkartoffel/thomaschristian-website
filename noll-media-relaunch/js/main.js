@@ -315,11 +315,13 @@
   const casesTrack = document.getElementById('casesTrack');
   const caseTitle = document.getElementById('caseActiveTitle');
 
-  const CASES = [
+  // Items come from js/cases-data.js (prepared by js/cases.js as
+  // window.NOLL_HOME_CASES); the list below is only the fallback.
+  const CASES = window.NOLL_HOME_CASES && window.NOLL_HOME_CASES.length ? window.NOLL_HOME_CASES : [
     { title: 'Projekt 02', tags: 'Web<br>Branding<br>Marketing', img: 'images/mockup_case.jpg' },
-    { title: 'URSA Chemie', tags: 'Web<br>Branding<br>Marketing', img: 'images/mockup_case.jpg' },
-    { title: 'Projekt 02', tags: 'Web<br>Branding<br>Marketing', img: 'images/mockup_case.jpg' },
-    { title: 'Projekt 03', tags: 'Web<br>Branding<br>Marketing', img: 'images/mockup_case.jpg' }
+    { title: 'URSA Chemie', tags: 'Industrie<br>Website<br>Content', img: 'images/cases/ursa-hero.jpg', href: 'case-ursa-chemie.html', alt: 'Website der URSA Chemie' },
+    { title: 'Westerwald Bank', tags: 'Immobilien<br>Website<br>SEO', img: 'images/cases/wwb-hero.jpg', href: 'case-westerwald-bank.html', alt: 'Website der Immobiliengesellschaft der Westerwald Bank' },
+    { title: 'Marx & Jansen', tags: 'Steuerberatung<br>Website<br>Online-Portal', img: 'images/cases/mj-hero.jpg', href: 'case-marx-jansen.html', alt: 'Website von Marx & Jansen' }
   ];
   const LAPS = 5; // generous buffer: 2 full laps of slack on each side of the middle lap, always
 
@@ -330,9 +332,14 @@
         const el = document.createElement('article');
         el.className = 'case-item';
         el.dataset.title = c.title;
-        el.innerHTML =
-          `<div class="case-media"><img src="${c.img}" alt=""></div>` +
-          `<p class="case-tags">${c.tags}</p>`;
+        // Real cases link through to their case page; placeholders stay inert.
+        // Only the middle lap's copy is exposed to screen readers / tab order,
+        // the buffer laps are visual repeats.
+        const img = `<img src="${c.img}" alt="${lap === Math.floor(LAPS / 2) ? (c.alt || '') : ''}" decoding="async">`;
+        const media = c.href
+          ? `<a class="case-media" href="${c.href}"${lap === Math.floor(LAPS / 2) ? '' : ' tabindex="-1" aria-hidden="true"'}>${img}</a>`
+          : `<div class="case-media">${img}</div>`;
+        el.innerHTML = media + `<p class="case-tags">${c.tags}</p>`;
         casesTrack.appendChild(el);
         // .case-media (height) and .case-tags (opacity) each declare their
         // own transition in CSS, independent of .case-item's (width). All
@@ -347,7 +354,7 @@
     const N = CASES.length;
     const HOME = N * Math.floor(LAPS / 2); // first index of the middle lap
     const SAFETY_MS = 600; // slightly more than the .5s CSS transition, in case transitionend doesn't fire
-    let activePos = HOME + 1; // 2nd item of the middle lap = URSA Chemie
+    let activePos = HOME; // first item of the middle lap = first case in js/cases-data.js
     let animating = false; // guards against overlapping slides from rapid clicks
 
     // Active slide is anchored to the start of column 4 of the 12-column
@@ -844,18 +851,24 @@
     if (teamSection) {
       const cols = Array.from(teamSection.querySelectorAll('[data-parallax]'));
 
-      // Fresh order on every visit: the six portraits are shuffled and dealt
+      // Fresh order on every visit: the portraits are shuffled and dealt
       // back out alternately, so both columns stay filled evenly and nobody
-      // holds a permanent top slot. Done before anything else in this block,
-      // since the drift amplitudes below are assigned by position.
+      // holds a permanent top slot. Dealing starts with the right column —
+      // it sits half a step higher than the left one, so it holds the first
+      // slot in the zigzag. With an odd head count the extra portrait then
+      // lands on the right too and the zigzag still ends right/left/right
+      // instead of two in a row on the left. Done before anything else in
+      // this block, since the drift amplitudes below are assigned by position.
       if (cols.length) {
         const shuffled = Array.from(teamSection.querySelectorAll('.ueber-person'));
         for (let i = shuffled.length - 1; i > 0; i -= 1) {
           const j = Math.floor(Math.random() * (i + 1));
           [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
         }
+        const dealOrder = cols.slice().sort((a, b) =>
+          (b.dataset.parallax === 'right') - (a.dataset.parallax === 'right'));
         shuffled.forEach((person, i) => {
-          cols[i % cols.length].appendChild(person);
+          dealOrder[i % dealOrder.length].appendChild(person);
         });
       }
 
@@ -1112,8 +1125,9 @@
   // Cases overview — the category filter. Each project carries its categories
   // in data-case-tags, each chip the one it selects in data-case-filter;
   // "alle" matches everything. Rows are hidden with the `hidden` attribute
-  // rather than a class, so they leave the flow and the left/right alternation
-  // re-forms on whatever is still showing.
+  // rather than a class, so they leave the flow; .is-alt re-forms the
+  // left/right alternation on whatever is still showing. Animated: out,
+  // FLIP for the rows that stay, staggered in (css: .is-leaving/.is-entering).
   {
     const filterBar = document.getElementById('casesFilter');
     const grid = document.getElementById('casesGrid');
@@ -1121,16 +1135,78 @@
       const chips = Array.from(filterBar.querySelectorAll('[data-case-filter]'));
       const rows = Array.from(grid.querySelectorAll('[data-case-tags]'));
 
+      const reduced = window.matchMedia('(prefers-reduced-motion:reduce)');
+      const matches = (row, value) => value === 'alle' || (row.dataset.caseTags || '').split(/\s+/).includes(value);
+      // every second *visible* row mirrors (css: .case-row.is-alt)
+      const alternate = () => {
+        let i = 0;
+        rows.forEach((row) => { if (!row.hidden) row.classList.toggle('is-alt', i++ % 2 === 1); });
+      };
+      grid.classList.add('is-js');
+      alternate();
+
+      let current = 'alle', timers = [];
+      const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+      const setChips = (value) => chips.forEach((chip) => {
+        const on = chip.dataset.caseFilter === value;
+        chip.classList.toggle('is-active', on);
+        chip.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+
       const apply = (value) => {
-        rows.forEach((row) => {
-          const tags = (row.dataset.caseTags || '').split(/\s+/);
-          row.hidden = value !== 'alle' && !tags.includes(value);
-        });
-        chips.forEach((chip) => {
-          const on = chip.dataset.caseFilter === value;
-          chip.classList.toggle('is-active', on);
-          chip.setAttribute('aria-pressed', on ? 'true' : 'false');
-        });
+        if (value === current) return;
+        current = value;
+        setChips(value);
+        // a click mid-animation: settle everything first
+        timers.forEach(clearTimeout); timers = [];
+        rows.forEach((r) => { r.classList.remove('is-leaving', 'is-entering', 'is-flip'); r.style.transform = ''; r.style.transitionDelay = ''; });
+
+        if (reduced.matches){
+          rows.forEach((r) => { r.hidden = !matches(r, value); });
+          alternate();
+          return;
+        }
+
+        // 1. rows that drop out fade and sink away
+        const leaving = rows.filter((r) => !r.hidden && !matches(r, value));
+        leaving.forEach((r) => r.classList.add('is-leaving'));
+
+        later(() => {
+          // 2. remember where the remaining rows are and which side they face
+          const before = new Map();
+          rows.forEach((r) => { if (!r.hidden && !leaving.includes(r)) before.set(r, { top: r.getBoundingClientRect().top, alt: r.classList.contains('is-alt') }); });
+
+          // 3. swap the set
+          leaving.forEach((r) => { r.hidden = true; r.classList.remove('is-leaving'); });
+          const entering = [];
+          rows.forEach((r) => {
+            if (matches(r, value) && r.hidden){ r.hidden = false; entering.push(r); }
+          });
+          alternate();
+
+          // 4. rows that stayed: glide from the old spot (FLIP); a row that now
+          //    faces the other way comes in fresh instead
+          before.forEach((b, r) => {
+            if (r.classList.contains('is-alt') !== b.alt){ entering.push(r); return; }
+            const dy = b.top - r.getBoundingClientRect().top;
+            if (Math.abs(dy) < 1) return;
+            r.classList.add('is-flip');
+            r.style.transform = `translateY(${dy}px)`;
+          });
+          entering.sort((x, y) => rows.indexOf(x) - rows.indexOf(y));
+          entering.forEach((r) => r.classList.add('is-entering'));
+          void grid.offsetHeight;   // commit the start positions
+
+          requestAnimationFrame(() => {
+            before.forEach((b, r) => { if (r.classList.contains('is-flip')){ r.classList.remove('is-flip'); r.style.transform = ''; } });
+            // 5. new rows rise in one after another
+            entering.forEach((r, i) => {
+              r.style.transitionDelay = (i * .09) + 's';
+              r.classList.remove('is-entering');
+              later(() => { r.style.transitionDelay = ''; }, 800 + i * 90);
+            });
+          });
+        }, leaving.length ? 320 : 0);
       };
 
       chips.forEach((chip) => {
