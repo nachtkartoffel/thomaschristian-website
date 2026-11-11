@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>thomas·ch – Thomas Christian, Art Director</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body id="top">
+  <!-- Lack-Ebene liegt fixiert über der ganzen Seite: gesprüht wird überall -->
+  <canvas class="page__canvas" id="c" aria-hidden="true"></canvas>
+
+  <nav class="nav" aria-label="Hauptnavigation">
+    <!-- Icons inline (Formen aus assets/icon-kontakt.svg / icon-termin.svg), damit einzelne Teile beim Hover animiert werden können -->
+    <a class="nav__icon nav__icon--kontakt" href="#kontakt" aria-label="Kontakt" title="Kontakt">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g class="ic-phone"><path fill-rule="evenodd" d="M1.75 0H10V1.93H3.68V22.07H18.32V11H20.25V24H1.75Z M9 17.535H13V19.465H9Z"/></g><path class="ic-bubble" d="M12 11.5L16 9H24V0H12Z"/></svg>
+    </a>
+    <a class="nav__icon nav__icon--termin" href="#termin" aria-label="Kostenloser Termin" title="Kostenloser Termin">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path class="ic-cal" d="M0 2.25H4.285V0H6.215V2.25H16.285V0H18.215V2.25H22.5V12H20.57V8.5H1.93V20.82H12V22.75H0Z"/><path class="ic-plus" d="M18.035 14H19.965V18.035H24V19.965H19.965V24H18.035V19.965H14V18.035H18.035Z"/></svg>
+    </a>
+    <a class="nav__bag" href="#shop" aria-label="Shop"><img src="assets/figma/icon-layer1.svg" alt=""></a>
+    <button class="nav__menu" id="menuBtn" type="button" aria-label="Menü öffnen" aria-expanded="false" aria-controls="menu"><span></span><span></span></button>
+  </nav>
+
+  <!-- Logo: liegt fixiert über der Seite, startet im Platzhalter auf der Stage und fährt beim Scrollen verkleinert nach oben in die Mitte -->
+  <div class="logo-float" id="logoFloat" data-logo></div>
+
+  <!-- Menü: öffnet sich als Spray-Fläche über den ganzen Bildschirm und macht dabei die Stage wieder sauber -->
+  <div class="menu" id="menu" hidden>
+    <canvas class="menu__spray" id="menuSpray" aria-hidden="true"></canvas>
+    <nav class="menu__inner" aria-label="Menü">
+      <ol class="menu__list">
+        <li><a href="#arbeiten"><span class="menu__no">01</span><span class="menu__rule"></span><span class="menu__label">Arbeiten</span></a></li>
+        <li><a href="#ueber-mich"><span class="menu__no">02</span><span class="menu__rule"></span><span class="menu__label">Über mich</span></a></li>
+        <li><a href="#pen-and-paper"><span class="menu__no">03</span><span class="menu__rule"></span><span class="menu__label">Pen &amp; Paper</span></a></li>
+        <li><a href="#improtheater"><span class="menu__no">04</span><span class="menu__rule"></span><span class="menu__label">Improtheater &amp; Moderation</span></a></li>
+        <li><a href="#kontakt"><span class="menu__no">05</span><span class="menu__rule"></span><span class="menu__label">Kontakt</span></a></li>
+      </ol>
+      <img class="menu__mark" src="assets/figma/thomas-ch.svg" alt="">
+    </nav>
+  </div>
+
+  <!-- Stage: Logo (Porträt im Kreis) blinzelt, bewegt sich leicht, Klick zeigt einen zufälligen Gesichtsausdruck; Sprühlack mit gedrückter Maustaste -->
+  <section class="stage" id="stage" aria-label="Illustriertes Porträt von Thomas Christian im Kreis. Ein Klick auf die Seite zeigt einen zufälligen Gesichtsausdruck. Mit gedrückter Maustaste lässt sich außerhalb des Kreises mit schwarzem Lack sprühen, Doppelklick entfernt den Lack.">
+    <div class="stage__logo" id="logoSlot" aria-hidden="true"></div><!-- Platzhalter: Startgröße und -position des Logos -->
+
+
+    <div class="stage__foot">
+      <div class="mark">
+        <h1 class="mark__logo"><img src="assets/figma/thomas-ch.svg" alt="thomas·ch"></h1>
+        <img class="mark__line" src="assets/figma/line.svg" alt="" aria-hidden="true">
+        <div class="mark__meta">
+          <span>Thomas Christian</span>
+          <span>Art Director</span>
+        </div>
+      </div>
+      <ul class="services" aria-label="Leistungen">
+        <li>Creative &amp; Art Directon</li>
+        <li>Brand Identity</li>
+        <li>Campaign Design</li>
+        <li>Graphic Design</li>
+        <li class="services__gap">Pen &amp; Paper</li>
+        <li>Improtheater</li>
+      </ul>
+    </div>
+
+  </section>
+
+  <!-- Intro: Positionierung, Kurztext, Verfügbarkeit -->
+  <section class="intro" id="intro" aria-labelledby="introTitle">
+    <h2 class="intro__title" id="introTitle" data-reveal="words">Freier Creative Director<br>und Art Director.</h2>
+    <div class="intro__body">
+      <div class="intro__media" data-reveal="up" role="img" aria-label="Platzhalter für ein Bild"></div>
+      <p class="intro__lead" data-reveal="words">Ich gestalte mutige Konzepte mit delikatem Geschmack in Branding, Grafik und Motion Design.</p>
+      <div class="intro__foot">
+        <p class="intro__avail" data-reveal="up">Verfügbar für ausgewählte Freelance-Projekte, Beratung und Vorträge.</p>
+        <a class="intro__more" href="#ueber-mich" data-reveal="up" data-cursor-frame><span>Über mich</span> <img src="assets/arrow.svg" alt=""></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ausgewählte Arbeiten: Bilder wachsen, wenn ein Case zur Bildschirmmitte scrollt, und schrumpfen danach wieder -->
+  <section class="works" id="arbeiten" aria-labelledby="worksTitle">
+    <h2 class="works__title" id="worksTitle" data-reveal="words">Ausgewählte Arbeiten</h2>
+    <div class="works__list">
+      <article class="case" data-reveal="line">
+        <a class="case__link" href="#arbeiten">
+          <div class="case__text">
+            <h3 class="case__title" data-reveal="words">Lorem Ipsum dolor sit amet</h3>
+            <div class="case__meta" data-reveal="up">
+              <span class="case__year">2026</span>
+              <span class="case__cat">Konzept und <br>Art Direction</span>
+            </div>
+          </div>
+          <div class="case__media" style="--ph: #9a4545" role="img" aria-label="Platzhalter für Projektbild Lorem Ipsum dolor sit amet"><span>Platzhalter</span></div>
+        </a>
+      </article>
+      <article class="case" data-reveal="line">
+        <a class="case__link" href="#arbeiten">
+          <div class="case__text">
+            <h3 class="case__title" data-reveal="words">cinemo</h3>
+            <div class="case__meta" data-reveal="up">
+              <span class="case__year">2026</span>
+              <span class="case__cat">Brand Identity <br>&amp; Web</span>
+            </div>
+          </div>
+          <div class="case__media" style="--ph: #2e3640" role="img" aria-label="Platzhalter für Projektbild cinemo"><span>Platzhalter</span></div>
+        </a>
+      </article>
+      <article class="case" data-reveal="line">
+        <a class="case__link" href="#arbeiten">
+          <div class="case__text">
+            <h3 class="case__title" data-reveal="words">Dolor Amet</h3>
+            <div class="case__meta" data-reveal="up">
+              <span class="case__year">2025</span>
+              <span class="case__cat">Kampagne <br>&amp; Social Media</span>
+            </div>
+          </div>
+          <div class="case__media" style="--ph: #c4b49a" role="img" aria-label="Platzhalter für Projektbild Dolor Amet"><span>Platzhalter</span></div>
+        </a>
+      </article>
+      <article class="case" data-reveal="line">
+        <a class="case__link" href="#arbeiten">
+          <div class="case__text">
+            <h3 class="case__title" data-reveal="words">Consectetur Studio</h3>
+            <div class="case__meta" data-reveal="up">
+              <span class="case__year">2025</span>
+              <span class="case__cat">Corporate Design</span>
+            </div>
+          </div>
+          <div class="case__media" style="--ph: #56664c" role="img" aria-label="Platzhalter für Projektbild Consectetur Studio"><span>Platzhalter</span></div>
+        </a>
+      </article>
+      <article class="case" data-reveal="line">
+        <a class="case__link" href="#arbeiten">
+          <div class="case__text">
+            <h3 class="case__title" data-reveal="words">Adipiscing Elit</h3>
+            <div class="case__meta" data-reveal="up">
+              <span class="case__year">2024</span>
+              <span class="case__cat">Motion Design <br>&amp; Film</span>
+            </div>
+          </div>
+          <div class="case__media" style="--ph: #1d1d1d" role="img" aria-label="Platzhalter für Projektbild Adipiscing Elit"><span>Platzhalter</span></div>
+        </a>
+      </article>
+    </div>
+  </section>
+
+  <!-- Cookie-Banner -->
+  <div class="consent" id="consent">
+    <section class="consent__panel" aria-labelledby="consentTitle" hidden>
+      <div class="consent__copy">
+        <h2 id="consentTitle">Datenschutz &amp; Cookies</h2>
+        <p>thomas·ch nutzt Google Analytics, um zu verstehen, welche Seiten besucht werden. Das ist freiwillig: Es wird nur geladen, wenn du zustimmst. Du kannst deine Wahl jederzeit ändern.</p>
+        <p class="consent__status" aria-live="polite"></p>
+        <a href="#datenschutz">Datenschutzerklärung ↗</a>
+      </div>
+      <div class="consent__actions">
+        <button type="button" data-choice="accepted" aria-pressed="false">Akzeptieren</button>
+        <button type="button" data-choice="denied" aria-pressed="false">Ablehnen</button>
+        <button type="button" class="consent__close">Schließen</button>
+      </div>
+    </section>
+    <button type="button" class="consent__prefs">Cookie-Einstellungen</button>
+  </div>
+
+  <div class="cursor__ring" id="ring"></div>
+  <div class="cursor__pt" id="pt"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="js/logo.js"></script>
+<script src="js/stage.js"></script>
+<script src="js/menu.js"></script>
+<script src="js/consent.js"></script>
+<script src="js/scroll.js"></script>
+<script src="js/shop.js"></script>
+</body>
+</html>

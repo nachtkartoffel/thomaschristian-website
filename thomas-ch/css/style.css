@@ -1,0 +1,351 @@
+/* Maße aus dem Figma-Layout (Frame 3840 px breit): 1 Designpixel = var(--u) */
+:root {
+  --bg: #ffffff;
+  --ink: #000000;
+  --muted: #7a7a76;
+  --cursor: #ffffff; /* wirkt durch Differenz schwarz */
+  --sans: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --serif: "Instrument Serif", Georgia, "Times New Roman", serif;
+  --u: calc(100vw / 3840);
+  --gutter: calc(148 * var(--u));
+  --gutter-r: calc(138 * var(--u));
+  --fs-s: max(14px, calc(40 * var(--u)));
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--bg); color: var(--ink); font-family: var(--sans); font-variation-settings: "wdth" 100; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+a:focus-visible, button:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
+
+/* ---------- Stage ---------- */
+.stage {
+  position: relative; height: 100vh; height: 100svh; min-height: 560px; overflow: hidden;
+  user-select: none; -webkit-user-select: none; touch-action: pan-y;
+}
+
+/* Negativ-Effekt: Alle schwarzen Elemente auf der Stage sind eigentlich weiß und stehen auf „Differenz“.
+   Über Weiß erscheinen sie schwarz, über schwarzem Lack kippen sie ins Weiße, über der Büste ins Negativ. */
+.nav, .stage__foot, .cursor__ring, .cursor__pt,
+.intro__title, .intro__lead, .intro__avail, .intro__more,
+.works__title, .case__text { mix-blend-mode: difference; color: #fff; }
+.intro__more img { filter: invert(1); }
+/* Die Navigation liegt außerhalb der Stage fixiert über allem (auch über dem Menü) und kippt so über Schwarz ins Weiße. */
+.nav img, .stage__foot img { filter: invert(1); }
+.intro__title, .intro__lead, .intro__avail, .intro__more, .works__title, .case__text { position: relative; z-index: 2; }
+.nav a:focus-visible, .nav button:focus-visible { outline-color: #fff; }
+/* Ebene über der ganzen Seite: Lack + Büste auf reinem Weiß. Texte liegen darüber auf „Differenz“. */
+.page__canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; z-index: 1; }
+.page__canvas { opacity: 0; transition: opacity 1.2s ease; }
+body.ready .page__canvas { opacity: 1; }
+
+/* ---------- Navigation oben rechts ---------- */
+.nav {
+  position: fixed; z-index: 60; right: var(--gutter-r); top: calc(env(safe-area-inset-top, 0px) + 83 * var(--u));
+  display: flex; align-items: center; gap: max(24px, calc(90 * var(--u)));
+}
+.nav__links { display: flex; align-items: center; gap: max(20px, calc(80 * var(--u))); font-size: var(--fs-s); line-height: 1.088; letter-spacing: -0.005em; }
+.nav__divider { display: block; width: 1px; height: max(12px, calc(32 * var(--u))); }
+.nav__bag { display: block; width: max(17px, calc(44 * var(--u))); }
+/* Kontakt + Termin als Icons: gleiche Höhe wie die Shop-Tasche (44×52), damit die Strichstärke übereinstimmt */
+.nav__icon { display: block; width: max(20px, calc(52 * var(--u))); height: max(20px, calc(52 * var(--u))); }
+.nav__icon svg { display: block; width: 100%; height: 100%; overflow: visible; fill: currentColor; }   /* weiß + Differenz = schwarz, wie die übrigen Navi-Elemente */
+.nav__icon svg * { transform-box: fill-box; }
+.ic-phone { transform-origin: 50% 100%; }
+.ic-bubble { transform-origin: 0% 100%; }   /* Sprechblase wächst aus ihrer Spitze */
+.ic-cal { transform-origin: 50% 100%; }
+.ic-plus { transform-origin: 50% 50%; }
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .nav__icon--kontakt:hover .ic-phone { animation: ic-buzz .6s linear; }            /* Telefon vibriert */
+  .nav__icon--kontakt:hover .ic-bubble { animation: ic-pop .6s cubic-bezier(.3,.7,.4,1); }
+  .nav__icon--termin:hover .ic-cal { animation: ic-hop .6s cubic-bezier(.3,.7,.4,1); } /* Kalender hüpft */
+  .nav__icon--termin:hover .ic-plus { animation: ic-spin .6s cubic-bezier(.3,.7,.4,1); } /* Plus dreht sich */
+}
+@keyframes ic-buzz {
+  0%, 100% { transform: rotate(0); }
+  10% { transform: rotate(-9deg); } 20% { transform: rotate(8deg); } 30% { transform: rotate(-7deg); }
+  40% { transform: rotate(6deg); } 50% { transform: rotate(-4deg); } 60% { transform: rotate(3deg); } 75% { transform: rotate(-1deg); }
+}
+@keyframes ic-pop {
+  0% { transform: scale(1); } 25% { transform: scale(.3); } 60% { transform: scale(1.2); } 100% { transform: scale(1); }
+}
+@keyframes ic-hop {
+  0%, 100% { transform: translateY(0) scale(1, 1); } 20% { transform: translateY(0) scale(1.06, .9); }
+  50% { transform: translateY(-14%) scale(.96, 1.05); } 80% { transform: translateY(0) scale(1.03, .97); }
+}
+@keyframes ic-spin {
+  0% { transform: rotate(0) scale(1); } 55% { transform: rotate(180deg) scale(1.3); } 100% { transform: rotate(180deg) scale(1); }
+}
+.nav__bag img { display: block; width: 100%; height: auto; }
+.nav__bag img { transform-origin: 50% 8%; }                          /* hängt am Henkel */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .nav__bag:hover img { animation: bag-swing .7s cubic-bezier(.3,.7,.4,1); }  /* kurzes Schwingen beim Drüberfahren */
+}
+@keyframes bag-swing {
+  0%   { transform: translateY(0) rotate(0); }
+  18%  { transform: translateY(-12%) rotate(-14deg); }
+  40%  { transform: translateY(-6%) rotate(10deg); }
+  62%  { transform: translateY(-2%) rotate(-5deg); }
+  82%  { transform: translateY(0) rotate(2deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+.nav__menu {
+  position: relative; width: max(40px, calc(106 * var(--u))); height: max(40px, calc(106 * var(--u)));
+  background: #fff; border: 0; padding: 0; cursor: pointer;
+}
+.nav__menu span { position: absolute; left: 16%; width: 68%; height: 4.7%; background: #262626; transition: top .35s cubic-bezier(.7,0,.2,1), transform .35s cubic-bezier(.7,0,.2,1); } /* ergibt mit Differenz #d9d9d9 */
+.nav__menu span:first-child { top: 35.8%; }
+.nav__menu span:last-child { top: 59.4%; }
+.menu-open .nav__menu span:first-child { top: 47.6%; transform: rotate(45deg); }
+.menu-open .nav__menu span:last-child { top: 47.6%; transform: rotate(-45deg); }
+
+/* ---------- Menü (Spray-Overlay) ---------- */
+.menu { position: fixed; inset: 0; z-index: 50; color: #fff; }
+.menu[hidden] { display: none; }
+.menu__spray { position: absolute; inset: 0; width: 100%; height: 100%; display: block; image-rendering: pixelated; }
+.menu__inner {
+  position: absolute; inset: 0; padding: max(110px, calc(330 * var(--u))) var(--gutter-r) max(28px, calc(100 * var(--u))) var(--gutter);
+  display: flex; flex-direction: column; justify-content: space-between;
+  opacity: 0; visibility: hidden; transition: opacity .35s ease, visibility 0s linear .35s;
+}
+.menu.is-content .menu__inner { opacity: 1; visibility: visible; transition: opacity .45s ease, visibility 0s; }
+/* Menüpunkte: Nummer | Linie | Titel im Raster, damit umbrechende Titel bündig bleiben.
+   Hover: die Linie wächst und schiebt den Titel ein Stück nach rechts, die übrigen Punkte treten zurück. */
+.menu__list { list-style: none; margin: 0; padding: 0; --rule: max(48px, calc(190 * var(--u))); --gap: max(16px, calc(48 * var(--u))); }
+.menu__list a {
+  display: grid; grid-template-columns: 2.6em auto 1fr; align-items: center; column-gap: var(--gap);
+  padding: max(4px, calc(12 * var(--u))) 0; transition: opacity .3s ease;
+}
+.menu__no { font-size: var(--fs-s); line-height: 1; font-variant-numeric: tabular-nums; opacity: .7; }
+.menu__rule { display: block; width: var(--rule); height: 1px; background: currentColor; transition: width .45s cubic-bezier(.2,.7,.2,1); }
+.menu__label { font-weight: 600; font-size: clamp(36px, calc(170 * var(--u)), 150px); line-height: 1.04; letter-spacing: -0.02em; }
+@media (hover: hover) { .menu__list:hover a { opacity: .32; } }
+.menu__list:has(a:focus-visible) a { opacity: .32; }
+.menu__list a:hover, .menu__list a:focus-visible { opacity: 1; }
+.menu__list a:hover .menu__rule, .menu__list a:focus-visible .menu__rule { width: calc(var(--rule) + max(24px, calc(96 * var(--u)))); }
+.menu__list a:focus-visible { outline: none; }
+.menu__list li { opacity: 0; transform: translateY(14px); transition: opacity .3s ease, transform .4s cubic-bezier(.2,.7,.2,1); }
+.menu.is-content .menu__list li { opacity: 1; transform: none; }
+.menu.is-content .menu__list li:nth-child(2) { transition-delay: .03s; }
+.menu.is-content .menu__list li:nth-child(3) { transition-delay: .06s; }
+.menu.is-content .menu__list li:nth-child(4) { transition-delay: .09s; }
+.menu.is-content .menu__list li:nth-child(5) { transition-delay: .12s; }
+.menu__mark { align-self: flex-end; width: max(160px, calc(700 * var(--u))); height: auto; filter: invert(1); }
+body.menu-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .menu__list li, .menu__inner { transition: none; }
+}
+
+/* ---------- Wortmarke + Leistungen unten ---------- */
+.stage__foot {
+  position: absolute; z-index: 2; left: var(--gutter); right: var(--gutter-r);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + max(28px, 100 * var(--u)));
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; pointer-events: none;
+}
+.mark { width: calc(2064 * var(--u)); }
+.mark__logo { margin: 0; font-size: 0; line-height: 0; }
+.mark__logo img { display: block; width: 100%; height: auto; }
+.mark__line { display: block; width: 100%; height: max(1px, calc(2 * var(--u))); margin-top: calc(-4 * var(--u)); }
+.mark__meta {
+  display: flex; justify-content: space-between; margin-top: calc(32 * var(--u));
+  font-size: var(--fs-s); line-height: 0.936; letter-spacing: -0.005em;
+}
+.services {
+  list-style: none; margin: 0; padding: 0; text-align: right;
+  font-size: var(--fs-s); line-height: 1.088; letter-spacing: -0.005em;
+}
+.services__gap { margin-top: 1.088em; }
+
+/* ---------- Logo (ersetzt die Chrom-Büste) ----------
+   Kreis + Rand skalieren gemeinsam, der Rand bleibt proportional (19 von 1065 Einheiten). */
+.stage__logo {               /* Platzhalter auf der Stage */
+  position: absolute; z-index: 0; left: 50%; top: var(--logo-top);
+  width: var(--logo-w); aspect-ratio: 1065.5 / 1108.4; transform: translateX(-50%); pointer-events: none;
+  --logo-w: min(calc(1000 * var(--u)), 46svh); --logo-top: max(88px, calc(50svh - var(--logo-w) * .62));
+}
+/* Das eigentliche Logo: fixiert, Position und Größe setzt js/logo.js beim Scrollen (Platzhalter -> klein oben mittig) */
+.logo-float {
+  position: fixed; z-index: 40; left: 0; top: 0; width: 100px; aspect-ratio: 1065.5 / 1108.4;
+  transform-origin: 0 0; will-change: transform; visibility: hidden;
+}
+.logo-float.is-placed { visibility: visible; }
+.logo-float::before { content: ""; position: absolute; left: 1%; top: 1%; width: 98%; aspect-ratio: 1; border-radius: 50%; background: #fff; } /* weiße Fläche im Kreis, damit Inhalte darunter nicht durchscheinen */
+/* Menü offen: Logo sitzt oben mittig über dem Menü, invertiert (weiß auf Schwarz), und wächst kurz auf */
+.logo-float.is-menu { z-index: 55; filter: invert(1); }
+.logo-float.is-menu svg { animation: logo-menu-in .5s cubic-bezier(.2,.8,.3,1.2) both; transform-origin: 50% 48%; }
+@keyframes logo-menu-in { from { transform: scale(.4); } to { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .logo-float.is-menu svg { animation: none; } }
+.logo-float svg { position: relative; display: block; width: 100%; height: 100%; overflow: visible; }
+.logo-float .pupil, .logo-float .lid--r, .logo-float .brow, .logo-float .lowlid, .logo-float .mouth, .logo-float .dimple, .logo-float .fx { transform-box: fill-box; transform-origin: 50% 50%; }
+.logo-float .pupil { transform-origin: 50% 96%; }
+.logo-float .idle { transform-box: view-box; transform-origin: 532px 1090px; }   /* Grundbewegung: Drehpunkt unten mittig */
+.logo-float .brow { stroke: #fff; stroke-width: 0; paint-order: stroke fill; stroke-linejoin: round; } /* weißer Abstand zu den Haaren bei Erstaunt & Nachdenklich */
+.logo-float .fx { transform: scale(0); }                         /* neue Formen wachsen aus 0 heraus */
+.logo-float .tear, .logo-float .sweat, .logo-float .bridge { transform-origin: 50% 0; }
+.logo-float .dimple { transform-origin: 30% 100%; }
+.logo-float .tear, .logo-float .sweat { fill: #fff; stroke: #000; stroke-width: 6; }
+
+/* ---------- eigener Zeiger in Schwarz (über die ganze Seite): Ring = Spraygröße, Punkt = Position ---------- */
+.cursor__ring, .cursor__pt { position: fixed; z-index: 70; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity .3s ease; will-change: transform; }
+.cursor__ring { width: 30px; height: 30px; border: 1.5px solid var(--cursor); border-radius: 50%; box-sizing: border-box; }   /* Größe/Form setzt js/bust.js */
+.cursor__pt { width: 8px; height: 8px; margin: -4px 0 0 -4px; background: var(--cursor); border-radius: 50%; }
+body { user-select: none; -webkit-user-select: none; }
+@media (pointer: fine) {
+  body.seen:not(.menu-open) .cursor__ring, body.seen:not(.menu-open) .cursor__pt { opacity: 1; }
+  body:not(.menu-open), body:not(.menu-open) a, body:not(.menu-open) button { cursor: none; }
+}
+
+/* ---------- Intro (unter der Stage) ---------- */
+.intro {
+  display: grid; grid-template-columns: calc(1528 * var(--u)) 1fr;
+  padding: max(72px, calc(265 * var(--u))) var(--gutter-r) max(96px, calc(560 * var(--u))) var(--gutter);
+}
+.intro__title { margin: 0; font-weight: 700; font-size: max(26px, calc(84 * var(--u))); line-height: 1.088; letter-spacing: -0.005em; }
+.intro__body { display: flex; flex-direction: column; }
+.intro__media { width: max(200px, calc(640 * var(--u))); aspect-ratio: 1; background: #954848; } /* Platzhalter für Bild */
+.intro__lead {
+  margin: max(18px, calc(53 * var(--u))) 0 0; max-width: calc(1945 * var(--u));
+  font-size: max(22px, calc(84 * var(--u))); line-height: 1.088; letter-spacing: -0.005em;
+}
+.intro__foot {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 32px;
+  margin-top: max(48px, calc(272 * var(--u)));
+}
+.intro__avail { margin: 0; max-width: calc(963 * var(--u)); font-size: max(17px, calc(64 * var(--u))); line-height: 1.088; letter-spacing: -0.005em; }
+.intro__more {
+  display: inline-flex; align-items: center; gap: 0.36em; white-space: nowrap;
+  font-weight: 700; font-size: max(22px, calc(84 * var(--u))); line-height: 1.088; letter-spacing: -0.005em;
+}
+.intro__more img { width: 0.6em; height: 0.6em; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+.intro__more:hover img, .intro__more:focus-visible img { transform: translateX(0.18em); }
+/* CTAs mit Cursor-Rahmen (data-cursor-frame) werden nicht unterstrichen */
+
+/* ---------- Cookie-Banner (nach dem Vorbild effepinna) ---------- */
+.consent { position: relative; z-index: 65; font-family: var(--sans); color: var(--ink); user-select: text; -webkit-user-select: text; }
+.consent [hidden] { display: none !important; }
+.consent__panel {
+  position: fixed; inset: auto 18px 18px; max-width: 960px; margin: auto; padding: 20px;
+  background: #fff; border: 1px solid; display: grid; grid-template-columns: minmax(0, 1fr) 240px; gap: 24px;
+  max-height: calc(100dvh - 36px); overflow: auto; overscroll-behavior: contain;
+  animation: consentIn .5s cubic-bezier(.2,.7,.2,1);
+}
+@keyframes consentIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+.consent h2 { font: 600 24px/1.15 var(--sans); letter-spacing: -0.02em; margin: 0 0 10px; }
+.consent p { font: 400 15px/1.4 var(--sans); margin: 0 0 10px; }
+.consent a { color: inherit; text-decoration: underline; text-underline-offset: 0.15em; font-size: 14px; }
+.consent__status { font-weight: 600 !important; }
+.consent__actions { display: grid; grid-template-columns: 1fr 1fr; align-content: center; gap: 10px; }
+.consent button {
+  font: 600 15px/1.3 var(--sans); color: inherit; background: #fff; border: 1px solid; border-radius: 0;
+  padding: 12px 10px; min-height: 44px; cursor: pointer; touch-action: manipulation;
+}
+.consent button:hover { background: var(--ink); color: #fff; }
+.consent button[aria-pressed="true"] { outline: 1px solid; outline-offset: 2px; }
+.consent button:focus-visible, .consent a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.consent__close { grid-column: 1 / -1; }
+.consent .consent__prefs { position: fixed; left: 10px; bottom: 10px; font-size: 12px; padding: 8px 10px; min-height: 44px; }
+body.menu-open .consent { display: none; }
+
+/* ---------- Ausgewählte Arbeiten ---------- */
+.works { padding: 0 var(--gutter-r) max(96px, calc(400 * var(--u))) var(--gutter); overflow-anchor: none; }
+.works__title {
+  margin: 0 0 max(48px, calc(200 * var(--u))); text-align: center;
+  font-weight: 600; font-size: max(40px, calc(138 * var(--u))); line-height: 0.936; letter-spacing: -0.005em;
+}
+.case {
+  position: relative; padding: max(18px, calc(56 * var(--u))) 0;   /* gleicher Abstand über und unter der Linie */
+  --tf: max(34px, calc(138 * var(--u)));      /* Titel */
+  --ms: var(--fs-s);                          /* Jahr */
+  --mc: max(17px, calc(64 * var(--u)));       /* Kategorie */
+}
+.case::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: var(--ink); transform-origin: left; }
+.case__link { display: flex; justify-content: space-between; align-items: flex-start; gap: calc(50 * var(--u)); }
+.case__text { flex: 0 0 calc(1177 * var(--u)); min-width: 0; display: flex; justify-content: space-between; gap: 24px; }
+.case__title { margin: 0; min-width: 0; max-width: calc(789 * var(--u)); font-weight: 600; font-size: var(--tf); line-height: 0.936; letter-spacing: -0.005em; }
+/* Hover: Unterstreichung direkt auf der Grundlinie (unteres Ende der x-Höhe), wie die Linie unter der Wortmarke.
+   Gilt für die Wort-Spans (Einscroll-Animation) und die Leerzeichen dazwischen, damit die Linie durchläuft. */
+.case__title, .case__title .rw > span {
+  text-decoration-line: underline; text-decoration-color: transparent; text-decoration-thickness: max(1px, calc(2 * var(--u)));
+  text-underline-position: from-font; text-underline-offset: -0.205em; text-decoration-skip-ink: none;
+  transition: text-decoration-color .2s ease;
+}
+/* nur beim Hovern der Schrift selbst (der Wörter), nicht des ganzen Case */
+.case__title:has(.rw:hover), .case__title:has(.rw:hover) .rw > span,
+.case__title:not(:has(.rw)):hover,
+.case__link:focus-visible .case__title, .case__link:focus-visible .case__title .rw > span { text-decoration-color: currentColor; }
+.case__link:focus-visible { outline: none; }
+/* Grundlinien-Raster (Instrument Sans: Ascent .97, Descent .25 → Grundlinie liegt L/2 + .36·Schriftgröße unter der Zeilenoberkante):
+   Jahr auf der Grundlinie der 1. Titelzeile, 1. Zeile der Kategorie auf der Grundlinie der 2. Titelzeile. */
+.case__meta { flex: 0 0 auto; white-space: nowrap; display: flex; flex-direction: column; align-items: flex-end; text-align: right; }
+.case__year { font-size: var(--ms); line-height: 1.088; letter-spacing: -0.005em; margin-top: calc(0.828 * var(--tf) - 0.904 * var(--ms)); }
+.case__cat { font-size: var(--mc); line-height: 1.088; letter-spacing: -0.005em; margin-top: calc(0.936 * var(--tf) - 0.904 * var(--mc) - 0.184 * var(--ms)); }
+/* Bildbreite setzt js/scroll.js (--w), Seitenverhältnis wie im Figma-Layout */
+.case__media {
+  --w: calc(980 * var(--u));
+  flex: 0 1 auto; min-width: 0; width: var(--w); aspect-ratio: 2314 / 1361;   /* darf schrumpfen, nie über den Rand */ background: var(--ph, #9a4545);
+  display: grid; place-items: center; overflow: hidden;
+}
+.case__media span { font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: rgba(255,255,255,.55); }
+.case__link:hover .case__media span { color: #fff; }
+
+/* ---------- Einscroll-Animationen (js/scroll.js setzt .is-in) ---------- */
+.js-reveal [data-reveal="up"] { opacity: 0; transform: translateY(40px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform 1.1s cubic-bezier(.2,.7,.2,1); }
+.js-reveal [data-reveal="up"].is-in { opacity: 1; transform: none; }
+/* Maske mit Luft für Unterlängen (g, p) und Akzente (Ü), damit nichts abgeschnitten wird */
+.rw { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.12em 0 0.28em; margin: -0.12em 0 -0.28em; }
+.rw > span { display: inline-block; transform: translateY(150%); transition: transform 1s cubic-bezier(.2,.75,.15,1); transition-delay: calc(var(--i, 0) * 45ms); }
+.is-in .rw > span, .is-in.rw > span { transform: none; }
+.js-reveal .case[data-reveal="line"]::before { transform: scaleX(0); transition: transform 1.2s cubic-bezier(.7,0,.2,1); }
+.js-reveal .case[data-reveal="line"].is-in::before { transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce) {
+  .js-reveal [data-reveal="up"], .rw > span, .js-reveal .case[data-reveal="line"]::before { opacity: 1; transform: none; transition: none; }
+}
+
+/* ---------- Mobil ---------- */
+@media (max-width: 760px) {
+  :root { --gutter: 20px; --gutter-r: 20px; }
+  .nav { top: calc(env(safe-area-inset-top, 0px) + 16px); }
+  .menu__rule { display: none; }
+  .menu__list a { grid-template-columns: 2em 1fr; column-gap: 12px; align-items: baseline; padding: 6px 0; }
+  .menu__label { font-size: 34px; line-height: 1.05; }
+  .nav__links { display: none; }
+  .stage__foot { flex-direction: column; align-items: stretch; }
+  .mark { width: 100%; }
+  .mark__line { margin-top: -2px; }
+  .mark__meta { margin-top: 10px; }
+  .services { display: none; }
+  .stage__logo { --logo-w: min(68vw, 40svh); --logo-top: max(84px, calc(44svh - var(--logo-w) * .52)); }
+  .intro { grid-template-columns: 1fr; row-gap: 32px; }
+  .intro__media { width: 100%; }
+  .intro__lead, .intro__avail { max-width: none; }
+  .intro__foot { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .consent__panel { inset: auto 10px 10px; max-height: calc(100dvh - 20px); grid-template-columns: minmax(0, 1fr); gap: 16px; padding: 16px; }
+  .consent h2 { font-size: 22px; }
+  /* Cases schieben sich beim Scrollen übereinander (Karten-Stapel) */
+  .case { position: sticky; top: 72px; z-index: 1; background: var(--bg); padding: 18px 0 22px; }
+  .case:last-child { margin-bottom: 40vh; }
+  .case__link { flex-direction: column; gap: 18px; }
+  .case__text { flex: none; width: 100%; flex-direction: column; gap: 10px; }
+  .case__title { max-width: none; }
+  /* Kategorie und Jahr linksbündig unter dem Titel */
+  .case__meta { align-items: flex-start; text-align: left; white-space: normal; }
+  .case__cat { order: -1; margin-top: 0; }
+  .case__cat br { display: none; }
+  .case__year { margin-top: 2px; }
+  .case__media { width: 100% !important; }
+}
+
+/* Cookie-Banner vorerst komplett ausgeblendet (Seite im Aufbau) – zum Reaktivieren diese Zeile entfernen */
+.consent { display: none !important; }
+
+/* ---------- Hinweis unter dem Shop-Icon („kommt noch“) ---------- */
+.nav__bag { position: relative; }
+.bag-note {                                   /* einfacher Text, gleitet aus einer Maske nach oben – wie die Wörter beim Scrollen */
+  position: absolute; left: 0; top: calc(100% + 14px);             /* linksbündig zum Icon */
+  white-space: nowrap; pointer-events: none;
+  font-size: var(--fs-s); line-height: 1.15; letter-spacing: -0.005em;
+}
+.bag-note > span { display: block; overflow: hidden; }          /* je Zeile eine Maske */
+.bag-note > span > span { display: block; transform: translateY(110%); transition: transform .4s cubic-bezier(.2,.7,.2,1); }
+.bag-note > span:nth-child(2) > span { transition-delay: .06s; }
+.bag-note.is-on > span > span { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) { .bag-note > span > span { transition: none; } }

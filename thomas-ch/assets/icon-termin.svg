@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none">
+  <!-- Termin: aus assets/termin.svg (Streamline „Calendar Add“), Strichstärke auf das Shop-Icon angepasst (1.93 statt 2.5 Einheiten) -->
+  <path fill="#000" d="M0 2.25H4.285V0H6.215V2.25H16.285V0H18.215V2.25H22.5V12H20.57V8.5H1.93V20.82H12V22.75H0Z M18.035 14H19.965V18.035H24V19.965H19.965V24H18.035V19.965H14V18.035H18.035Z"/>
+</svg>
